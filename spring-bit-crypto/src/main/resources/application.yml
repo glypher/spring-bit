@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: spring-bit-crypto
+
+  sql:
+    init:
+      schema-locations: classpath*:db/hsqldb/schema.sql
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+
+  datasource:
+    url: jdbc:h2:file:./data/chains
+    username: springbit
+    password: dbpass
+    driverClassName: org.h2.Driver
+
+springdoc:
+  swagger-ui:
+    path: /openapi
+
+spring-bit:
+  init-graphql: false
+  bitquery:
+    apitoken:
+
+
+# Logging
+logging.level.org.springframework: INFO
+
+# Metrics
+management:
+  endpoint:
+    metrics:
+      access: unrestricted
+    prometheus:
+      access: unrestricted
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+# Tracing
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://tracing-server:9411

@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  api-gateway:
+    image: springbit/spring-bit-crypto
+    container_name: crypto
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+     - 8080:8080
+
+  tracing-server:
+    image: openzipkin/zipkin
+    container_name: tracing-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+    - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+    ports:
+     - 9411:9411
+
+  ## Grafana / Prometheus
+
+  grafana-server:
+    build: ./docker/grafana
+    container_name: grafana-server
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    ports:
+    - 3000:3000
+
+  prometheus-server:
+    build: ./docker/prometheus
+    container_name: prometheus-server
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    ports:
+    - 9091:9090
