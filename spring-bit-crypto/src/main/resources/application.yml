@@ -16,6 +16,7 @@ spring:
     password: dbpass
     driverClassName: org.h2.Driver
 
+
 springdoc:
   swagger-ui:
     path: /openapi
@@ -26,9 +27,11 @@ spring-bit:
     apitoken:
 
 
-# Logging
-logging.level.org.springframework: INFO
-
+---
+spring:
+  config:
+    activate:
+      on-profile: production
 # Metrics
 management:
   endpoint:
@@ -51,3 +54,8 @@ management:
   zipkin:
     tracing:
       endpoint: http://tracing-server:9411
+
+# Logging
+logging.level.org.springframework: INFO
+logging.config: classpath:logging/logback-spring.xml
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

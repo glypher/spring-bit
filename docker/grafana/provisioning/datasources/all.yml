@@ -11,3 +11,13 @@ datasources:
   is_default: true
   version: 1
   editable: true
+
+- name: Loki
+  type: loki
+  access: proxy
+  org_id: 1
+  url: http://loki-server:3100
+  basic_auth: false
+  is_default: false
+  version: 1
+  editable: true
