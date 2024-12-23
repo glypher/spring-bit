@@ -1,11 +1,23 @@
 services:
-  api-gateway:
+  discovery-service:
+    image: springbit/spring-bit-discovery
+    container_name: discovery-service
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    ports:
+      - 8888:8888
+
+  crypto-service:
     image: springbit/spring-bit-crypto
-    container_name: crypto
+    container_name: crypto-service
     deploy:
       resources:
         limits:
           memory: 512M
+    depends_on:
+      - discovery-service
     ports:
      - 8080:8080
 

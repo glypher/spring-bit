@@ -32,6 +32,13 @@ spring:
   config:
     activate:
       on-profile: production
+
+# Eureka server registry
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-service:8888/eureka/v2/
+
 # Metrics
 management:
   endpoint:
@@ -63,3 +70,4 @@ management:
 logging.level.org.springframework: INFO
 logging.config: classpath:logging/logback-spring.xml
 logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
