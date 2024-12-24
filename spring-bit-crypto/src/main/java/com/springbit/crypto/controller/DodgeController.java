@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 @RestController
-@RequestMapping("/api/dodge")
+@RequestMapping("/crypto/dodge")
 @RequiredArgsConstructor
 public class DodgeController {
     private final EntMapper modelMapper;

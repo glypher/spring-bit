@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: spring-bit-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: crypto-service
+          uri: lb://spring-bit-crypto
+          predicates:
+            - Path=/api/**
+          filters:
+            - StripPrefix=1
+
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+
+# Eureka server registry
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://discovery-service:8888/eureka/v2/
+
+# Metrics
+management:
+  endpoint:
+    metrics:
+      access: unrestricted
+    prometheus:
+      access: unrestricted
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  # Tracing
+  tracing:
+    enabled:
+      true
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://tracing-server:9411/api/v2/spans
+      export:
+        enabled: true
+
+# Logging
+logging.level.org.springframework: INFO
+logging.config: classpath:logging/logback-spring.xml
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+

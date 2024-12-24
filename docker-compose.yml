@@ -32,6 +32,22 @@ services:
     ports:
      - 8080:8080
 
+  gateway-service:
+    image: springbit/spring-bit-gateway
+    container_name: gateway-service
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    depends_on:
+      - discovery-service
+      - crypto-service
+    networks:
+      - internal
+      - default
+    ports:
+      - 8090:8080
+
   tracing-server:
     image: openzipkin/zipkin:3
     container_name: tracing-server

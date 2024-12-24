@@ -18,6 +18,7 @@
     <modules>
         <module>spring-bit-crypto</module>
         <module>spring-bit-discovery</module>
+        <module>spring-bit-gateway</module>
     </modules>
 
     <properties>
