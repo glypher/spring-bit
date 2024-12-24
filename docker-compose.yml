@@ -1,3 +1,8 @@
+networks:
+  internal:
+    name: internal
+    internal: true
+
 services:
   discovery-service:
     image: springbit/spring-bit-discovery
@@ -6,18 +11,24 @@ services:
       resources:
         limits:
           memory: 256M
+    networks:
+      - internal
+      - default
     ports:
       - 8888:8888
 
   crypto-service:
     image: springbit/spring-bit-crypto
-    container_name: crypto-service
     deploy:
       resources:
         limits:
           memory: 512M
+      mode: replicated
+      replicas: 2
     depends_on:
       - discovery-service
+    networks:
+      - internal
     ports:
      - 8080:8080
 
@@ -28,6 +39,9 @@ services:
       resources:
         limits:
           memory: 512M
+    networks:
+      - internal
+      - default
     ports:
      - 9411:9411
 
@@ -40,6 +54,9 @@ services:
       resources:
         limits:
           memory: 256M
+    networks:
+      - internal
+      - default
     ports:
     - 3000:3000
 
@@ -50,6 +67,8 @@ services:
       resources:
         limits:
           memory: 256M
+    networks:
+      - internal
     ports:
       - 3100:3100
 
@@ -60,5 +79,8 @@ services:
       resources:
         limits:
           memory: 256M
+    networks:
+      - internal
+      - default
     ports:
     - 9091:9090
