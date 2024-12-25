@@ -19,7 +19,9 @@ spring:
 
 springdoc:
   swagger-ui:
-    path: /openapi
+    path: /ui
+    url: /api/v1/docs/v3/api-docs
+    config-url: /api/v1/docs/v3/api-docs/swagger-config
 
 spring-bit:
   init-graphql: false

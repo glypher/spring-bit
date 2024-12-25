@@ -13,7 +13,6 @@ services:
           memory: 256M
     networks:
       - internal
-      - default
     ports:
       - 8888:8888
 
@@ -30,7 +29,7 @@ services:
     networks:
       - internal
     ports:
-     - 8080:8080
+     - 8090:8080
 
   gateway-service:
     image: springbit/spring-bit-gateway
@@ -46,18 +45,19 @@ services:
       - internal
       - default
     ports:
-      - 8090:8080
+      - 8080:8080
 
   tracing-server:
     image: openzipkin/zipkin:3
     container_name: tracing-server
+    environment:
+      ZIPKIN_UI_BASEPATH: /tracing/zipkin
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 256M
     networks:
       - internal
-      - default
     ports:
      - 9411:9411
 
@@ -66,13 +66,15 @@ services:
   grafana-server:
     build: ./docker/grafana
     container_name: grafana-server
+    environment:
+      GF_SERVER_SERVE_FROM_SUB_PATH: true
+      GF_SERVER_ROOT_URL: /grafana
     deploy:
       resources:
         limits:
           memory: 256M
     networks:
       - internal
-      - default
     ports:
     - 3000:3000
 
@@ -91,12 +93,15 @@ services:
   prometheus-server:
     build: ./docker/prometheus
     container_name: prometheus-server
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.route-prefix=/
+      - --web.external-url=/prometheus
     deploy:
       resources:
         limits:
           memory: 256M
     networks:
       - internal
-      - default
     ports:
-    - 9091:9090
+    - 9090:9090
