@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: spring-bit-crypto
+
+  cloud:
+    discovery:
+      enabled: false

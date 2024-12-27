@@ -5,6 +5,22 @@ Spring 3 webflux microservices app for getting crypto chain info
 
 ### Building and running
 
+Api gateway and crypto service connects securely to a spring config server do get the production profile settings used in the docker container deployment.
+
+First we need to create the PKI self-signed certificates keystores and truststores that hold them.
+
+```console
+cd spring-bit-config/scripts
+
+chmod a+x gen_key_stores.sh
+
+./gen_key_stores.sh
+
+cd ../..
+```
+
+Then we can actually build the jars and deploy them in the docker containers.
+
 ```console
 ./mvnw -DskipTests clean install
  

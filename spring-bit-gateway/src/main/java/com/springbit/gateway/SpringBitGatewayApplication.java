@@ -9,6 +9,9 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableDiscoveryClient
 @EnableWebFlux
 public class SpringBitGatewayApplication {
+    static {
+        System.setProperty("spring.cloud.config.enabled", "true");
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(SpringBitGatewayApplication.class, args);

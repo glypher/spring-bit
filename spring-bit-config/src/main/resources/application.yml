@@ -1,0 +1,38 @@
+server:
+  port: 9095
+
+logging.level.org.springframework: INFO
+
+---
+spring:
+  profiles:
+    group:
+      production:
+        - native
+      default:
+        - native
+  cloud:
+    config:
+      server:
+        native:
+          searchLocations: classpath:/microservices
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+server:
+  ssl:
+    enabled: true
+    key-alias: spring-bit-config
+    key-password: springbit
+    key-store: classpath:stores/config-keystore.p12
+    key-store-type: PKCS12
+    key-store-password: springbit
+
+    # Clients certificates
+    trust-store: classpath:stores/config-truststore.p12
+    trust-store-type: PKCS12
+    trust-store-password: springbit

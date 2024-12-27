@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    discovery:
+      enabled: true
+
+# Eureka server registry
+eureka:
+  client:
+    enabled: true
+    serviceUrl:
+      defaultZone: http://discovery-service:8888/eureka/v2/

@@ -18,8 +18,16 @@ info = @Info(
 @EnableDiscoveryClient
 @EnableWebFlux
 public class SpringBitCryptoApplication {
+    static {
+        System.setProperty("spring.cloud.config.enabled", "true");
+    }
 
     public static void main(String[] args) {
+        // Debug ssl handshake...
+        //System.setProperty("javax.net.debug", "ssl:trustmanager");
+        // To enable loading bootstrap.yml properties
+        //System.setProperty("spring.cloud.bootstrap.enabled", "true");
+
         SpringApplication.run(SpringBitCryptoApplication.class, args);
     }
 

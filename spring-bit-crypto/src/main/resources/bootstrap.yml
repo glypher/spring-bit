@@ -1,0 +1,34 @@
+spring:
+  config:
+    activate:
+      on-profile: production
+  cloud:
+    config:
+      uri: https://config-service:9095
+      tls:
+        enabled: true
+        key-alias: spring-bit-crypto
+        key-password: springbit
+        key-store: classpath:stores/crypto-keystore.p12
+        key-store-type: PKCS12
+        key-store-password: springbit
+        trust-store: classpath:stores/crypto-truststore.p12
+        trust-store-type: PKCS12
+        trust-store-password: springbit
+
+      fail-fast: true
+      retry:
+        max-attempts: 4
+        max-interval: 1500
+        multiplier: 1
+
+---
+spring:
+  application:
+    name: spring-bit-crypto
+  config:
+    activate:
+      on-profile: default
+  cloud:
+    config:
+      uri: http://localhost:9095

@@ -19,6 +19,7 @@
         <module>spring-bit-crypto</module>
         <module>spring-bit-discovery</module>
         <module>spring-bit-gateway</module>
+        <module>spring-bit-config</module>
     </modules>
 
     <properties>

@@ -2,6 +2,9 @@ networks:
   internal:
     name: internal
     internal: true
+    ipam:
+      config:
+        - subnet: 172.177.0.0/16
 
 services:
   discovery-service:
@@ -16,6 +19,20 @@ services:
     ports:
       - 8888:8888
 
+
+  config-service:
+    image: springbit/spring-bit-config
+    container_name: config-service
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - internal
+    ports:
+      - 9095:9095
+
+
   crypto-service:
     image: springbit/spring-bit-crypto
     deploy:
@@ -25,7 +42,10 @@ services:
       mode: replicated
       replicas: 2
     depends_on:
-      - discovery-service
+      discovery-service:
+        condition: service_started
+      config-service:
+        condition: service_started
     networks:
       - internal
     ports:
@@ -39,8 +59,12 @@ services:
         limits:
           memory: 256M
     depends_on:
-      - discovery-service
-      - crypto-service
+      discovery-service:
+        condition: service_started
+      config-service:
+        condition: service_started
+      crypto-service:
+        condition: service_started
     networks:
       - internal
       - default

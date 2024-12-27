@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: spring-bit-crypto
+  config:
+    activate:
+      on-profile: production
+    import:
+      - classpath:microservices/common/monitoring.yml
+      - classpath:microservices/common/discovery.yml
+      - classpath:microservices/common/logging.yml
+
