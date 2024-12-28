@@ -35,3 +35,6 @@ build/
 **/data/
 
 **/resources/stores
+
+docker/vault/vault-data
+docker/vault/keys

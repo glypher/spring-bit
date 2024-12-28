@@ -3,14 +3,16 @@ server:
 
 logging.level.org.springframework: INFO
 
----
 spring:
   profiles:
     group:
       production:
         - native
+        - vault
       default:
         - native
+
+# Local path for configs
   cloud:
     config:
       server:
@@ -23,16 +25,47 @@ spring:
   config:
     activate:
       on-profile: production
+
+  cloud:
+    config:
+      server:
+        vault:
+          host: vault-server
+          port: 8200
+          scheme: https
+          skipSslValidation: false
+          kvVersion: 2
+          backend: spring-bit-config
+          profile-separator: '/'
+          authentication: TOKEN
+          token:
+          ssl:
+            key-alias: spring-bit-config
+            key-password: springbit
+            key-store: classpath:stores/config-keystore.p12
+            key-store-type: PKCS12
+            key-store-password: springbit
+            trust-store: classpath:stores/config-truststore.p12
+            trust-store-type: PKCS12
+            trust-store-password: springbit
+
+
+  ssl:
+    bundle:
+      jks:
+        secure-service:
+          key:
+            alias: spring-bit-config
+          keystore:
+            location: classpath:stores/config-keystore.p12
+            password: springbit
+            type: PKCS12
+          truststore:
+            location: classpath:stores/config-truststore.p12
+            password: springbit
+            type: PKCS12
+
 server:
   ssl:
     enabled: true
-    key-alias: spring-bit-config
-    key-password: springbit
-    key-store: classpath:stores/config-keystore.p12
-    key-store-type: PKCS12
-    key-store-password: springbit
-
-    # Clients certificates
-    trust-store: classpath:stores/config-truststore.p12
-    trust-store-type: PKCS12
-    trust-store-password: springbit
+    bundle: secure-service

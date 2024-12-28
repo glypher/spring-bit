@@ -4,6 +4,7 @@ spring:
       on-profile: production
   cloud:
     config:
+      enabled: true
       uri: https://config-service:9095
       tls:
         enabled: true
@@ -22,13 +23,12 @@ spring:
         max-interval: 1500
         multiplier: 1
 
+
 ---
 spring:
-  application:
-    name: spring-bit-crypto
   config:
     activate:
       on-profile: default
   cloud:
     config:
-      uri: http://localhost:9095
+      enabled: false

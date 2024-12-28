@@ -1,4 +1,4 @@
 package com.springbit.crypto.model.dto;
 
-public record Block(String blockHash, Long blockSize) {
+public record Block(String symbol, String blockHash, Long blockSize) {
 }

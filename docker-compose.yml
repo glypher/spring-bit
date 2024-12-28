@@ -27,6 +27,9 @@ services:
       resources:
         limits:
           memory: 256M
+    depends_on:
+      vault-server:
+        condition: service_started
     networks:
       - internal
     ports:
@@ -40,7 +43,7 @@ services:
         limits:
           memory: 512M
       mode: replicated
-      replicas: 2
+      replicas: 1
     depends_on:
       discovery-service:
         condition: service_started
@@ -129,3 +132,20 @@ services:
       - internal
     ports:
     - 9090:9090
+
+    ## Vault
+  vault-server:
+    container_name: vault-server
+    image: hashicorp/vault
+    volumes:
+      - ./docker/vault/vault-data:/vault-data
+    entrypoint: vault server -config=/vault-data/vault-server.hcl
+    post_start:
+      - command: /bin/sh /vault-data/unseal.sh ; rm /vault-data/unseal.sh
+        user: root
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - internal
+    ports:
+      - 8200:8200

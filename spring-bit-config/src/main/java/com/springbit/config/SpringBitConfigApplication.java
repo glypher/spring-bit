@@ -11,6 +11,7 @@ public class SpringBitConfigApplication {
     public static void main(String[] args) {
         // Debug ssl handshake...
         //System.setProperty("javax.net.debug", "ssl:trustmanager");
+        //System.setProperty("javax.net.debug", "ssl:handshake");
 
         SpringApplication.run(SpringBitConfigApplication.class, args);
     }

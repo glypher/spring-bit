@@ -7,16 +7,22 @@ Spring 3 webflux microservices app for getting crypto chain info
 
 Api gateway and crypto service connects securely to a spring config server do get the production profile settings used in the docker container deployment.
 
-First we need to create the PKI self-signed certificates keystores and truststores that hold them.
+The development environment is a host Ubuntu 22 amd64 machine with openjdk23 and Intellij.
 
-```console
-cd spring-bit-config/scripts
+First we need to create the PKI self-signed certificates keystores and trust stores that hold them.
 
-chmod a+x gen_key_stores.sh
+We also need to set up the vault server
+
+```consoles
+cd scripts
+
+chmod a+x gen_key_stores.sh init_vault.sh
 
 ./gen_key_stores.sh
 
-cd ../..
+./init_vault.sh
+
+cd ..
 ```
 
 Then we can actually build the jars and deploy them in the docker containers.
@@ -40,3 +46,17 @@ All web interfaces of all services are available through the API gateway.
 | Prometheus server      | [localhost:8080/prometheus](http://localhost:8080/prometheus)                                                            |
 | Graphana Dashboard     | [localhost:8080/grafana/d/spingbit/spring-bit-metrics](http://localhost:8080/grafana/d/spingbit/spring-bit-metrics) |
 | Tracing server         | [localhost:8080/tracing](http://localhost:8080/tracing)                                                                  |
+
+
+
+#### Vault install
+
+Vault needs to be installed to store our secrets
+
+On Ubuntu you can install it
+```console
+wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install vault
+
+```

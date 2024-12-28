@@ -1,9 +1,15 @@
 #!/bin/bash
-CONFIG_DIR=../src/main/resources/stores
-CRYPTO_DIR=../../spring-bit-crypto/src/main/resources/stores
-GATEWAY_DIR=../../spring-bit-gateway/src/main/resources/stores
+CONFIG_DIR=../spring-bit-config/src/main/resources/stores
+CRYPTO_DIR=../spring-bit-crypto/src/main/resources/stores
+GATEWAY_DIR=../spring-bit-gateway/src/main/resources/stores
+VAULT_DIR=../docker/vault/vault-data
 
-
+# Vault server
+rm -rf $VAULT_DIR ; mkdir -p $VAULT_DIR
+keytool -genkeypair -noprompt -keyalg EC -alias vault-server -dname "CN=vault-server" -validity 365 -keystore vault-keystore.p12 -storepass springbit -deststoretype pkcs12
+openssl pkcs12 -in vault-keystore.p12 -nodes -nocerts -out $VAULT_DIR/vault-key.pem -passin pass:springbit
+openssl pkcs12 -in vault-keystore.p12 -nokeys -out $VAULT_DIR/vault-cert.pem -passin pass:springbit
+rm vault-keystore.p12
 
 # Config server key pair
 rm -rf $CONFIG_DIR ; mkdir -p $CONFIG_DIR
@@ -22,9 +28,13 @@ keytool -exportcert -noprompt -rfc -alias spring-bit-crypto -file spring-bit-cry
 keytool -importcert -noprompt -alias spring-bit-crypto -file spring-bit-crypto.crt -keystore $CONFIG_DIR/config-truststore.p12 -storepass springbit -deststoretype pkcs12
 rm spring-bit-crypto.crt
 
-keytool -exportcert -noprompt -rfc -alias spring-bit-gateway -file spring-bit-gateway -keystore $GATEWAY_DIR/gateway-keystore.p12 -storepass springbit
-keytool -importcert -noprompt -alias spring-bit-gateway -file spring-bit-gateway -keystore $CONFIG_DIR/config-truststore.p12 -storepass springbit -deststoretype pkcs12
-rm spring-bit-gateway
+keytool -exportcert -noprompt -rfc -alias spring-bit-gateway -file spring-bit-gateway.crt -keystore $GATEWAY_DIR/gateway-keystore.p12 -storepass springbit
+keytool -importcert -noprompt -alias spring-bit-gateway -file spring-bit-gateway.crt -keystore $CONFIG_DIR/config-truststore.p12 -storepass springbit -deststoretype pkcs12
+rm spring-bit-gateway.crt
+
+openssl x509 -outform der -in $VAULT_DIR/vault-cert.pem -out vault-server.crt
+keytool -importcert -noprompt -alias spring-bit-vault-server -file vault-server.crt -keystore $CONFIG_DIR/config-truststore.p12 -storepass springbit -deststoretype pkcs12
+rm vault-server.crt
 
 # Trust store crypto service
 keytool -exportcert -noprompt -rfc -alias spring-bit-config -file spring-bit-config.crt -keystore $CONFIG_DIR/config-keystore.p12 -storepass springbit

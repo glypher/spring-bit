@@ -1,4 +1,4 @@
-FROM eclipse-temurin:23 AS builder
+FROM eclipse-temurin:23-jre AS builder
 WORKDIR /app
 ARG ARTIFACT_NAME
 COPY ${ARTIFACT_NAME}.jar application.jar

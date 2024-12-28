@@ -9,3 +9,8 @@ spring:
       - classpath:microservices/common/discovery.yml
       - classpath:microservices/common/logging.yml
 
+springdoc:
+  swagger-ui:
+    path: /ui
+    url: /api/v1/docs/v3/api-docs
+    config-url: /api/v1/docs/v3/api-docs/swagger-config

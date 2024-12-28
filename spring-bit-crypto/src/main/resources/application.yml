@@ -1,7 +1,8 @@
+logging.level.org.springframework: INFO
+
 spring:
   application:
     name: spring-bit-crypto
-
   sql:
     init:
       schema-locations: classpath*:db/hsqldb/schema.sql
@@ -11,24 +12,43 @@ spring:
       ddl-auto: update
 
   datasource:
-    url: jdbc:h2:file:./data/chains
+    url: r2dbc:h2:file:./data/crypto
     username: springbit
     password: dbpass
-    driverClassName: org.h2.Driver
-
 
 springdoc:
   swagger-ui:
     path: /ui
-    url: /api/v1/docs/v3/api-docs
-    config-url: /api/v1/docs/v3/api-docs/swagger-config
 
 spring-bit:
-  init-graphql: false
-  bitquery:
-    apitoken:
+  services:
+    bitquery:
+      enable: true
+      url: https://graphql.bitquery.io
+      api-token:
+    coinmarketcap:
+      enable: true
+      url: https://pro-api.coinmarketcap.com
+      api-token: 
+---
+spring:
+  config:
+    activate:
+      on-profile: default
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
 
-# Logging
-logging.level.org.springframework: INFO
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+  tracing:
+    enabled:
+      false
+
 
 # Config server loads spring-bit-config/src/main/resources/microservices/spring-bit-crypto-production.yml

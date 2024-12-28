@@ -6,20 +6,22 @@ import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
 @OpenAPIDefinition(
-        servers = { @Server(url = "/api/v1", description = "Gateway prefix for the api") },
-info = @Info(
-        title = "Crypto API sample for chain data",
-        version = "1.0.0",
-        description = "Gets different chain information"))
+        //servers = { @Server(url = "/api/v1", description = "Gateway prefix for the api") },
+        info = @Info(
+                title = "Crypto API sample for chain data",
+                version = "1.0.0",
+                description = "Gets different chain information"))
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableWebFlux
+@EnableR2dbcRepositories
 public class SpringBitCryptoApplication {
     static {
-        System.setProperty("spring.cloud.config.enabled", "true");
+        System.setProperty("spring.cloud.bootstrap.enabled", "true");
     }
 
     public static void main(String[] args) {
