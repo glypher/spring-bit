@@ -36,8 +36,6 @@ spring:
     activate:
       on-profile: default
   cloud:
-    config:
-      enabled: false
     discovery:
       enabled: false
 

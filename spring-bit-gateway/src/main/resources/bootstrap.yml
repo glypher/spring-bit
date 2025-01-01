@@ -4,6 +4,7 @@ spring:
       on-profile: production
   cloud:
     config:
+      enabled: true
       uri: https://config-service:9095
       tls:
         enabled: true
@@ -24,11 +25,9 @@ spring:
 
 ---
 spring:
-  application:
-    name: spring-bit-gateway
   config:
     activate:
       on-profile: default
   cloud:
     config:
-      uri: http://localhost:9095
+      enabled: false

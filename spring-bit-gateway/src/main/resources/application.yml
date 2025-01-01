@@ -5,4 +5,39 @@ spring:
 # Logging
 logging.level.org.springframework: INFO
 
+---
+spring:
+  config:
+    activate:
+      on-profile: default
+  cloud:
+    gateway:
+      routes:
+        - id: crypto-service
+          uri: localhost:8090
+          predicates:
+            - Path=/api/v1/crypto/**
+          filters:
+            - StripPrefix=2
+
+        - id: crypto-service-docs
+          uri: localhost:8090
+          predicates:
+            - Path=/api/v1/docs/**
+          filters:
+            - StripPrefix=3
+            - RewriteResponseHeader=Location, ^/, /api/v1/docs/
+    discovery:
+      enabled: false
+
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+  tracing:
+    enabled:
+      false
+
+
 # Config server loads spring-bit-config/src/main/resources/microservices/spring-bit-gateway-production.yml

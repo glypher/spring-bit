@@ -10,7 +10,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableWebFlux
 public class SpringBitGatewayApplication {
     static {
-        System.setProperty("spring.cloud.config.enabled", "true");
+        System.setProperty("spring.cloud.bootstrap.enabled", "true");
     }
 
     public static void main(String[] args) {

@@ -60,3 +60,26 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashi
 sudo apt update && sudo apt install vault
 
 ```
+
+#### Web development
+
+An angular 19 app is provided for nice visualization in [spring-bit-gateway](spring-bit-gateway/src/main/resources/web) module.
+
+Nodejs 20 will be needed.
+```console
+curl -sL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
+sudo bash nodesource_setup.sh ; rm nodesource_setup.sh
+
+sudo apt-get install nodejs
+cd spring-bit-gateway/src/main/resources/
+
+sudo npm install -g @angular/cli@19
+
+ng new web-app
+cd web-app
+
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init
+
+ng generate service crypto
+```

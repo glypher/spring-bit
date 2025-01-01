@@ -9,16 +9,14 @@ import com.springbit.crypto.services.CryptoServiceDirectory;
 import com.springbit.crypto.services.CryptoType;
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/crypto")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class CryptoController {
     private final EntMapper modelMapper;

@@ -10,7 +10,7 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
 @OpenAPIDefinition(
-        //servers = { @Server(url = "/api/v1", description = "Gateway prefix for the api") },
+        servers = { @Server(url = "/api/v1", description = "Gateway prefix for the api") },
         info = @Info(
                 title = "Crypto API sample for chain data",
                 version = "1.0.0",
