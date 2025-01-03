@@ -28,6 +28,8 @@ cd ..
 Then we can actually build the jars and deploy them in the docker containers.
 
 ```console
+ng build --base-href=/web-app
+
 ./mvnw -DskipTests clean install
  
  docker-compose up
@@ -40,12 +42,12 @@ All web interfaces of all services are available through the API gateway.
 
 | Spring Bit components  | Resources                                                                                                           |
 |------------------------|---------------------------------------------------------------------------------------------------------------------|
-| API Gateway            | [localhost:8080](http://localhost:8080)                                                                                  |
-| Service Discovery      | [localhost:8080/discovery](http://localhost:8080/discovery)                                                              |
-| Crypto Service OpenApi | [localhost:8080/api/v1/docs/ui](http://localhost:8080/api/v1/docs/ui)                                                    |
-| Prometheus server      | [localhost:8080/prometheus](http://localhost:8080/prometheus)                                                            |
+| API Gateway Web App    | [localhost:8080/web-app](http://localhost:8080/web-app)                                                             |
+| Service Discovery      | [localhost:8080/discovery](http://localhost:8080/discovery)                                                         |
+| Crypto Service OpenApi | [localhost:8080/api/v1/docs/ui](http://localhost:8080/api/v1/docs/ui)                                               |
+| Prometheus server      | [localhost:8080/prometheus](http://localhost:8080/prometheus)                                                       |
 | Graphana Dashboard     | [localhost:8080/grafana/d/spingbit/spring-bit-metrics](http://localhost:8080/grafana/d/spingbit/spring-bit-metrics) |
-| Tracing server         | [localhost:8080/tracing](http://localhost:8080/tracing)                                                                  |
+| Tracing server         | [localhost:8080/tracing](http://localhost:8080/tracing)                                                             |
 
 
 
@@ -71,15 +73,21 @@ curl -sL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
 sudo bash nodesource_setup.sh ; rm nodesource_setup.sh
 
 sudo apt-get install nodejs
-cd spring-bit-gateway/src/main/resources/
 
 sudo npm install -g @angular/cli@19
 
-ng new web-app
 cd web-app
-
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init
 
+ng build --base-href=/web-app/ --configuration=production
+
+```
+
+Some useful angular commands
+```console
+ng new web-app
 ng generate service crypto
+ng generate component graph
+ng generate environments
 ```

@@ -14,14 +14,14 @@ spring:
     gateway:
       routes:
         - id: crypto-service
-          uri: localhost:8090
+          uri: http://localhost:8090
           predicates:
             - Path=/api/v1/crypto/**
           filters:
             - StripPrefix=2
 
         - id: crypto-service-docs
-          uri: localhost:8090
+          uri: http://localhost:8090
           predicates:
             - Path=/api/v1/docs/**
           filters:

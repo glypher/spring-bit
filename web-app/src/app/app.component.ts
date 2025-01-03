@@ -1,27 +1,18 @@
 import {Component, OnInit} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {CryptoService} from "./crypto.service";
 import {CommonModule} from "@angular/common";
-import {HttpClientModule} from "@angular/common/http";
+import {HeaderComponent} from "./header/header.component";
+import {MenuComponent} from "./menu/menu.component";
+import {GraphComponent} from "./graph/graph.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, HttpClientModule],
+  imports: [RouterOutlet, CommonModule, HeaderComponent, MenuComponent, GraphComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'web-app';
-
-  cryptoData: any[] = [];
-
-  constructor(private cryptoService: CryptoService) {}
-
-  ngOnInit(): void {
-    this.cryptoService.getCryptoData("BTC").subscribe((data) => {
-      this.cryptoData = data;
-    });
-  }
 }

@@ -27,6 +27,14 @@ public class CryptoController {
 
     private final CryptoServiceDirectory cryptoServiceDirectory;
 
+    @Observed(name = "crypto.blocks", contextualName = "getting-cryptos")
+    @GetMapping("/cryptos")
+    public Flux<CryptoType> getAvailableCryptos() {
+       return Flux.fromArray(CryptoType.values())
+               .filter(
+                       ct -> ct != CryptoType.UNKNOWN);
+    }
+
     @Observed(name = "crypto.blocks", contextualName = "getting-crypto-blocks")
     @GetMapping("/{symbol}/blocks")
     public Flux<Block> getBlocks(@PathVariable String symbol) {
@@ -39,7 +47,8 @@ public class CryptoController {
     @Observed(name = "crypto.blocks", contextualName = "getting-crypto-quote")
     @GetMapping("/{symbol}/quote")
     public Flux<Crypto> getLatestQuote(@PathVariable String symbol) {
-        return quoteRepository.findAll().map(modelMapper::mapCrypto)
+        CryptoType cryptoType = CryptoType.map(symbol);
+        return quoteRepository.findBySymbol(cryptoType.getSymbol()).map(modelMapper::mapCrypto)
                 .switchIfEmpty(Flux.defer(
                         () -> cryptoServiceDirectory.getLiveQuote(List.of(CryptoType.map(symbol))))
                 );

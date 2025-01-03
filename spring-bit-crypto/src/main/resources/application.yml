@@ -1,4 +1,6 @@
 logging.level.org.springframework: INFO
+server:
+  port: 8090
 
 spring:
   application:
@@ -16,6 +18,10 @@ spring:
     username: springbit
     password: dbpass
 
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss.SSS"
+    time-zone: "UTC"
+
 springdoc:
   swagger-ui:
     path: /ui
@@ -30,6 +36,7 @@ spring-bit:
       enable: true
       url: https://pro-api.coinmarketcap.com
       api-token: 
+
 ---
 spring:
   config:

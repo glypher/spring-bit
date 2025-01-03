@@ -1,8 +1,10 @@
 package com.springbit.crypto.services;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
-
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 @Getter
 public enum CryptoType {
     BITCOIN("BTC"),
@@ -14,6 +16,11 @@ public enum CryptoType {
 
     CryptoType(String symbol) {
         this.symbol = symbol;
+    }
+
+    @JsonProperty("name")
+    private String getName() {
+        return this.name();
     }
 
     public static CryptoType map(String type) {
