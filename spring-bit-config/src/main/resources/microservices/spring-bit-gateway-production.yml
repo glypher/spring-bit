@@ -59,3 +59,17 @@ spring:
             - Path=/prometheus/**
           filters:
             - StripPrefix=1
+
+        - id: bitquery
+          uri: https://graphql.bitquery.io
+          predicates:
+            - Path=/bitquery/**
+          filters:
+            - StripPrefix=1
+
+        - id: coinmarketcap
+          uri: https://pro-api.coinmarketcap.com
+          predicates:
+            - Path=/coinmarketcap/**
+          filters:
+            - StripPrefix=1

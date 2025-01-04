@@ -8,9 +8,24 @@ spring:
       - classpath:microservices/common/monitoring.yml
       - classpath:microservices/common/discovery.yml
       - classpath:microservices/common/logging.yml
+  datasource:
+    password: '{vault}:keys#mysql.password'
 
 springdoc:
   swagger-ui:
     path: /ui
     url: /api/v1/docs/v3/api-docs
     config-url: /api/v1/docs/v3/api-docs/swagger-config
+
+# The spring-bit-crypto containers are only on the internal network
+# So forward their requests through the gateway - see routes
+spring-bit:
+  services:
+    bitquery:
+      enable: false
+      url: http://gateway-service:8080/bitquery
+      api-token: '{vault}:keys#bitquery.api-token'
+    coinmarketcap:
+      enable: true
+      url: http://gateway-service:8080/coinmarketcap
+      api-token: '{vault}:keys#coinmarketcap.api-token'

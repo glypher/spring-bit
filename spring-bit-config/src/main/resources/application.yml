@@ -34,7 +34,7 @@ spring:
           port: 8200
           scheme: https
           skipSslValidation: false
-          kvVersion: 2
+          kv-version: 2
           backend: spring-bit-config
           profile-separator: '/'
           authentication: TOKEN
@@ -48,7 +48,6 @@ spring:
             trust-store: classpath:stores/config-truststore.p12
             trust-store-type: PKCS12
             trust-store-password: springbit
-
 
   ssl:
     bundle:

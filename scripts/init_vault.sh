@@ -1,4 +1,5 @@
 #!/bin/bash
+
 VAULT_DATA=$PWD/../docker/vault/vault-data/storage
 
 VAULT_CONFIG_DIR=../docker/vault/config
@@ -46,8 +47,10 @@ mapfile -t userToken < <(grep "token     " < $VAULT_KEYS/auth-spring-bit-token.t
 # replace it in the spring config server's configuration
 sed -i -e "s|          token:.*|          token: ${userToken[0]}|g" $CONFIG_SERVICE_YML
 
-# Put a test key
-vault kv put spring-bit-config/keys secret-key=s3cr3t
+# PUT ALL SECRETS
+while IFS='=' read -r key value; do
+  [[ -n $key ]] && vault kv put spring-bit-config/keys "$key"="$value"
+done < "./secrets.prop"
 
 # finally copy server docker hcl to the mounted volume
 cp $VAULT_CONFIG_DOCKER $VAULT_DATA/../.

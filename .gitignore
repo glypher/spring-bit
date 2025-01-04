@@ -36,5 +36,6 @@ build/
 
 **/resources/stores
 
-docker/vault/vault-data
-docker/vault/keys
+docker/vault/vault-data/
+docker/vault/keys/
+scripts/secrets.prop
