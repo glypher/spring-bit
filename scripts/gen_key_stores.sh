@@ -2,7 +2,8 @@
 CONFIG_DIR=../spring-bit-config/src/main/resources/stores
 CRYPTO_DIR=../spring-bit-crypto/src/main/resources/stores
 GATEWAY_DIR=../spring-bit-gateway/src/main/resources/stores
-VAULT_DIR=../docker/vault/vault-data
+VAULT_DIR=../data/vault/certs
+MYSQL_DIR=../data/mysql/certs
 
 # Vault server
 rm -rf $VAULT_DIR ; mkdir -p $VAULT_DIR
@@ -45,3 +46,12 @@ rm spring-bit-config.crt
 keytool -exportcert -noprompt -rfc -alias spring-bit-config -file spring-bit-config.crt -keystore $CONFIG_DIR/config-keystore.p12 -storepass springbit
 keytool -importcert -noprompt -alias spring-bit-config -file spring-bit-config.crt -keystore $GATEWAY_DIR/gateway-truststore.p12 -storepass springbit -deststoretype pkcs12
 rm spring-bit-config.crt
+
+# Mysql server
+rm -rf $MYSQL_DIR ; mkdir -p $MYSQL_DIR
+keytool -genkeypair -noprompt -keyalg EC -alias mysql-server -dname "CN=mysql-server" -validity 365 -keystore mysql-keystore.p12 -storepass springbit -deststoretype pkcs12
+openssl pkcs12 -in mysql-keystore.p12 -nodes -nocerts -out $MYSQL_DIR/mysql-key.pem -passin pass:springbit
+openssl pkcs12 -in mysql-keystore.p12 -nokeys -out $MYSQL_DIR/mysql-cert.pem -passin pass:springbit
+rm mysql-keystore.p12
+# Add crypto service cert as ca
+openssl pkcs12 -in $CRYPTO_DIR/crypto-keystore.p12 -nokeys -out $MYSQL_DIR/mysql-ca-cert.pem -passin pass:springbit

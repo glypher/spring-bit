@@ -1,12 +1,11 @@
 #!/bin/bash
 
-VAULT_DATA=$PWD/../docker/vault/vault-data/storage
+VAULT_DATA=$PWD/../data/vault/storage
+VAULT_KEYS=../data/vault/keys
 
 VAULT_CONFIG_DIR=../docker/vault/config
 VAULT_CONFIG=$VAULT_CONFIG_DIR/vault-server-init.hcl
 VAULT_POLICY=$VAULT_CONFIG_DIR/spring-bit-policy.hcl
-
-VAULT_KEYS=../docker/vault/keys
 
 CONFIG_SERVICE_YML=../spring-bit-config/src/main/resources/application.yml
 

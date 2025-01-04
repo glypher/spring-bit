@@ -5,32 +5,28 @@ server:
 spring:
   application:
     name: spring-bit-crypto
-  sql:
-    init:
-      schema-locations: classpath*:db/hsqldb/schema.sql
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: update
-
-  datasource:
-    url: r2dbc:h2:file:./data/crypto
-    username: springbit
-    password: dbpass
-
   jackson:
     date-format: "yyyy-MM-dd HH:mm:ss.SSS"
     time-zone: "UTC"
-
-springdoc:
-  swagger-ui:
-    path: /ui
 
 ---
 spring:
   config:
     activate:
       on-profile: default
+
+  sql:
+    init:
+      schema-locations: classpath*:db/hsqldb/schema.sql
+  datasource:
+    url: r2dbc:h2:file:./data/crypto
+    username: springbit
+    password: dbpass
+
   cloud:
     discovery:
       enabled: false
@@ -44,14 +40,18 @@ management:
     enabled:
       false
 
+springdoc:
+  swagger-ui:
+    path: /ui
+
 spring-bit:
   services:
     bitquery:
-      enable: true
+      enable: false
       url: https://graphql.bitquery.io
       api-token:
     coinmarketcap:
-      enable: true
+      enable: false
       url: https://pro-api.coinmarketcap.com
       api-token:
 

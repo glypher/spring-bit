@@ -8,8 +8,22 @@ spring:
       - classpath:microservices/common/monitoring.yml
       - classpath:microservices/common/discovery.yml
       - classpath:microservices/common/logging.yml
+  sql:
+    init:
+      schema-locations: classpath*:db/mysql/schema.sql
+
+  r2dbc:
+    url: r2dbc:mysql://mysql-server:3306/springbit
+    username: spring-bit-user
+    password: spring-bit-mysql
+    #'{vault}:keys#mysql.password'
+    ssl: true
+    pool:
+      initial-size: 5
+      max-size: 10
+      max-idle-time: 30m
   datasource:
-    password: '{vault}:keys#mysql.password'
+    ssl: true
 
 springdoc:
   swagger-ui:

@@ -35,7 +35,6 @@ services:
     ports:
       - 9095:9095
 
-
   crypto-service:
     image: springbit/spring-bit-crypto
     deploy:
@@ -48,6 +47,8 @@ services:
       discovery-service:
         condition: service_started
       config-service:
+        condition: service_started
+      mysql-server:
         condition: service_started
     networks:
       - internal
@@ -138,7 +139,7 @@ services:
     container_name: vault-server
     image: hashicorp/vault
     volumes:
-      - ./docker/vault/vault-data:/vault-data
+      - ./data/vault/:/vault-data
     entrypoint: vault server -config=/vault-data/vault-server.hcl
     post_start:
       - command: /bin/sh /vault-data/unseal.sh ; rm /vault-data/unseal.sh
@@ -149,3 +150,15 @@ services:
       - internal
     ports:
       - 8200:8200
+
+    ## Mysql
+  mysql-server:
+    container_name: mysql-server
+    build: ./docker/mysql
+    networks:
+      - internal
+    ports:
+      - 3306:3306
+    volumes:
+      - ./data/mysql/:/var/lib/mysql
+

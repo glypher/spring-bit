@@ -4,8 +4,8 @@ ui                      = false
 
 listener "tcp" {
 address       = "0.0.0.0:8200"
-tls_cert_file = "/vault-data/vault-cert.pem"
-tls_key_file  = "/vault-data/vault-key.pem"
+tls_cert_file = "/vault-data/certs/vault-cert.pem"
+tls_key_file  = "/vault-data/certs/vault-key.pem"
 }
 
 listener "tcp" {
