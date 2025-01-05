@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NgForOf} from "@angular/common";
 import {CryptoQuote} from "../service/crypto.types";
 import {CryptoService} from "../service/crypto.service";
@@ -12,7 +12,7 @@ import {CryptoService} from "../service/crypto.service";
   templateUrl: './graph.component.html',
   styleUrl: './graph.component.css'
 })
-export class GraphComponent {
+export class GraphComponent implements OnInit {
 
   cryptoData: CryptoQuote[] = [];
 

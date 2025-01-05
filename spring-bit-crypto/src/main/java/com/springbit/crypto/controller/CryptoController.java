@@ -9,8 +9,10 @@ import com.springbit.crypto.services.CryptoServiceDirectory;
 import com.springbit.crypto.services.CryptoType;
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -26,6 +28,12 @@ public class CryptoController {
     private final QuoteRepository quoteRepository;
 
     private final CryptoServiceDirectory cryptoServiceDirectory;
+
+    @Observed(name = "crypto", contextualName = "getting-live")
+    @GetMapping("/live")
+    public Mono<ResponseEntity<String>> isAlive() {
+        return Mono.just(ResponseEntity.ok("Crypto Service is alive!"));
+    }
 
     @Observed(name = "crypto", contextualName = "getting-cryptos")
     @GetMapping("/cryptos")

@@ -12,14 +12,36 @@ export class CryptoService {
   private apiUrl = environment.apiUrl;
 
   private selectedSymbolSource = new BehaviorSubject<CryptoType>(CryptoType.DEFAULT_TYPE);
-
   selectedSymbol = this.selectedSymbolSource.asObservable();
 
+
+  private isServiceAvailableSource = new BehaviorSubject<boolean>(false);
+  isServiceAvailable = this.isServiceAvailableSource.asObservable();
+
+  private readonly timerId;
+
   constructor(private http: HttpClient) {
+    this.checkServiceStatus();
+    this.timerId = setInterval(() => this.checkServiceStatus(), 5000); // Poll every 5 seconds
+  }
+
+  checkServiceStatus(): void {
+    this.isAlive().subscribe({
+      next: () => {
+        clearInterval(this.timerId);
+        this.isServiceAvailableSource.next(true)
+      },
+      error: () => this.isServiceAvailableSource.next(false)
+    });
   }
 
   onSymbolChange(newCryptoType: CryptoType) {
     this.selectedSymbolSource.next(newCryptoType);
+  }
+
+  // Public APIs
+  isAlive() {
+    return this.http.get(this.apiUrl + "live", { responseType: 'text' });
   }
 
   loadCryptos() {

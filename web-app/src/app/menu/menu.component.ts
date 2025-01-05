@@ -11,13 +11,18 @@ import {CryptoType} from "../service/crypto.types";
   styleUrl: './menu.component.css'
 })
 export class MenuComponent implements OnInit {
-  cryptoIcons: any;
-  private a: CryptoType;
+  cryptoIcons: any = [];
 
   constructor(private cryptoService: CryptoService) {
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
+    this.cryptoService.isServiceAvailable.subscribe(
+      status => status? this.getAvailableCryptos() : this.cryptoIcons = []
+    )
+  }
+
+  getAvailableCryptos(): void {
     this.cryptoService.loadCryptos().subscribe((data: CryptoType[]) => {
       this.cryptoIcons = data.map( (ct:CryptoType)=> {
         CryptoType.setType(ct);
@@ -31,7 +36,7 @@ export class MenuComponent implements OnInit {
     });
   }
 
-  setSymbol(symbol: string) {
+  setSymbol(symbol: string): void {
     this.cryptoService.onSymbolChange(CryptoType.getType(symbol));
   }
 
