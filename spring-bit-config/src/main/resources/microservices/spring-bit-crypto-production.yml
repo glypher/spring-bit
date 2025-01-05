@@ -15,15 +15,12 @@ spring:
   r2dbc:
     url: r2dbc:mysql://mysql-server:3306/springbit
     username: spring-bit-user
-    password: spring-bit-mysql
-    #'{vault}:keys#mysql.password'
-    ssl: true
+    password: '{vault}:keys#mysql.password'
+    properties.ssl: true
     pool:
       initial-size: 5
       max-size: 10
       max-idle-time: 30m
-  datasource:
-    ssl: true
 
 springdoc:
   swagger-ui:

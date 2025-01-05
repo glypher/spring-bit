@@ -18,5 +18,3 @@ CREATE TABLE crypto_quote (
     date         TIMESTAMP,
     usd          FLOAT NOT NULL
 );
-
-INSERT INTO blocks VALUES (default, "bbb", "sds", 2.0);

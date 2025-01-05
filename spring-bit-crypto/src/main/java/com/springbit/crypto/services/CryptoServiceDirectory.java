@@ -5,6 +5,7 @@ import com.springbit.crypto.model.QuoteRepository;
 import com.springbit.crypto.model.dto.Block;
 import com.springbit.crypto.model.dto.Crypto;
 import com.springbit.crypto.model.mappers.EntMapper;
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ public class CryptoServiceDirectory implements ICryptoService {
     }
 
     @Override
+    @Observed(name = "crypto.services", contextualName = "getting-live-quote")
     public Flux<Crypto> getLiveQuote(List<CryptoType> symbols) {
         var flux = this.getService(Optional.of("coinmarketcap")).getLiveQuote(symbols);
 
@@ -51,6 +53,7 @@ public class CryptoServiceDirectory implements ICryptoService {
     }
 
     @Override
+    @Observed(name = "crypto.services", contextualName = "getting-blocks")
     public Flux<Block> getBlocks(CryptoType symbol) {
         var flux = this.getService(Optional.of("bitquery")).getBlocks(symbol);
 

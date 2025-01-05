@@ -34,7 +34,7 @@ spring:
           port: 8200
           scheme: https
           skipSslValidation: false
-          kv-version: 2
+          kvVersion: 2
           backend: spring-bit-config
           profile-separator: '/'
           authentication: TOKEN

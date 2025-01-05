@@ -1,0 +1,19 @@
+# Promtail config
+server:
+  disable: true
+
+positions:
+  filename: /tmp/promtail-positions.yaml
+
+clients:
+  - url: http://loki-server:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: mysql-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: mysql
+          shipper: promtail
+          __path__: /mysql-data/logs/*.log
