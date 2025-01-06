@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-server
+  labels:
+    app: mysql-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-server
+  template:
+    metadata:
+      labels:
+        app: mysql-server
+    spec:
+      containers:
+      - name: mysql-server
+        image: springbit/mysql-server
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /mysql-data
+            name: mysql-server-volume
+        ports:
+        - containerPort: 3306
+      volumes:
+        - name: mysql-server-volume
+          persistentVolumeClaim:
+            claimName: mysql-server-volume

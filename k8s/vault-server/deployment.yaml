@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault-server
+  labels:
+    app: vault-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vault-server
+  template:
+    metadata:
+      labels:
+        app: vault-server
+    spec:
+      containers:
+      - name: vault-server
+        image: hashicorp/vault
+        command: ["vault"]
+        args: ["server", "-config=/vault-data/vault-server.hcl"]
+        lifecycle:
+          postStart:
+            exec:
+              command: [ "sleep 2 ; /bin/sh -c /vault-data/unseal.sh" ]
+        volumeMounts:
+          - mountPath: /vault-data
+            name: vault-server-volume
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+        ports:
+        - containerPort: 8200
+      volumes:
+        - name: vault-server-volume
+          persistentVolumeClaim:
+            claimName: vault-server-volume

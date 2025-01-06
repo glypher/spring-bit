@@ -8,8 +8,8 @@ networks:
 
 services:
   discovery-service:
-    image: springbit/spring-bit-discovery
     container_name: discovery-service
+    image: springbit/spring-bit-discovery
     deploy:
       resources:
         limits:
@@ -21,8 +21,8 @@ services:
 
 
   config-service:
-    image: springbit/spring-bit-config
     container_name: config-service
+    image: springbit/spring-bit-config
     deploy:
       resources:
         limits:
@@ -56,8 +56,8 @@ services:
      - 8090:8090
 
   gateway-service:
-    image: springbit/spring-bit-gateway
     container_name: gateway-service
+    image: springbit/spring-bit-gateway
     deploy:
       resources:
         limits:
@@ -76,8 +76,8 @@ services:
       - 8080:8080
 
   tracing-server:
-    image: openzipkin/zipkin:3
     container_name: tracing-server
+    image: openzipkin/zipkin:3
     environment:
       ZIPKIN_UI_BASEPATH: /tracing/zipkin
     deploy:
@@ -92,8 +92,9 @@ services:
   ## Grafana / Locki / Prometheus
 
   grafana-server:
-    build: ./docker/grafana
     container_name: grafana-server
+    build: ./docker/grafana
+    image: springbit/grafana-server
     environment:
       GF_SERVER_SERVE_FROM_SUB_PATH: true
       GF_SERVER_ROOT_URL: /grafana
@@ -107,8 +108,9 @@ services:
     - 3000:3000
 
   loki-server:
-    build: ./docker/loki
     container_name: loki-server
+    build: ./docker/loki
+    image: springbit/loki-server
     deploy:
       resources:
         limits:
@@ -119,8 +121,9 @@ services:
       - 3100:3100
 
   prometheus-server:
-    build: ./docker/prometheus
     container_name: prometheus-server
+    build: ./docker/prometheus
+    image: springbit/prometheus-server
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.route-prefix=/
@@ -155,6 +158,7 @@ services:
   mysql-server:
     container_name: mysql-server
     build: ./docker/mysql
+    image: springbit/mysql-server
     networks:
       - internal
     ports:

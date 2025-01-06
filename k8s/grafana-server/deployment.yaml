@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-server
+  labels:
+    app: grafana-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana-server
+  template:
+    metadata:
+      labels:
+        app: grafana-server
+    spec:
+      containers:
+      - name: grafana-server
+        image: springbit/grafana-server
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: GF_SERVER_SERVE_FROM_SUB_PATH
+            value: "true"
+          - name: GF_SERVER_ROOT_URL
+            value: "/grafana"
+        ports:
+        - containerPort: 3000

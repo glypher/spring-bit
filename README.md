@@ -49,6 +49,68 @@ All web interfaces of all services are available through the API gateway.
 | Graphana Dashboard     | [localhost:8080/grafana/d/spingbit/spring-bit-metrics](http://localhost:8080/grafana/d/spingbit/spring-bit-metrics) |
 | Tracing server         | [localhost:8080/tracing](http://localhost:8080/tracing)                                                             |
 
+### Kubernates deployment
+
+Install Minikube
+```console
+curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
+
+
+# Install kubectl
+minikube kubectl -- get po -A
+# You can set the below command in ~/.bash_aliases
+alias kubectl="minikube kubectl --"
+kubectl version --client
+```
+
+Next need to build all images to minikube's docker container
+```console
+sudo chown -R $USER data/
+minikube delete
+minikube start --mount --mount-string="./data:/hostdata" --driver=docker
+minikube status
+minikube ssh -- ls /hostdata
+# Configure docker to point to minikube's docker daemon
+
+eval $(minikube docker-env)
+
+./mvnw -DskipTests clean install ; docker-compose build
+# Check built images..
+minikube ssh -- docker images
+```
+
+Now run the k8s deployment
+```console
+kubectl delete pods --all
+
+kubectl apply -f k8s -R 
+
+kubectl get nodes -o wide
+kubectl get pods -o wide
+kubectl get pv 
+
+kubectl get all
+
+kubectl get nodes --show-labels
+
+# Tunnel gateway service pod port to hosts localhost:8080
+kubectl port-forward deployment/gateway-service 8080:8080
+```
+Now you can access the app through localhost:8080 like before see [Service table](#Services)
+
+Some useful commands
+```console
+kubectl delete sts --all; kubectl delete pods --all ; kubectl delete pvc --all ; kubectl delete pv --all
+
+kubectl logs <pod-name>
+
+
+minikube stop
+```
+
+
+### Development
 
 
 #### Vault install

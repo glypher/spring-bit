@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-service
+  labels:
+    app: crypto-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crypto-service
+  template:
+    metadata:
+      labels:
+        app: crypto-service
+    spec:
+      containers:
+      - name: crypto-service
+        image: springbit/spring-bit-crypto
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command: [ "sleep 5" ]
+        ports:
+        - containerPort: 8090

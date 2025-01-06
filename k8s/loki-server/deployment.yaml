@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-server
+  labels:
+    app: loki-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loki-server
+  template:
+    metadata:
+      labels:
+        app: loki-server
+    spec:
+      containers:
+      - name: loki-server
+        image: springbit/loki-server
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3100

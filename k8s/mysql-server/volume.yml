@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-server-volume
+spec:
+  volumeMode: Filesystem
+  storageClassName: local-storage
+  capacity:
+    storage: 300Mi
+  accessModes:
+    - ReadWriteOnce  # The volume can be mounted as read-write by a single node
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /hostdata/mysql  # Local path in minikube node's vm
+    type: Directory
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - minikube
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-server-volume
+spec:
+  volumeName: mysql-server-volume
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce  # The claim needs to be mounted as read-write by a single node
+  resources:
+    requests:
+      storage: 300Mi

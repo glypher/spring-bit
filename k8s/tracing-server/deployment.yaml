@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracing-server
+  labels:
+    app: tracing-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tracing-server
+  template:
+    metadata:
+      labels:
+        app: tracing-server
+    spec:
+      containers:
+      - name: tracing-server
+        image: openzipkin/zipkin:3
+        env:
+          - name: ZIPKIN_UI_BASEPATH
+            value: "/tracing/zipkin"
+        ports:
+        - containerPort: 9411
