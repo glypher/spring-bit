@@ -9,7 +9,7 @@ public record Crypto(
         String symbol,
         @JsonFormat(
         shape = JsonFormat.Shape.STRING,
-        pattern = "dd-MM-yyyy hh:mm:ss")
+        pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime quoteDate,
         Float quotePrice
 ) {}

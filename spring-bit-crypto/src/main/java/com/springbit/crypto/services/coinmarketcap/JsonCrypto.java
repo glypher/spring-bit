@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Data
@@ -27,7 +29,8 @@ public class JsonCrypto
     @JsonProperty("quote")
     private void unpackQuote(JsonNode json) {
         json = json.get("USD");
-        quoteDate = LocalDateTime.parse(json.get("last_updated").asText(), JsonCrypto.dateFormatter);
+        var zt = ZonedDateTime.parse(json.get("last_updated").asText(), JsonCrypto.dateFormatter);
+        quoteDate = LocalDateTime.ofInstant(zt.toInstant(), ZoneOffset.UTC);
         quotePrice = json.get("price").floatValue();
     }
 }

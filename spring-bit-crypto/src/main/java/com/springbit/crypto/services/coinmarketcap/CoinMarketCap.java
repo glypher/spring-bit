@@ -56,9 +56,6 @@ public class CoinMarketCap implements ICryptoService {
         return "coinmarketcap";
     }
 
-    public void saveCrypto(Flux<Crypto> crypto) {
-
-    }
 
     @Override
     public Flux<Crypto> getLiveQuote(List<CryptoType> symbols) {
@@ -70,7 +67,8 @@ public class CoinMarketCap implements ICryptoService {
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(JsonNode.class)
-                .flatMapMany(node -> Flux.fromIterable(node.get("data")))
+                .flatMapMany(node ->
+                        Flux.fromIterable(node.get("data")))
                 .mapNotNull(node -> {
                     try {
                         return objectMapper.treeToValue(node.get(0), JsonCrypto.class);
@@ -80,7 +78,10 @@ public class CoinMarketCap implements ICryptoService {
                     }
                 })
                 .map(mapper::mapD)
-                .onErrorComplete();
+                .onErrorResume(error -> {
+                    logger.error("Endpoint error:", error);
+                    return Flux.empty();
+                });
     }
 
     @Override

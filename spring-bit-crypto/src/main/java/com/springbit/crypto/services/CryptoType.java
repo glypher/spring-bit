@@ -1,5 +1,6 @@
 package com.springbit.crypto.services;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -23,9 +24,10 @@ public enum CryptoType {
         return this.name();
     }
 
-    public static CryptoType map(String type) {
+    @JsonCreator
+    public static CryptoType map(String symbol) {
         for (CryptoType cryptoType : CryptoType.values()) {
-            if (cryptoType.getSymbol().equalsIgnoreCase(type)) {
+            if (cryptoType.symbol.equalsIgnoreCase(symbol)) {
                 return cryptoType;
             }
         }

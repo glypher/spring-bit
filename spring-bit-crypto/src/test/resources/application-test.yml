@@ -2,7 +2,33 @@
 logging.level.org.springframework: ERROR
 logging.config: classpath:logging/logback-spring-test.xml
 
-spring.cloud.service-registry.auto-registration.enabled: false
-eureka.client.enabled: false
-eureka.client.serviceUrl.registerWithEureka: false
+spring:
+  cloud:
+    discovery:
+      enabled: false
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss[.SSS]"
+    time-zone: "UTC"
 
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+  tracing:
+    enabled: false
+  zipkin:
+    tracing:
+      export:
+        enabled: false
+
+spring-bit:
+  services:
+    bitquery:
+      enable: true
+      url: http://localhost:5050
+      api-token: test-pass-bitquery
+    coinmarketcap:
+      enable: true
+      url: http://localhost:5051
+      api-token: test-pass-coinmarketcap
