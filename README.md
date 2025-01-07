@@ -141,9 +141,12 @@ sudo npm install -g @angular/cli@19
 cd web-app
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init
+npm install jasmine-core --save-dev
 
 ng build --base-href=/web-app/ --configuration=production
 
+# To run all tests
+ng test
 ```
 
 Some useful angular commands
