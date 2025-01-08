@@ -65,4 +65,5 @@ sed -i -e "s|REPLACE_KEY_1|${keyArray[0]}|g"  $VAULT_DATA/../unseal.sh
 sed -i -e "s|REPLACE_KEY_2|${keyArray[1]}|g"  $VAULT_DATA/../unseal.sh
 sed -i -e "s|REPLACE_KEY_3|${keyArray[2]}|g"  $VAULT_DATA/../unseal.sh
 
-pkill vault || true
+pkill -P $$
+sleep 3
