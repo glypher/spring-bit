@@ -18,6 +18,11 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v4
@@ -48,6 +53,20 @@ jobs:
       uses: sigstore/cosign-installer@6e04d228eb30da1757ee4e1dd75a0ec73a653e06 #v3.1.1
       with:
         cosign-release: 'v2.1.1'
+
+    - uses: actions/checkout@v4
+    - name: Run web-app tests with npm and Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: 'web-app/package-lock.json'
+    - run: |
+        cd web-app
+        npm ci
+        npm run build  -- --base-href=/web-app/ --configuration=production
+        npm test -- --browsers ChromeHeadless --watch=false
+        cd ..
         
     - name: Run tests with Maven
       run: |
