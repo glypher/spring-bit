@@ -76,3 +76,22 @@ jobs:
       if: github.event_name != 'pull_request'
       run: |
         mvn --file pom.xml clean install
+
+    - uses: actions/checkout@v4
+    - name: login to docker hub
+      env:
+        username: ${{secrets.DOCKERHUB_USERNAME}}
+        password: ${{secrets.DOCKERHUB_PASSWORD}}
+      run: |
+        docker login -u $username -p $password
+    
+    - name: push the docker images
+      run: |
+        docker tag springbit/spring-bit-config:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-config:latest
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-config:latest
+        docker tag springbit/spring-bit-gateway:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-gateway:latest
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-gateway:latest
+        docker tag springbit/spring-bit-discovery:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-discovery:latest
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-discovery:latest        
+        docker tag springbit/spring-bit-crypto:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-crypto:latest
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-crypto:latest
