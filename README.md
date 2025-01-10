@@ -28,11 +28,12 @@ cd ..
 Then we can actually build the jars and deploy them in the docker containers.
 
 ```console
-ng build --base-href=/web-app
+cd web-app; ng build --base-href=/web-app/ --configuration=production ; cd ..
 
 ./mvnw -DskipTests clean install
  
- docker-compose up
+export VAULT_USER_TOKEN=$(grep vault.token scripts/secrets.prop | cut -d'=' -f 2-)
+docker-compose build --no-cache
 ```
 
 ### Services
@@ -75,7 +76,7 @@ minikube ssh -- ls /hostdata
 
 eval $(minikube docker-env)
 
-./mvnw -DskipTests clean install ; docker-compose build
+./mvnw -DskipTests clean install ; docker-compose build --no-cache
 # Check built images..
 minikube ssh -- docker images
 ```
@@ -85,6 +86,7 @@ Now run the k8s deployment
 kubectl delete pods --all
 
 kubectl apply -f k8s -R 
+kubectl set env deployment/config-service VAULT_USER_TOKEN=$(grep vault.token scripts/secrets.prop | cut -d'=' -f 2-)
 
 kubectl get nodes -o wide
 kubectl get pods -o wide

@@ -16,13 +16,8 @@ spec:
     spec:
       containers:
       - name: vault-server
-        image: hashicorp/vault
-        command: ["vault"]
-        args: ["server", "-config=/vault-data/vault-server.hcl"]
-        lifecycle:
-          postStart:
-            exec:
-              command: [ "sleep 2 ; /bin/sh -c /vault-data/unseal.sh" ]
+        image: springbit/vault-server
+        imagePullPolicy: IfNotPresent
         volumeMounts:
           - mountPath: /vault-data
             name: vault-server-volume

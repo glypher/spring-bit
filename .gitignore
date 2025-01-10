@@ -38,3 +38,6 @@ build/
 
 data/
 scripts/secrets.prop
+docker/**/certs/
+docker/vault/unseal/
+spring-bit-gateway/src/main/resources/web-app/

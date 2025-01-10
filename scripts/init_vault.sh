@@ -1,15 +1,14 @@
 #!/bin/bash
 
 VAULT_DATA=$PWD/../data/vault/storage
+
 VAULT_KEYS=../data/vault/keys
 
+VAULT_UNSEAL_DIR=../docker/vault/unseal
 VAULT_CONFIG_DIR=../docker/vault/config
 VAULT_CONFIG=$VAULT_CONFIG_DIR/vault-server-init.hcl
 VAULT_POLICY=$VAULT_CONFIG_DIR/spring-bit-policy.hcl
 
-CONFIG_SERVICE_YML=../spring-bit-config/src/main/resources/application.yml
-
-VAULT_CONFIG_DOCKER=$VAULT_CONFIG_DIR/vault-server.hcl
 
 
 rm -rf $VAULT_DATA ; mkdir -p $VAULT_DATA
@@ -42,28 +41,32 @@ vault secrets enable -version=2 -path=spring-bit-config kv
 # create config-service auth token
 vault policy write spring-bit-policy $VAULT_POLICY
 vault token create -policy=spring-bit-policy &> $VAULT_KEYS/auth-spring-bit-token.txt
-mapfile -t userToken < <(grep "token     " < $VAULT_KEYS/auth-spring-bit-token.txt  | cut -c21- )
-# replace it in the spring config server's configuration
-sed -i -e "s|          token:.*|          token: ${userToken[0]}|g" $CONFIG_SERVICE_YML
+
+mapfile -t userToken < <(grep "token     " < $VAULT_KEYS/auth-spring-bit-token.txt  | cut -c21- | sed 's/^\ *//')
+
+sed -i -e "s|^vault.token=.*||g" ./secrets.prop
 
 # PUT ALL SECRETS
 vault kv put -mount=spring-bit-config keys spring.bit=init
 while IFS='=' read -r key value; do
   echo "Setting key $key..."
-  [[ -n $key ]] && vault kv patch -mount=spring-bit-config keys $key=$value
+  [[ -n $key ]] && [[ -n $value ]] && vault kv patch -mount=spring-bit-config keys $key=$value
 done < "./secrets.prop"
 #echo "Keys...."
 #vault kv get -mount spring-bit-config keys
 
-# finally copy server docker hcl to the mounted volume
-cp $VAULT_CONFIG_DOCKER $VAULT_DATA/../.
-# Copy useal script as well
-cp $VAULT_CONFIG_DIR/unseal.sh $VAULT_DATA/../.
+# replace it in the spring config server's configuration
+echo "vault.token=${userToken[0]}" >> ./secrets.prop
 
-sed -i -e "s|REPLACE_TOKEN|${rootToken[0]}|g" $VAULT_DATA/../unseal.sh
-sed -i -e "s|REPLACE_KEY_1|${keyArray[0]}|g"  $VAULT_DATA/../unseal.sh
-sed -i -e "s|REPLACE_KEY_2|${keyArray[1]}|g"  $VAULT_DATA/../unseal.sh
-sed -i -e "s|REPLACE_KEY_3|${keyArray[2]}|g"  $VAULT_DATA/../unseal.sh
+
+# Copy useal script as well
+rm -rf $VAULT_UNSEAL_DIR ; mkdir -p $VAULT_UNSEAL_DIR
+cp $VAULT_CONFIG_DIR/unseal.sh $VAULT_UNSEAL_DIR/.
+
+sed -i -e "s|REPLACE_TOKEN|${rootToken[0]}|g" $VAULT_UNSEAL_DIR/unseal.sh
+sed -i -e "s|REPLACE_KEY_1|${keyArray[0]}|g"  $VAULT_UNSEAL_DIR/unseal.sh
+sed -i -e "s|REPLACE_KEY_2|${keyArray[1]}|g"  $VAULT_UNSEAL_DIR/unseal.sh
+sed -i -e "s|REPLACE_KEY_3|${keyArray[2]}|g"  $VAULT_UNSEAL_DIR/unseal.sh
 
 pkill -P $$
 sleep 3

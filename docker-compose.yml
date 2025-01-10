@@ -23,6 +23,8 @@ services:
   config-service:
     container_name: config-service
     image: springbit/spring-bit-config
+    environment:
+      VAULT_USER_TOKEN: ${VAULT_USER_TOKEN}
     deploy:
       resources:
         limits:
@@ -140,13 +142,10 @@ services:
     ## Vault
   vault-server:
     container_name: vault-server
-    image: hashicorp/vault
+    build: ./docker/vault
+    image: springbit/vault-server
     volumes:
       - ./data/vault/:/vault-data
-    entrypoint: vault server -config=/vault-data/vault-server.hcl
-    post_start:
-      - command: /bin/sh /vault-data/unseal.sh ; rm /vault-data/unseal.sh
-        user: root
     cap_add:
       - IPC_LOCK
     networks:

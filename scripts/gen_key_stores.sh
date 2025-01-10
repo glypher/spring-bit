@@ -2,8 +2,8 @@
 CONFIG_DIR=../spring-bit-config/src/main/resources/stores
 CRYPTO_DIR=../spring-bit-crypto/src/main/resources/stores
 GATEWAY_DIR=../spring-bit-gateway/src/main/resources/stores
-VAULT_DIR=../data/vault/certs
-MYSQL_DIR=../data/mysql/certs
+VAULT_DIR=../docker/vault/certs
+MYSQL_DIR=../docker/mysql/certs
 
 # Vault server
 rm -rf $VAULT_DIR ; mkdir -p $VAULT_DIR

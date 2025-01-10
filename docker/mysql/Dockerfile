@@ -15,6 +15,10 @@ COPY config/my.cnf /etc/mysql/conf.d/my.cnf
 COPY config/spring-bit-start.sh /usr/local/bin/
 RUN chmod a+x /usr/local/bin/spring-bit-start.sh
 
+# Copy certificates
+COPY certs /etc/mysql/certs
+RUN chown -R mysql:mysql /etc/mysql/certs
+
 # Expose MySQL default port
 EXPOSE 3306
 

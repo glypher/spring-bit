@@ -38,7 +38,7 @@ spring:
           backend: spring-bit-config
           profile-separator: '/'
           authentication: TOKEN
-          token:
+          token: ${VAULT_USER_TOKEN}
           ssl:
             key-alias: spring-bit-config
             key-password: springbit
