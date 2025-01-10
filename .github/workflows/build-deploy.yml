@@ -35,15 +35,15 @@ jobs:
         
     - name: Run generation scripts
       run: |
-         # Install vault and set up data
-         wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-         sudo apt update && sudo apt install vault
-         # Run the cert and vault generation
-         cd scripts
-         chmod u+x gen_key_stores.sh init_vault.sh
-         ./gen_key_stores.sh
-         ./init_vault.sh
+        # Run the cert and vault generation
+        cd scripts
+        chmod u+x gen_key_stores.sh init_vault.sh
+        ./gen_key_stores.sh
+        # Install vault and set up data
+        wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+        sudo apt update && sudo apt install vault
+        ./init_vault.sh
       shell: bash
       
       # Install the cosign tool except on PR
@@ -54,7 +54,6 @@ jobs:
       with:
         cosign-release: 'v2.1.1'
 
-    - uses: actions/checkout@v4
     - name: Run web-app tests with npm and Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
@@ -67,18 +66,27 @@ jobs:
         npm run build  -- --base-href=/web-app/ --configuration=production
         npm test -- --browsers ChromeHeadless --watch=false
         cd ..
+      shell: bash
         
     - name: Run tests with Maven
       run: |
         mvn --file pom.xml clean verify
   
     - name: Build docker containers with Maven
-      if: github.event_name != 'pull_request'
       run: |
         mvn --file pom.xml clean install
+        
+    - name: Build rest of docker containers
+      if: github.event_name != 'pull_request'
+      run: |
+        docker build -t ${{secrets.DOCKERHUB_USERNAME}}/mysql-server       docker/mysql
+        docker build -t ${{secrets.DOCKERHUB_USERNAME}}/vault-server       docker/vault
+        docker build -t ${{secrets.DOCKERHUB_USERNAME}}/grafana-server     docker/grafana
+        docker build -t ${{secrets.DOCKERHUB_USERNAME}}/loki-server        docker/loki
+        docker build -t ${{secrets.DOCKERHUB_USERNAME}}/prometheus-server  docker/prometheus
 
-    - uses: actions/checkout@v4
     - name: login to docker hub
+      if: github.event_name != 'pull_request'
       env:
         username: ${{secrets.DOCKERHUB_USERNAME}}
         password: ${{secrets.DOCKERHUB_PASSWORD}}
@@ -86,12 +94,35 @@ jobs:
         docker login -u $username -p $password
     
     - name: push the docker images
+      if: github.event_name != 'pull_request'
       run: |
         docker tag springbit/spring-bit-config:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-config:latest
         docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-config:latest
         docker tag springbit/spring-bit-gateway:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-gateway:latest
         docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-gateway:latest
         docker tag springbit/spring-bit-discovery:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-discovery:latest
-        docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-discovery:latest        
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-discovery:latest
         docker tag springbit/spring-bit-crypto:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-crypto:latest
         docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-crypto:latest
+        docker tag springbit/mysql-server:latest ${{secrets.DOCKERHUB_USERNAME}}/mysql-server:latest
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/mysql-server:latest
+        docker tag springbit/vault-server:latest ${{secrets.DOCKERHUB_USERNAME}}/vault-server:latest
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/vault-server:latest
+        docker tag springbit/grafana-server:latest ${{secrets.DOCKERHUB_USERNAME}}/grafana-server:latest
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/grafana-server:latest
+        docker tag springbit/loki-server:latest ${{secrets.DOCKERHUB_USERNAME}}/loki-server:latest
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/loki-server:latest
+        docker tag springbit/prometheus-server:latest ${{secrets.DOCKERHUB_USERNAME}}/prometheus-server:latest
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/prometheus-server:latest
+
+    - name: Setup AWS CLI
+      if: github.event_name != 'pull_request'
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+        aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        aws-region: us-east-1
+    - name: Sync files to S3 bucket
+      if: github.event_name != 'pull_request'
+      run: |
+        aws s3 sync data s3://${{secrets.AWS_S3_BUCKET}}
