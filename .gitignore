@@ -41,3 +41,8 @@ scripts/secrets.prop
 docker/**/certs/
 docker/vault/unseal/
 spring-bit-gateway/src/main/resources/web-app/
+
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
