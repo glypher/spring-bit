@@ -36,7 +36,8 @@ sudo sysctl --system
 # Disable swap
 sudo swapoff -a
 
-sudo kubeadm init --node-name control-plane --pod-network-cidr=10.0.0.0/16
+# Pod ip network has to be --pod-network-cidr=10.32.0.0/12 to be compatible with weave
+sudo kubeadm init --node-name control-plane --pod-network-cidr=10.32.0.0/12
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
