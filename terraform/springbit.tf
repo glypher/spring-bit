@@ -48,19 +48,19 @@ variable "springbit_tag"  {
 }
 
 
-variable "springbit_domain"  {
-  description = "The web domain for the deployment"
+variable "springbit_route53_zone"  {
+  description = "The aws route53 zone name"
+  type        = string
+  default     = "springbit.org"
+}
+variable "springbit_route53_A_record"  {
+  description = "The aws route53 zone A record"
   type        = string
   default     = "springbit.org"
 }
 
-variable "springbit_route53_domain_ns"  {
-  description = "The NS domains of the registered domain"
-  type        = list(string)
-  default     = [
-    "ns-2024.awsdns-61.co.uk",
-    "ns-212.awsdns-26.com",
-    "ns-874.awsdns-45.net",
-    "ns-1491.awsdns-58.org"
-  ]
+variable "springbit_ip"  {
+  description = "The aws public elastic ip"
+  type        = string
+  default     = "23.23.151.19"
 }

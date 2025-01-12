@@ -9,6 +9,11 @@ resource "aws_iam_instance_profile" "k8s_instance_profile" {
   role = "SpringbitInstanceRole"
 }
 
+# Associate the Elastic IP with the EC2 instance
+resource "aws_eip_association" "example" {
+  instance_id   = aws_instance.k8s_control_plane.id
+  allocation_id = data.aws_eip.springbit_ip.id
+}
 
 # Launch EC2 Instances for Master and Worker Nodes
 resource "aws_instance" "k8s_control_plane" {
@@ -19,6 +24,9 @@ resource "aws_instance" "k8s_control_plane" {
   security_groups = [aws_security_group.k8s_sg.id]
 
   iam_instance_profile = aws_iam_instance_profile.k8s_instance_profile.name
+
+  # Associate the Elastic IP
+  associate_public_ip_address = true
 
 #  instance_market_options {
 #    market_type = "spot"
