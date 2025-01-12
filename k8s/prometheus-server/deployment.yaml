@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus-server
+  namespace: springbit
   labels:
     app: prometheus-server
 spec:

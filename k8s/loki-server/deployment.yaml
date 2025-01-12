@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: loki-server
+  namespace: springbit
   labels:
     app: loki-server
 spec:

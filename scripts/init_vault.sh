@@ -1,15 +1,17 @@
 #!/bin/bash
 
-VAULT_DATA=$PWD/../data/vault/storage
+DATA_DIR=$PWD/../data
 
-VAULT_KEYS=../data/vault/keys
+VAULT_DATA=$DATA_DIR/vault/storage
+
+VAULT_KEYS=$DATA_DIR/vault/keys
 
 VAULT_UNSEAL_DIR=../docker/vault/unseal
 VAULT_CONFIG_DIR=../docker/vault/config
 VAULT_CONFIG=$VAULT_CONFIG_DIR/vault-server-init.hcl
 VAULT_POLICY=$VAULT_CONFIG_DIR/spring-bit-policy.hcl
 
-
+mkdir -p $DATA_DIR/mysql/storage
 
 rm -rf $VAULT_DATA ; mkdir -p $VAULT_DATA
 
@@ -56,7 +58,8 @@ done < "./secrets.prop"
 #vault kv get -mount spring-bit-config keys
 
 # replace it in the spring config server's configuration
-echo "vault.token=${userToken[0]}" >> ./secrets.prop
+cp ./secrets.prop $DATA_DIR/secrets.prop
+echo "vault.token=${userToken[0]}" >> $DATA_DIR/secrets.prop
 
 
 # Copy useal script as well
@@ -69,4 +72,4 @@ sed -i -e "s|REPLACE_KEY_2|${keyArray[1]}|g"  $VAULT_UNSEAL_DIR/unseal.sh
 sed -i -e "s|REPLACE_KEY_3|${keyArray[2]}|g"  $VAULT_UNSEAL_DIR/unseal.sh
 
 pkill -P $$
-sleep 3
+sleep 1

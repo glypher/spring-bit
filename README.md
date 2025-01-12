@@ -32,7 +32,7 @@ cd web-app; ng build --base-href=/web-app/ --configuration=production ; cd ..
 
 ./mvnw -DskipTests clean install
  
-export VAULT_USER_TOKEN=$(grep vault.token scripts/secrets.prop | cut -d'=' -f 2-)
+export VAULT_USER_TOKEN=$(grep vault.token data/secrets.prop | cut -d'=' -f 2-)
 docker-compose build --no-cache
 ```
 
@@ -86,7 +86,7 @@ Now run the k8s deployment
 kubectl delete pods --all
 
 kubectl apply -f k8s -R 
-kubectl set env deployment/config-service VAULT_USER_TOKEN=$(grep vault.token scripts/secrets.prop | cut -d'=' -f 2-)
+kubectl set env deployment/config-service VAULT_USER_TOKEN=$(grep vault.token data/secrets.prop | cut -d'=' -f 2-)
 
 kubectl get nodes -o wide
 kubectl get pods -o wide
@@ -106,6 +106,8 @@ Some useful commands
 kubectl delete sts --all; kubectl delete pods --all ; kubectl delete pvc --all ; kubectl delete pv --all
 
 kubectl logs <pod-name>
+
+kubectl taint nodes <node-name> node-role.kubernetes.io/control-plane:NoSchedule-
 
 
 minikube stop
@@ -157,4 +159,29 @@ ng new web-app
 ng generate service crypto
 ng generate component graph
 ng generate environments
+```
+
+
+### Terraform AWS deployment
+
+```console
+wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
+terraform -install-autocomplete
+```
+
+Some usefull commands
+```console
+cd terraform
+
+terraform init
+terraform validate
+terraform plan
+terraform apply
+terraform destroy
+
+systemctl status kubelet
+journalctl -xeu kubelet
+
 ```

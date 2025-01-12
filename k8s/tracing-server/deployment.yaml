@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tracing-server
+  namespace: springbit
   labels:
     app: tracing-server
 spec:

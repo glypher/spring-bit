@@ -1,0 +1,45 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gateway-policy
+  namespace: springbit
+spec:
+  podSelector:
+    matchLabels:
+      app: gateway-service  # Select the gateway pod
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector: {}  # Allow communication from any pod within the cluster
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0  # Allow access to any external IP (internet)
+      ports:
+        - protocol: TCP
+          port: 80   # Allow HTTP traffic to the internet
+        - protocol: TCP
+          port: 443  # Allow HTTPS traffic to the internet
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-external-access-to-other-pods
+  namespace: springbit
+spec:
+  podSelector:
+    matchLabels: {}  # Select all pods except the gateway pod
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: {}  # Allow communication between all pods internally
+  egress:
+    - to:
+        - podSelector:
+            matchLabels: {}  # Allow all pods to communicate internally
+  policyTypes:
+    - Ingress
+    - Egress
