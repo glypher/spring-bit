@@ -35,6 +35,13 @@ resource "aws_instance" "k8s_control_plane" {
 #    }
 #  }
 
+  # Configure the root EBS volume
+  root_block_device {
+    volume_size = var.master_instance_ebs_size
+    volume_type = "gp3"
+    delete_on_termination = true
+  }
+
   tags = {
     Name = var.springbit_tag
     Value = "${var.springbit_tag}-k8s-master"

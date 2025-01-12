@@ -28,6 +28,12 @@ variable "master_instance_size"  {
   default     = "t3.medium"
 }
 
+variable "master_instance_ebs_size"  {
+  description = "The EC2 instance disk size to run k8s control plane"
+  type        = number
+  default     = 20
+}
+
 variable "worker_instance_size"  {
   description = "The EC2 instance to run k8s node"
   type        = string

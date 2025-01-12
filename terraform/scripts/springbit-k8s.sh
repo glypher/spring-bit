@@ -4,6 +4,7 @@ kubectl taint nodes control-plane node-role.kubernetes.io/control-plane:NoSchedu
 
 kubectl delete namespace springbit
 kubectl create namespace springbit
+kubectl delete pv --all
 
 kubectl apply -f /hostdata/k8s -R
 
@@ -14,4 +15,6 @@ kubectl get pods -A -o wide
 echo ""
 kubectl get nodes -o wide
 echo ""
-kubectl get pv
+kubectl -n springbit get pv
+echo ""
+kubectl -n springbit get pvc

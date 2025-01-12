@@ -109,6 +109,7 @@ kubectl logs <pod-name>
 
 kubectl taint nodes <node-name> node-role.kubernetes.io/control-plane:NoSchedule-
 
+kubectl -n springbit describe pod <pod name>
 
 minikube stop
 ```

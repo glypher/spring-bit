@@ -22,6 +22,7 @@ spec:
               operator: In
               values:
                 - minikube
+                - control-plane
 
 ---
 apiVersion: v1
