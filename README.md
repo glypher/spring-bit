@@ -72,8 +72,8 @@ minikube delete
 minikube start --mount --mount-string="./data:/hostdata" --driver=docker
 minikube status
 minikube ssh -- ls /hostdata
-# Configure docker to point to minikube's docker daemon
 
+# Configure docker to point to minikube's docker daemon
 eval $(minikube docker-env)
 
 ./mvnw -DskipTests clean install ; docker-compose build --no-cache
@@ -84,20 +84,19 @@ minikube ssh -- docker images
 Now run the k8s deployment
 ```console
 kubectl delete pods --all
+kubectl label nodes --all springbit.org/volume=yes
 
+kubectl create namespace springbit
 kubectl apply -f k8s -R 
 kubectl set env deployment/config-service VAULT_USER_TOKEN=$(grep vault.token data/secrets.prop | cut -d'=' -f 2-)
 
-kubectl get nodes -o wide
-kubectl get pods -o wide
+kubectl get nodes --show-labels
+kubectl get pods -A -o wide
 kubectl get pv 
 
-kubectl get all
-
-kubectl get nodes --show-labels
 
 # Tunnel gateway service pod port to hosts localhost:8080
-kubectl port-forward deployment/gateway-service 8080:8080
+kubectl -n springbit port-forward deployment/gateway-service 8080:8080
 ```
 Now you can access the app through localhost:8080 like before see [Service table](#Services)
 

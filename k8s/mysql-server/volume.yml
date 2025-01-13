@@ -18,11 +18,10 @@ spec:
     required:
       nodeSelectorTerms:
         - matchExpressions:
-            - key: kubernetes.io/hostname
+            - key: springbit.org/volume
               operator: In
               values:
-                - minikube
-                - control-plane
+                - "yes"
 
 ---
 apiVersion: v1
