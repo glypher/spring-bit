@@ -53,13 +53,13 @@ vault kv put -mount=spring-bit-config keys spring.bit=init
 while IFS='=' read -r key value; do
   echo "Setting key $key..."
   [[ -n $key ]] && [[ -n $value ]] && vault kv patch -mount=spring-bit-config keys $key=$value
-done < "./secrets.prop"
+done < "$DATA_DIR/secrets.prop"
 #echo "Keys...."
 #vault kv get -mount spring-bit-config keys
 
 # replace it in the spring config server's configuration
 cp ./secrets.prop $DATA_DIR/secrets.prop
-echo "vault.token=${userToken[0]}" >> $DATA_DIR/secrets.prop
+echo "vault.token=${userToken[0]}" > $DATA_DIR/secrets.prop
 
 
 # Copy useal script as well
