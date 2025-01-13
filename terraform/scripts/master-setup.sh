@@ -79,8 +79,3 @@ rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 
 cilium install --version 1.16.3
 cilium status --wait
-
-#sleep 3
-# install the network CNI policy in k8s
-# https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy
-#kubectl apply -f https://reweave.azurewebsites.net/k8s/v1.32/net.yaml

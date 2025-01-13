@@ -47,6 +47,12 @@ variable "springbit_s3_bucket"  {
   default     = "springbit"
 }
 
+variable "springbit_certs_s3_bucket"  {
+  description = "The S3 bucket to pull domain certificates from"
+  type        = string
+  default     = "springbit-certs"
+}
+
 variable "springbit_tag"  {
   description = "The aws tag prefix to use"
   type        = string

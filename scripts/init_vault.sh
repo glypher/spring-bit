@@ -58,7 +58,6 @@ done < "$DATA_DIR/secrets.prop"
 #vault kv get -mount spring-bit-config keys
 
 # replace it in the spring config server's configuration
-cp ./secrets.prop $DATA_DIR/secrets.prop
 echo "vault.token=${userToken[0]}" > $DATA_DIR/secrets.prop
 
 
