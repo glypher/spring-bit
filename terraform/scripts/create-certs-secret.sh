@@ -13,6 +13,6 @@ kubectl create namespace springbit
 kubectl create secret tls sprinbit-tls \
   --cert=certs/springbit.crt \
   --key=certs/springbit.key \
-  --namespace springbit
+  --namespace default
 
 rm -rf certs

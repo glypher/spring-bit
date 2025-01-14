@@ -1,7 +1,6 @@
 #!/bin/bash
 
 kubectl create namespace springbit
-kubectl delete pv --all
 
 kubectl apply -f /hostdata/k8s -R
 sleep 2
@@ -15,6 +14,3 @@ echo ""
 kubectl -n springbit get pv
 echo ""
 kubectl -n springbit get pvc
-
-# Set port forwarding
-kubectl -n springbit port-forward svc/nginx-ingress-controller 80:80 443:443

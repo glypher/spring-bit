@@ -68,6 +68,7 @@ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 # To match volume deployment
 kubectl label nodes --all springbit.org/volume=yes
 
+
 # Install Cillium CNI
 CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
 CLI_ARCH=amd64
@@ -77,5 +78,56 @@ sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
 sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 
-cilium install --version 1.16.3
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_gateways.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml
+
+cilium install --version 1.16.5 \
+  --set kubeProxyReplacement=true
+
 cilium status --wait
+
+
+# Install helm
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+rn get_helm.sh
+
+helm repo add cilium https://helm.cilium.io/
+
+cat >>cilium_gateway_host.yaml<<EOF
+kubeProxyReplacement: true
+gatewayAPI:
+  enabled: true
+  hostNetwork:
+    enabled: true
+envoy:
+  enabled: true
+  securityContext:
+    capabilities:
+      keepCapNetBindService: true
+      envoy:
+      # Add NET_BIND_SERVICE to the list (keep the others!)
+      - NET_BIND_SERVICE
+      - NET_ADMIN
+      - BPF
+EOF
+
+helm upgrade cilium cilium/cilium --version 1.16.5 \
+    --namespace kube-system \
+    --reuse-values \
+    -f cilium_gateway_host.yaml
+
+rm cilium_gateway_host.yaml
+
+kubectl -n kube-system rollout restart deployment/cilium-operator
+kubectl -n kube-system rollout restart ds/cilium
+kubectl -n kube-system rollout restart ds/cilium-envoy
+
+
+
+

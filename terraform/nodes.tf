@@ -56,9 +56,11 @@ resource "aws_instance" "k8s_control_plane" {
     inline = [
       "chmod -R +x /tmp/scripts/",
       "/tmp/scripts/master-setup.sh",
+      "/tmp/scripts/fix-coredns.sh",
       "/tmp/scripts/pull-s3-bucket.sh ${var.springbit_s3_bucket}",
-      "/tmp/scripts/create-ingress-tls.sh ${var.springbit_certs_s3_bucket}",
+      "/tmp/scripts/create-certs-secret.sh ${var.springbit_certs_s3_bucket}",
       "/tmp/scripts/springbit-k8s.sh",
+#      "/tmp/hubble-setup.sh",
     ]
   }
   connection {
