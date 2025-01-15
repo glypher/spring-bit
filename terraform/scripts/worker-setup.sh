@@ -1,4 +1,10 @@
 #!/bin/bash
+#!/bin/bash
+if [[ $# -ne 1 ]]; then
+  echo "Usage: $0 s3-bucket-name"
+  exit 1
+fi
+
 sudo apt-get update -y
 sudo apt-get install -y apt-transport-https ca-certificates curl unzip
 
@@ -57,16 +63,16 @@ sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 sudo systemctl enable --now kubelet
 
-
-# TODO register node
-#sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --service-cidr=10.0.0.0/12 --cri-socket unix:///run/containerd/containerd.sock
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
-#kubectl taint nodes --all node.cilium.io/agent-not-ready=true:NoExecute
-kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 # To match volume deployment
 kubectl label nodes --all springbit.org/volume=yes
+kubectl label nodes --all springbit.org/frontend=yes
+kubectl label nodes --all springbit.org/backend=yes
+
+# Join the cluster
+aws s3 cp s3://"$1"/k8s_join.sh ./k8s_join.sh
+chmod +x k8s_join.sh
+./k8s_join.sh
+rm k8s_join.sh
 
 # Install Cillium CNI
 CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
@@ -77,5 +83,9 @@ sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
 sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 
-cilium install --version 1.16.3
+
+cilium install --version 1.16.5 \
+  --set kubeProxyReplacement=true \
+  --set=ipam.operator.clusterPoolIPv4PodCIDRList="10.244.0.0/16"
+
 cilium status --wait

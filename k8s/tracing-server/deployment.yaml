@@ -23,3 +23,12 @@ spec:
             value: "/tracing/zipkin"
         ports:
         - containerPort: 9411
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: springbit.org/monitoring
+                    operator: In
+                    values:
+                      - "yes"

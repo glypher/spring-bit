@@ -28,3 +28,12 @@ spec:
         - name: mysql-server-volume
           persistentVolumeClaim:
             claimName: mysql-server-volume
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: springbit.org/volume
+                    operator: In
+                    values:
+                      - "yes"

@@ -26,3 +26,12 @@ spec:
             value: "/grafana"
         ports:
         - containerPort: 3000
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: springbit.org/monitoring
+                    operator: In
+                    values:
+                      - "yes"

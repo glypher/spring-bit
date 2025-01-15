@@ -22,3 +22,12 @@ spec:
         args: [ "--config.file=/etc/prometheus/prometheus.yml", "--web.route-prefix=/",  "--web.external-url=/prometheus"]
         ports:
         - containerPort: 9090
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: springbit.org/monitoring
+                    operator: In
+                    values:
+                      - "yes"

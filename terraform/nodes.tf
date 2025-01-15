@@ -10,7 +10,7 @@ resource "aws_iam_instance_profile" "k8s_instance_profile" {
 }
 
 # Associate the Elastic IP with the EC2 instance
-resource "aws_eip_association" "example" {
+resource "aws_eip_association" "control_plane_eip_association" {
   instance_id   = aws_instance.k8s_control_plane.id
   allocation_id = data.aws_eip.springbit_ip.id
 }
@@ -56,6 +56,7 @@ resource "aws_instance" "k8s_control_plane" {
     inline = [
       "chmod -R +x /tmp/scripts/",
       "/tmp/scripts/master-setup.sh",
+      "/tmp/scripts/create-k8s-join.sh ${var.springbit_s3_bucket}",
       "/tmp/scripts/fix-coredns.sh",
       "/tmp/scripts/pull-s3-bucket.sh ${var.springbit_s3_bucket}",
       "/tmp/scripts/create-certs-secret.sh ${var.springbit_certs_s3_bucket}",
@@ -76,6 +77,7 @@ output "springbit_k8s_master_public_ip" {
   description = "The public IP of the EC2 k8s control plane"
 }
 
+
 resource "aws_instance" "k8s_node" {
   count         = 0
   ami           = "ami-079cb33ef719a7b78" # Canonical, Ubuntu, 24.04, amd64 noble image
@@ -85,6 +87,9 @@ resource "aws_instance" "k8s_node" {
   security_groups = [aws_security_group.k8s_sg.id]
 
   iam_instance_profile = aws_iam_instance_profile.k8s_instance_profile.name
+
+  # Associate the Elastic IP
+  associate_public_ip_address = true
 
   tags = {
     Name = var.springbit_tag
@@ -99,7 +104,7 @@ resource "aws_instance" "k8s_node" {
   provisioner "remote-exec" {
     inline = [
       "chmod -R +x /tmp/scripts/",
-      "/tmp/scripts/worker-setup.sh",
+      "/tmp/scripts/worker-setup.sh ${var.springbit_s3_bucket}",
       "/tmp/scripts/pull-s3-bucket.sh ${var.springbit_s3_bucket}"
     ]
   }

@@ -21,3 +21,12 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3100
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: springbit.org/monitoring
+                    operator: In
+                    values:
+                      - "yes"

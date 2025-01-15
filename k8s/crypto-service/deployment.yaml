@@ -25,3 +25,12 @@ spec:
               command: [ "sleep 5" ]
         ports:
         - containerPort: 8090
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: springbit.org/backend
+                    operator: In
+                    values:
+                      - "yes"

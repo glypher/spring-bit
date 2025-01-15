@@ -24,3 +24,12 @@ spec:
             value: ${VAULT_USER_TOKEN}
         ports:
         - containerPort: 9095
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: springbit.org/backend
+                    operator: In
+                    values:
+                      - "yes"

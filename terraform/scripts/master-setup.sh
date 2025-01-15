@@ -63,10 +63,12 @@ sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --service-cidr=10.0.0.0/12 --
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
 #kubectl taint nodes --all node.cilium.io/agent-not-ready=true:NoExecute
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
-# To match volume deployment
-kubectl label nodes --all springbit.org/volume=yes
+# Label node for monitoring
+kubectl label nodes --all springbit.org/publichost=yes
+kubectl label nodes --all springbit.org/monitoring=yes
 
 
 # Install Cillium CNI

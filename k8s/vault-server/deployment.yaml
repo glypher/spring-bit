@@ -32,3 +32,12 @@ spec:
         - name: vault-server-volume
           persistentVolumeClaim:
             claimName: vault-server-volume
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: springbit.org/volume
+                    operator: In
+                    values:
+                      - "yes"
