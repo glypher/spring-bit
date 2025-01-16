@@ -1,0 +1,13 @@
+<!-- server-footer.component.html -->
+<footer class="bg-gray-800 text-white p-4 flex justify-between items-center">
+  <div class="text-xl font-bold">Springbit Monitoring Services</div>
+  <div class="flex space-x-4 pr-8">
+    <a *ngFor="let link of links"
+       [href]="link.url"
+       target="_blank"
+       class="flex items-center space-x-2 hover:text-blue-400">
+      <img [src]="link.icon" alt="{{link.name}} icon" class="w-6 h-6">
+      <span>{{ link.name }}</span>
+    </a>
+  </div>
+</footer>
