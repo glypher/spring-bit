@@ -48,6 +48,7 @@ jobs:
         # Add tokens
         echo "bitquery.api-token=${{secrets.BITQUERY_TOKEN}}}" >> ../data/secrets.prop
         echo "coinmarketcap.api-token=${{secrets.COINMARKETCAP_TOKEN}}}" >> ../data/secrets.prop
+        echo "mysql.password=${{secrets.MYSQL_PASSWORD}}}" >> ../data/secrets.prop
         ./init_vault.sh
       shell: bash
       
