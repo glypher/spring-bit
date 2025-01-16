@@ -21,7 +21,7 @@ public class TracingConfig {
 
     @Bean
     public ObservationHandler<Observation.Context> observationTextPublisher() {
-        return new ObservationTextPublisher(logger::info);
+        return new ObservationTextPublisher(logger::debug);
     }
 
 }
