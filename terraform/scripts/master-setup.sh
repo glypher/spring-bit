@@ -91,12 +91,18 @@ mkdir -p $HOME/.kube
 sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
+echo "Waiting for Kubernetes API server to become available..."
+while ! kubectl version  &>/dev/null; do
+  echo "Waiting..."
+  sleep 5  # Check every 5 seconds
+done
+echo "Kubernetes API server is available!"
+
 #kubectl taint nodes --all node.cilium.io/agent-not-ready=true:NoExecute
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 # Label node for monitoring
 kubectl label nodes --all springbit.org/publichost=yes
 kubectl label nodes --all springbit.org/monitoring=yes
-
 
 # Cilium CNI setup
 kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml

@@ -4,7 +4,7 @@ DATA_DIR=$PWD/../data
 
 VAULT_DATA=$DATA_DIR/vault/storage
 
-VAULT_KEYS=$DATA_DIR/vault/keys
+VAULT_KEYS=$DATA_DIR/vault-keys
 
 VAULT_UNSEAL_DIR=../docker/vault/unseal
 VAULT_CONFIG_DIR=../docker/vault/config

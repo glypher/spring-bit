@@ -19,22 +19,22 @@ export class FooterComponent {
     {
       name: 'Grafana',
       url: '/grafana',
-      icon: '/assets/logos/icons8-grafana-96.png'
+      icon: 'assets/logos/icons8-grafana-96.png'
     },
     {
       name: 'Zipkin',
       url: '/tracing',
-      icon: '/assets/logos/zipkin-logo.png'
+      icon: 'assets/logos/zipkin-logo.png'
     },
     {
       name: 'Prometheus',
       url: '/prometheus',
-      icon: '/assets/logos/icons8-prometheus-96.png'
+      icon: 'assets/logos/icons8-prometheus-96.png'
     },
     {
       name: 'Eureka',
       url: '/discover',
-      icon: '/assets/logos/eureka-logo-150.png'
+      icon: 'assets/logos/eureka-logo-150.png'
     }
   ];
 }
