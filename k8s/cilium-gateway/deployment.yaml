@@ -24,15 +24,6 @@ spec:
           - kind: Secret
             name: springbit-tls
             namespace: springbit
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: springbit.org/publichost
-                operator: In
-                values:
-                  - "yes"
 
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1

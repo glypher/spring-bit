@@ -72,24 +72,28 @@ resource "aws_instance" "k8s_control_plane" {
   }
 }
 
-output "springbit_k8s_master_public_ip" {
-  value = aws_instance.k8s_control_plane.public_ip
-  description = "The public IP of the EC2 k8s control plane"
-}
-
 
 resource "aws_instance" "k8s_node" {
-  count         = 0
+  count         = 1
   ami           = "ami-079cb33ef719a7b78" # Canonical, Ubuntu, 24.04, amd64 noble image
   instance_type = var.worker_instance_size
   subnet_id     = aws_subnet.k8s_subnet.id
   key_name      = var.instance_key_pair
   security_groups = [aws_security_group.k8s_sg.id]
 
+  depends_on = [aws_instance.k8s_control_plane]
+
   iam_instance_profile = aws_iam_instance_profile.k8s_instance_profile.name
 
   # Associate the Elastic IP
   associate_public_ip_address = true
+
+  # Configure the root EBS volume
+  root_block_device {
+    volume_size = var.worker_instance_ebs_size
+    volume_type = "gp3"
+    delete_on_termination = true
+  }
 
   tags = {
     Name = var.springbit_tag

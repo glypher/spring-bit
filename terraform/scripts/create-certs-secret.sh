@@ -6,7 +6,7 @@ fi
 
 mkdir -p certs
 
-aws s3 sync s3://"$1" certs
+aws s3 sync s3://"$1" certs --quiet
 
 kubectl create namespace springbit
 

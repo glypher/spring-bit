@@ -4,8 +4,8 @@ if [[ $# -ne 1 ]]; then
   exit 1
 fi
 
-kubeadm token create --print-join-command > k8s_join.sh
+kubeadm token create --print-join-command --ttl 12h > k8s_join.sh
 
-aws s3 cp k8s_join.sh s3://"$1"
+aws s3 cp k8s_join.sh s3://"$1" --quiet
 
 rm k8s_join.sh
