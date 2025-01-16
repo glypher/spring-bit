@@ -7,3 +7,7 @@ fi
 sudo mkdir -p /hostdata
 
 sudo aws s3 sync s3://"$1" /hostdata --quiet
+
+sudo mkdir -p /hostdata/mysql/storage
+
+sudo chmod u+rw -R /hostdata

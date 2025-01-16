@@ -1,5 +1,8 @@
 #!/bin/bash
-sudo apt-get update -y -qq
+
+source "$(dirname "$0")/utils.sh"
+
+sudo apt-get update -y -qq > /dev/null 2>&1
 sudo apt-get install -y -qq apt-transport-https ca-certificates curl unzip net-tools
 
 # Install aws cli
@@ -8,6 +11,9 @@ unzip -q awscliv2.zip
 sudo ./aws/install
 rm -rf awscliv2.zip aws
 
+###############################################################
+# Install K8s, containerd, runc, Cilium CNI and Helm packages #
+###############################################################
 
 # Disable swap
 sudo swapoff -a
@@ -72,17 +78,16 @@ chmod 700 get_helm.sh
 ./get_helm.sh
 rm get_helm.sh
 
-
-
-
+##############################################################################################
+# Installing K8s control plane with Cilium CNI and kube-proxy replacement and Cilium Gateway #
+##############################################################################################
 IPV4=$(hostname -I | cut -d ' ' -f1)
 
-#sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --service-cidr=10.0.0.0/12 --cri-socket unix:///run/containerd/containerd.sock
 sudo kubeadm init \
     --skip-phases=addon/kube-proxy \
     --apiserver-advertise-address=$IPV4 \
     --cri-socket unix:///run/containerd/containerd.sock
-#Force to listen to IPV4
+# Force to listen to IPV4
 sudo sed -i "/- kube-apiserver/a\ \ \ \ - --bind-address=$IPV4" /etc/kubernetes/manifests/kube-apiserver.yaml
 sudo systemctl restart kubelet
 echo "Api server listening to: $(sudo netstat -tuln | grep 6443)"
@@ -91,26 +96,24 @@ mkdir -p $HOME/.kube
 sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-echo "Waiting for Kubernetes API server to become available..."
-while ! kubectl version  &>/dev/null; do
-  echo "Waiting..."
-  sleep 5  # Check every 5 seconds
-done
+retry_command "kubectl version"
 echo "Kubernetes API server is available!"
 
 #kubectl taint nodes --all node.cilium.io/agent-not-ready=true:NoExecute
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+
 # Label node for monitoring
-kubectl label nodes --all springbit.org/publichost=yes
-kubectl label nodes --all springbit.org/monitoring=yes
+NODE_NAME=$(hostname)
+kubectl label nodes "$NODE_NAME" springbit.org/publichost=yes
+kubectl label nodes "$NODE_NAME" springbit.org/monitoring=yes
 
 # Cilium CNI setup
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_gateways.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml
+retry_command "kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml"
+retry_command "kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_gateways.yaml"
+retry_command "kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml"
+retry_command "kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml"
+retry_command "kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml"
+retry_command "kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml"
 
 
 cilium install --version 1.16.5 \
@@ -149,8 +152,6 @@ helm upgrade cilium cilium/cilium --version 1.16.5 \
     -f cilium_gateway_host.yaml
 
 rm cilium_gateway_host.yaml
-
-
 
 kubectl -n kube-system rollout restart deployment/cilium-operator
 kubectl -n kube-system rollout restart ds/cilium

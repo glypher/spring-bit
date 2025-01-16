@@ -1,11 +1,13 @@
 #!/bin/bash
-#!/bin/bash
+
 if [[ $# -ne 1 ]]; then
   echo "Usage: $0 s3-bucket-name"
   exit 1
 fi
 
-sudo apt-get update -y -qq
+source "$(dirname "$0")/utils.sh"
+
+sudo apt-get update -y -qq > /dev/null 2>&1
 sudo apt-get install -y -qq apt-transport-https ca-certificates curl unzip net-tools
 
 # Install aws cli
@@ -14,6 +16,10 @@ unzip -q awscliv2.zip
 sudo ./aws/install
 rm -rf awscliv2.zip aws
 
+
+##########################################################################
+# Install K8s, containerd, runc, Cilium agent will be deployed by master #
+##########################################################################
 
 # Disable swap
 sudo swapoff -a
@@ -63,6 +69,10 @@ sudo apt-get install -y -qq kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 sudo systemctl enable --now kubelet
 
+##########################################
+# Registering K8s worker node            #
+##########################################
+
 # Join the cluster
 aws s3 cp s3://"$1"/k8s_join.sh ./k8s_join.sh --quiet
 chmod +x k8s_join.sh
@@ -81,7 +91,10 @@ sudo cp -f /etc/kubernetes/kubelet.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 sudo chmod a+r /var/lib/kubelet/pki/kubelet-client-current.pem
 
-# To match volume deployment
+##########################################
+# Node labels for scheduling pods        #
+##########################################
+
 NODE_NAME=$(hostname)
 kubectl label nodes "$NODE_NAME" springbit.org/volume=yes
 kubectl label nodes "$NODE_NAME" springbit.org/frontend=yes
