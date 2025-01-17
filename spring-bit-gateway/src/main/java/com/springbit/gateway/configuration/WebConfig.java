@@ -21,7 +21,9 @@ public class WebConfig {
     RouterFunction<?> routerFunction() {
         return RouterFunctions.resources("/web-app/**", new ClassPathResource("web-app/"))
                 .andRoute(
-                        RequestPredicates.GET("/web-app").or(RequestPredicates.GET("/web-app/")),
+                        RequestPredicates.GET("/web-app")
+                                .or(RequestPredicates.GET("/web-app/"))
+                                .or(RequestPredicates.GET("/")),
                         request -> ServerResponse.temporaryRedirect(URI.create("/web-app/index.html")).build());
     }
 
