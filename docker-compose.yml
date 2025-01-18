@@ -7,22 +7,26 @@ networks:
         - subnet: 172.177.0.0/16
 
 services:
-  discovery-service:
-    container_name: discovery-service
-    image: springbit/spring-bit-discovery
-    deploy:
-      resources:
-        limits:
-          memory: 256M
+  ## Secure keys
+  vault-server:
+    container_name: vault-server
+    build: ./docker/vault
+    image: springbit/vault-server
+    pull_policy: never
+    volumes:
+      - ./data/vault/:/vault-data
+    cap_add:
+      - IPC_LOCK
     networks:
       - internal
     ports:
-      - 8888:8888
+      - 8200:8200
 
-
+  ## Spring profile configs
   config-service:
     container_name: config-service
     image: springbit/spring-bit-config
+    pull_policy: never
     environment:
       VAULT_USER_TOKEN: ${VAULT_USER_TOKEN}
     deploy:
@@ -37,8 +41,72 @@ services:
     ports:
       - 9095:9095
 
+  ## Persistent model backend
+  mysql-server:
+    container_name: mysql-server
+    build: ./docker/mysql
+    image: springbit/mysql-server
+    pull_policy: never
+    networks:
+      - internal
+    ports:
+      - 3306:3306
+    volumes:
+      - ./data/mysql/:/mysql-data
+
+  ## OpenId backend
+  auth-server:
+    container_name: auth-server
+    image: springbit/spring-bit-oidc-server
+    pull_policy: never
+    depends_on:
+      config-service:
+        condition: service_started
+    networks:
+      - internal
+    ports:
+      - 9443:9443
+
+  discovery-service:
+    container_name: discovery-service
+    image: springbit/spring-bit-discovery
+    pull_policy: never
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - internal
+    ports:
+      - 8888:8888
+
+  gateway-service:
+    container_name: gateway-service
+    image: springbit/spring-bit-gateway
+    pull_policy: never
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    depends_on:
+      discovery-service:
+        condition: service_started
+      config-service:
+        condition: service_started
+      crypto-service:
+        condition: service_started
+      auth-server:
+        condition: service_started
+    networks:
+      - internal
+      - default
+    ports:
+      - 8080:8080
+
   crypto-service:
+    container_name: crypto-service
     image: springbit/spring-bit-crypto
+    pull_policy: never
     deploy:
       resources:
         limits:
@@ -57,25 +125,9 @@ services:
     ports:
      - 8090:8090
 
-  gateway-service:
-    container_name: gateway-service
-    image: springbit/spring-bit-gateway
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-    depends_on:
-      discovery-service:
-        condition: service_started
-      config-service:
-        condition: service_started
-      crypto-service:
-        condition: service_started
-    networks:
-      - internal
-      - default
-    ports:
-      - 8080:8080
+
+
+  ## Monitoring/Logging
 
   tracing-server:
     container_name: tracing-server
@@ -91,12 +143,11 @@ services:
     ports:
      - 9411:9411
 
-  ## Grafana / Locki / Prometheus
-
   grafana-server:
     container_name: grafana-server
     build: ./docker/grafana
     image: springbit/grafana-server
+    pull_policy: never
     environment:
       GF_SERVER_SERVE_FROM_SUB_PATH: true
       GF_SERVER_ROOT_URL: /grafana
@@ -113,6 +164,7 @@ services:
     container_name: loki-server
     build: ./docker/loki
     image: springbit/loki-server
+    pull_policy: never
     deploy:
       resources:
         limits:
@@ -126,6 +178,7 @@ services:
     container_name: prometheus-server
     build: ./docker/prometheus
     image: springbit/prometheus-server
+    pull_policy: never
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.route-prefix=/
@@ -138,30 +191,3 @@ services:
       - internal
     ports:
     - 9090:9090
-
-    ## Vault
-  vault-server:
-    container_name: vault-server
-    build: ./docker/vault
-    image: springbit/vault-server
-    volumes:
-      - ./data/vault/:/vault-data
-    cap_add:
-      - IPC_LOCK
-    networks:
-      - internal
-    ports:
-      - 8200:8200
-
-    ## Mysql
-  mysql-server:
-    container_name: mysql-server
-    build: ./docker/mysql
-    image: springbit/mysql-server
-    networks:
-      - internal
-    ports:
-      - 3306:3306
-    volumes:
-      - ./data/mysql/:/mysql-data
-

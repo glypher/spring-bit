@@ -1,9 +1,21 @@
 spring:
   application:
     name: spring-bit-gateway
-
-# Logging
-logging.level.org.springframework: INFO
+  security:
+    oauth2:
+      client:
+        registration:
+          springbit-openid:
+            provider: springbit-openid-server
+            client-id: springbit-openid
+            client-secret: "secret"
+            authorization-grant-type: authorization_code
+            redirect-uri: "${spring-bit.auth.gateway}/login/oauth2/code/{registrationId}"
+            scope: openid, profile, monitoring.read
+            client-name: springbit-openid
+        provider:
+          springbit-openid-server:
+            issuer-uri: ${spring-bit.auth.server}
 
 ---
 spring:
@@ -30,6 +42,12 @@ spring:
     discovery:
       enabled: false
 
+spring-bit:
+  auth:
+    gateway: http://localhost:8080
+    server: http://localhost:9443
+
+
 management:
   prometheus:
     metrics:
@@ -39,5 +57,8 @@ management:
     enabled:
       false
 
+# Logging
+logging.level.org.springframework: INFO
+logging.level.org.springframework.security: INFO
 
 # Config server loads spring-bit-config/src/main/resources/microservices/spring-bit-gateway-production.yml

@@ -9,9 +9,8 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class CryptoService {
-  static DEFAULT_TIMER = 5000
-
   private apiUrl = environment.apiUrl;
+  private liveTTL = environment.liveTTL
 
   private selectedSymbolSource = new BehaviorSubject<CryptoType>(CryptoType.DEFAULT_TYPE);
   selectedSymbol = this.selectedSymbolSource.asObservable();
@@ -24,7 +23,7 @@ export class CryptoService {
 
   constructor(private http: HttpClient) {
     this.checkServiceStatus();
-    this.timerId = setInterval(() => this.checkServiceStatus(), CryptoService.DEFAULT_TIMER); // Poll every 5 seconds
+    this.timerId = setInterval(() => this.checkServiceStatus(), this.liveTTL); // Poll every 5 seconds
   }
 
   checkServiceStatus(): void {

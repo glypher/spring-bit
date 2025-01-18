@@ -18,4 +18,5 @@ vault operator unseal REPLACE_KEY_3
 
 echo "Unsealed vault..."
 
-rm -- "$0"
+# TODO: enable me
+#rm -- "$0"

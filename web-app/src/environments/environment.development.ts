@@ -1,3 +1,4 @@
 export const environment = {
-  apiUrl: '/crypto/'
+  apiUrl: '/crypto/',
+  liveTTL: 100000
 };

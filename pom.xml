@@ -20,6 +20,7 @@
         <module>spring-bit-discovery</module>
         <module>spring-bit-gateway</module>
         <module>spring-bit-config</module>
+        <module>spring-bit-oidc-server</module>
     </modules>
 
     <properties>
@@ -40,6 +41,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>

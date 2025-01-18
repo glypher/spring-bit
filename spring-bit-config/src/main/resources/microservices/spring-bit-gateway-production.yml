@@ -38,6 +38,14 @@ spring:
           predicates:
             - Path=/eureka/**
 
+        - id: openid
+          uri: http://auth-server:9443
+          predicates:
+            - Path=/oauth2/**
+            - Path=/userInfo/**
+          filters:
+            - StripPrefix=0
+
         - id: tracing
           uri: http://tracing-server:9411
           predicates:
@@ -73,3 +81,13 @@ spring:
             - Path=/coinmarketcap/**
           filters:
             - StripPrefix=1
+
+spring-bit:
+  auth:
+    gateway: http://gateway-service:8080
+    server: http://auth-server:9443
+
+# Logging
+logging.level.org.springframework: INFO
+logging.level.org.springframework.security: INFO
+logging.level.org.springframework.boot.autoconfigure: ERROR

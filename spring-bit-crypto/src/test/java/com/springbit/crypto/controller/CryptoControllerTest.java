@@ -1,6 +1,5 @@
 package com.springbit.crypto.controller;
 
-import com.springbit.crypto.configuration.ApiSecurity;
 import com.springbit.crypto.configuration.ModelConfig;
 import com.springbit.crypto.model.BlockRepository;
 import com.springbit.crypto.model.QuoteRepository;
@@ -26,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
-@Import({ApiSecurity.class, ModelConfig.class})
+@Import({ModelConfig.class})
 @WebFluxTest(CryptoController.class)
 @ActiveProfiles("test")
 public class CryptoControllerTest {
