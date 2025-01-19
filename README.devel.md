@@ -7,7 +7,7 @@
 Vault needs to be installed to store our secrets
 
 On Ubuntu you can install it
-```console
+```shell
 wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 sudo apt update && sudo apt install vault
@@ -19,7 +19,7 @@ sudo apt update && sudo apt install vault
 An angular 19 app is provided for nice visualization in [spring-bit-gateway](spring-bit-gateway/src/main/resources/web) module.
 
 Nodejs 20 will be needed.
-```console
+```shell
 curl -sL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
 sudo bash nodesource_setup.sh ; rm nodesource_setup.sh
 
@@ -39,7 +39,7 @@ ng test
 ```
 
 Some useful angular commands
-```console
+```shell
 ng new web-app
 ng generate service crypto
 ng generate component graph
@@ -48,11 +48,10 @@ ng generate environments
 
 ### Kubernetes development
 
-Install Minikube
-```console
+#### Install Minikube
+```shell
 curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
-
 
 # Install kubectl
 minikube kubectl -- get po -A
@@ -61,9 +60,24 @@ alias kubectl="minikube kubectl --"
 kubectl version --client
 ```
 
+
+#### Useful commands
+```shell
+kubectl delete sts --all; kubectl delete pods --all ; kubectl delete pvc --all ; kubectl delete pv --all
+
+kubectl logs <pod-name>
+
+kubectl taint nodes <node-name> node-role.kubernetes.io/control-plane:NoSchedule-
+
+kubectl -n springbit describe pod <pod name>
+
+minikube stop
+```
+
+
 ### Terraform AWS deployment
 
-```console
+```shell
 wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 sudo apt update && sudo apt install terraform
@@ -71,7 +85,7 @@ terraform -install-autocomplete
 ```
 
 Some usefull commands
-```console
+```shell
 cd terraform
 
 terraform init
@@ -82,5 +96,4 @@ terraform destroy
 
 systemctl status kubelet
 journalctl -xeu kubelet
-
 ```
