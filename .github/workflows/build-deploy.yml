@@ -110,6 +110,8 @@ jobs:
         docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-discovery:latest
         docker tag springbit/spring-bit-crypto:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-crypto:latest
         docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-crypto:latest
+        docker tag springbit/spring-bit-auth-server:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-auth-server:latest
+        docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-auth-server:latest
         docker tag springbit/mysql-server:latest ${{secrets.DOCKERHUB_USERNAME}}/mysql-server:latest
         docker push ${{secrets.DOCKERHUB_USERNAME}}/mysql-server:latest
         docker tag springbit/vault-server:latest ${{secrets.DOCKERHUB_USERNAME}}/vault-server:latest
