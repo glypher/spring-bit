@@ -525,6 +525,17 @@
           "hide": false,
           "queryType": "range",
           "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "editorMode": "builder",
+          "expr": "{app=\"spring-bit-auth-server\"} |= ``",
+          "hide": false,
+          "queryType": "range",
+          "refId": "D"
         }
       ],
       "title": "Spring-Bit Logs",

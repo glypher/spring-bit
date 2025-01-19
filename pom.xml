@@ -20,7 +20,7 @@
         <module>spring-bit-discovery</module>
         <module>spring-bit-gateway</module>
         <module>spring-bit-config</module>
-        <module>spring-bit-oidc-server</module>
+        <module>spring-bit-auth-server</module>
     </modules>
 
     <properties>

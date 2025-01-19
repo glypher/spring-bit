@@ -1,12 +1,12 @@
 server:
   port: 9443
 
-logging.level.org.springframework.security: debug
-
 spring:
+  application:
+    name: spring-bit-auth-server
   security:
     oauth2:
-      authorizationserver:
+      authorization-server:
         client:
           springbit-client:
             registration:
@@ -34,6 +34,10 @@ spring:
   config:
     activate:
       on-profile: default
+  security:
+    oauth2:
+      authorization-server:
+        issuer: ${SPRINGBIT_DOMAIN:http://localhost:9443}
 
 management:
   prometheus:
@@ -47,3 +51,6 @@ management:
 spring-bit:
   auth:
     gateway: http://localhost:8080
+
+logging.level.org.springframework: DEBUG
+logging.level.org.springframework.security: DEBUG

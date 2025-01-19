@@ -21,7 +21,7 @@ The development environment requires:
 First we need to create the PKI self-signed certificates keystores and trust stores that hold them.
 
 ```consoles
-sudo chown -R $USER data/
+sudo rm -rf data/ ; mkdir -p data
 cd scripts
 chmod a+x gen_key_stores.sh init_vault.sh
 ./gen_key_stores.sh

@@ -84,8 +84,9 @@ spring:
 
 spring-bit:
   auth:
-    gateway: http://gateway-service:8080
+    gateway: ${SPRINGBIT_DOMAIN:http://localhost:8080}
     server: http://auth-server:9443
+    public-auth-server: ${SPRINGBIT_AUTH_DOMAIN:localhost:9443}
 
 # Logging
 logging.level.org.springframework: INFO

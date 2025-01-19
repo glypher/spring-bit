@@ -57,13 +57,14 @@ services:
   ## OpenId backend
   auth-server:
     container_name: auth-server
-    image: springbit/spring-bit-oidc-server
+    image: springbit/spring-bit-auth-server
     pull_policy: never
     depends_on:
       config-service:
         condition: service_started
     networks:
       - internal
+      - default
     ports:
       - 9443:9443
 

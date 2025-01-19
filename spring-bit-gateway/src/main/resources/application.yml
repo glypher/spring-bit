@@ -1,21 +1,6 @@
 spring:
   application:
     name: spring-bit-gateway
-  security:
-    oauth2:
-      client:
-        registration:
-          springbit-openid:
-            provider: springbit-openid-server
-            client-id: springbit-openid
-            client-secret: "secret"
-            authorization-grant-type: authorization_code
-            redirect-uri: "${spring-bit.auth.gateway}/login/oauth2/code/{registrationId}"
-            scope: openid, profile, monitoring.read
-            client-name: springbit-openid
-        provider:
-          springbit-openid-server:
-            issuer-uri: ${spring-bit.auth.server}
 
 ---
 spring:
@@ -39,6 +24,7 @@ spring:
           filters:
             - StripPrefix=3
             - RewriteResponseHeader=Location, ^/, /api/v1/docs/
+
     discovery:
       enabled: false
 
@@ -46,6 +32,7 @@ spring-bit:
   auth:
     gateway: http://localhost:8080
     server: http://localhost:9443
+    public-auth-server: localhost:9443
 
 
 management:
@@ -58,7 +45,12 @@ management:
       false
 
 # Logging
-logging.level.org.springframework: INFO
-logging.level.org.springframework.security: INFO
+logging.level.org.springframework: DEBUG
+logging.level.org.springframework.cloud.gateway: DEBUG
+logging.level.org.springframework.web: DEBUG
+logging.level.org.springframework.http: DEBUG
+logging.level.org.springframework.web.filter: DEBUG
+logging.level.org.springframework.web.reactive.result: DEBUG
+logging.level.org.springframework.security: DEBUG
 
 # Config server loads spring-bit-config/src/main/resources/microservices/spring-bit-gateway-production.yml

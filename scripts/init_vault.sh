@@ -46,7 +46,7 @@ vault token create -policy=spring-bit-policy &> $VAULT_KEYS/auth-spring-bit-toke
 
 mapfile -t userToken < <(grep "token     " < $VAULT_KEYS/auth-spring-bit-token.txt  | cut -c21- | sed 's/^\ *//')
 
-sed -i -e "s|^vault.token=.*||g" ./secrets.prop
+sed -i -e "s|^vault.token=.*||g" $DATA_DIR/secrets.prop
 
 # PUT ALL SECRETS
 vault kv put -mount=spring-bit-config keys spring.bit=init

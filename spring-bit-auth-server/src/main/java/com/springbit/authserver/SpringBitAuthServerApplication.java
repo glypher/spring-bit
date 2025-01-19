@@ -1,10 +1,10 @@
-package com.springbit.springbitoidcserver;
+package com.springbit.authserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringBitOidcServerApplication {
+public class SpringBitAuthServerApplication {
     static {
         System.setProperty("spring.cloud.bootstrap.enabled", "true");
 
@@ -15,7 +15,7 @@ public class SpringBitOidcServerApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringBitOidcServerApplication.class, args);
+        SpringApplication.run(SpringBitAuthServerApplication.class, args);
     }
 
 }

@@ -8,12 +8,12 @@ spring:
       uri: https://config-service:9095
       tls:
         enabled: true
-        key-alias: spring-bit-oidc-server
+        key-alias: spring-bit-auth-server
         key-password: springbit
-        key-store: classpath:stores/oidc-server-keystore.p12
+        key-store: classpath:stores/auth-server-keystore.p12
         key-store-type: PKCS12
         key-store-password: springbit
-        trust-store: classpath:stores/oidc-server-truststore.p12
+        trust-store: classpath:stores/auth-server-truststore.p12
         trust-store-type: PKCS12
         trust-store-password: springbit
 
@@ -23,6 +23,8 @@ spring:
         max-interval: 1500
         multiplier: 1
 
+logging.level.org.springframework: debug
+logging.level.org.springframework.security: debug
 ---
 spring:
   config:
