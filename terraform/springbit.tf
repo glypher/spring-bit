@@ -82,3 +82,9 @@ variable "springbit_ip"  {
   type        = string
   default     = "23.23.151.19"
 }
+
+variable "springbit_domain"  {
+  description = "The aws public domain"
+  type        = string
+  default     = "springbit.org"
+}
