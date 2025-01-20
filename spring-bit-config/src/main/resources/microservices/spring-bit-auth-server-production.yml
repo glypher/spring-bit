@@ -17,5 +17,5 @@ spring-bit:
     gateway: ${SPRINGBIT_DOMAIN:http://localhost:8080}
 
 # Logging
-logging.level.org.springframework: INFO
-logging.level.org.springframework.security: INFO
+logging.level.org.springframework: ${LOG_LEVEL:INFO}
+logging.level.org.springframework.security: ${LOG_LEVEL:INFO}

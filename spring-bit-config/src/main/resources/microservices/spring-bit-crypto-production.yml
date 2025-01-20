@@ -40,3 +40,7 @@ spring-bit:
       enable: true
       url: http://gateway-service:8080/coinmarketcap
       api-token: '{vault}:keys#coinmarketcap.api-token'
+
+# Logging
+logging.level.org.springframework: ${LOG_LEVEL:INFO}
+logging.level.org.springframework.security: ${LOG_LEVEL:INFO}

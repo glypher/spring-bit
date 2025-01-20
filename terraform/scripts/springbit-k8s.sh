@@ -17,6 +17,11 @@ kubectl -n springbit set env deployment/auth-server      SPRINGBIT_AUTH_DOMAIN=$
 kubectl -n springbit set env deployment/gateway-service  SPRINGBIT_DOMAIN=$1
 kubectl -n springbit set env deployment/gateway-service  SPRINGBIT_AUTH_DOMAIN=$2
 
+# Debug logging
+kubectl -n springbit set env deployment/config-service   LOG_LEVEL=DEBUG
+kubectl -n springbit set env deployment/auth-server      LOG_LEVEL=DEBUG
+kubectl -n springbit set env deployment/gateway-service  LOG_LEVEL=DEBUG
+
 # Restart the services to load the above envs
 kubectl -n springbit rollout restart deployment config-service
 kubectl -n springbit rollout restart deployment auth-server

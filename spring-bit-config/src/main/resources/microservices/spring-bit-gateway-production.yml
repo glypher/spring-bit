@@ -89,6 +89,6 @@ spring-bit:
     public-auth-server: ${SPRINGBIT_AUTH_DOMAIN:localhost:9443}
 
 # Logging
-logging.level.org.springframework: INFO
-logging.level.org.springframework.security: INFO
+logging.level.org.springframework: ${LOG_LEVEL:INFO}
+logging.level.org.springframework.security: ${LOG_LEVEL:INFO}
 logging.level.org.springframework.boot.autoconfigure: ERROR
