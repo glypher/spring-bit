@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
 import { faGoogle, faFacebookF, faGithub } from '@fortawesome/free-brands-svg-icons';
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
+import {AuthType, AuthService} from "../service/auth.service";
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [
-    FaIconComponent
-  ],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+    selector: 'app-login',
+    imports: [
+        FaIconComponent
+    ],
+    templateUrl: './login.component.html',
+    standalone: true,
+    styleUrl: './login.component.css'
 })
 export class LoginComponent {
   // Icons for buttons
@@ -17,9 +18,10 @@ export class LoginComponent {
   facebookIcon = faFacebookF;
   githubIcon = faGithub;
 
-  loginWithGitHub() {}
+  constructor(private authService: AuthService) {
+  }
 
-  loginWithGoogle() {}
-
-  loginWithFacebook() {}
+  loginWithGitHub() {
+      this.authService.login(AuthType.Github);
+  }
 }

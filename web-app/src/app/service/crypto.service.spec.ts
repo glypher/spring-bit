@@ -10,6 +10,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 describe('CryptoService', () => {
   let service: CryptoService;
   let httpMock: HttpTestingController;
+  let apiUrl: string = environment.serviceUrl + environment.apiPath;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -20,7 +21,7 @@ describe('CryptoService', () => {
     service = TestBed.inject(CryptoService);
     httpMock = TestBed.inject(HttpTestingController);
 
-    httpMock.expectOne(environment.apiUrl + 'live');
+    httpMock.expectOne(apiUrl + 'live');
     httpMock.verify();
   });
 
@@ -37,7 +38,7 @@ describe('CryptoService', () => {
       expect(data).toEqual("Server alive!");
     });
 
-    const req = httpMock.expectOne(environment.apiUrl + 'live');
+    const req = httpMock.expectOne(apiUrl + 'live');
     expect(req.request.method).toBe('GET');
     req.flush("Server alive!");
   });
@@ -49,7 +50,7 @@ describe('CryptoService', () => {
       expect(data).toContain(new CryptoType("ETHEREUM", "ETH"));
     });
 
-    const req = httpMock.expectOne(environment.apiUrl + 'cryptos');
+    const req = httpMock.expectOne(apiUrl + 'cryptos');
     expect(req.request.method).toBe('GET');
     req.flush([new CryptoType("BITCOIN", "BTC"), new CryptoType("ETHEREUM", "ETH")]);
   });
@@ -65,7 +66,7 @@ describe('CryptoService', () => {
         quotePrice: 1000});
     });
 
-    const req = httpMock.expectOne(environment.apiUrl + 'BTC/quote');
+    const req = httpMock.expectOne(apiUrl + 'BTC/quote');
     expect(req.request.method).toBe('GET');
     req.flush([{
       name: "BITCOIN",

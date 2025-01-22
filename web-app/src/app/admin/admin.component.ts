@@ -5,13 +5,11 @@ import {environment} from "../../environments/environment";
 
 @Component({
   selector: 'app-admin',
-  standalone: true,
-  imports: [
-    NgIf
-  ],
   templateUrl: './admin.component.html',
+  standalone: true,
   styleUrl: './admin.component.css'
 })
+
 export class AdminComponent implements AfterViewInit {
   currentUrl: string;
   @ViewChild('adminFrame') adminFrame: any;

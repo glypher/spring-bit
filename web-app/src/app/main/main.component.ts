@@ -3,14 +3,13 @@ import {GraphComponent} from "../graph/graph.component";
 import {MenuComponent} from "../menu/menu.component";
 
 @Component({
-  selector: 'app-main',
-  standalone: true,
+    selector: 'app-main',
     imports: [
         GraphComponent,
         MenuComponent
     ],
-  templateUrl: './main.component.html',
-  styleUrl: './main.component.css'
+    templateUrl: './main.component.html',
+    styleUrl: './main.component.css'
 })
 export class MainComponent {
 

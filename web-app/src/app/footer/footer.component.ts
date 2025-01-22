@@ -4,14 +4,16 @@
 // server-footer.component.ts
 import { Component } from '@angular/core';
 import {NgForOf} from "@angular/common";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-footer',
-  standalone: true,
   imports: [
-    NgForOf
+    NgForOf,
+    RouterLink
   ],
   templateUrl: './footer.component.html',
+  standalone: true,
   styleUrls: ['./footer.component.css']
 })
 export class FooterComponent {

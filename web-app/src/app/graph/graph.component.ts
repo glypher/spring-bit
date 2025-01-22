@@ -5,11 +5,11 @@ import {CryptoService} from "../service/crypto.service";
 
 @Component({
   selector: 'app-graph',
-  standalone: true,
   imports: [
     NgForOf
   ],
   templateUrl: './graph.component.html',
+  standalone: true,
   styleUrl: './graph.component.css'
 })
 export class GraphComponent implements OnInit {

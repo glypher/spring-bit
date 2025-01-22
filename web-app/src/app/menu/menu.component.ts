@@ -5,9 +5,9 @@ import {CryptoType} from "../service/crypto.types";
 
 @Component({
   selector: 'app-menu',
-  standalone: true,
   imports: [CommonModule],
   templateUrl: './menu.component.html',
+  standalone: true,
   styleUrl: './menu.component.css'
 })
 export class MenuComponent implements OnInit {
