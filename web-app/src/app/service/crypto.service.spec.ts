@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 
 import { CryptoService } from './crypto.service';
-import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing";
+import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
 import {environment} from "../../environments/environment";
 import {CryptoQuote, CryptoType} from "./crypto.types";
 import {map, Observable} from "rxjs";
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('CryptoService', () => {
   let service: CryptoService;
@@ -12,9 +13,9 @@ describe('CryptoService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule], // Import the HttpClientTestingModule
-      providers: [CryptoService]
-    });
+    imports: [],
+    providers: [CryptoService, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
 
     service = TestBed.inject(CryptoService);
     httpMock = TestBed.inject(HttpTestingController);
