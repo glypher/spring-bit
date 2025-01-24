@@ -1,7 +1,5 @@
 import {AfterViewInit, Component, Renderer2, ViewChild} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
-import {NgIf} from "@angular/common";
-import {environment} from "../../environments/environment";
+import {ActivatedRoute, Router} from "@angular/router";
 
 @Component({
   selector: 'app-admin',
@@ -11,17 +9,26 @@ import {environment} from "../../environments/environment";
 })
 
 export class AdminComponent implements AfterViewInit {
-  currentUrl: string;
   @ViewChild('adminFrame') adminFrame: any;
 
-  constructor(private renderer: Renderer2, private activatedRoute: ActivatedRoute) {}
+  constructor(private renderer: Renderer2, private router: Router, private activatedRoute: ActivatedRoute) {}
 
   ngAfterViewInit() {
     this.activatedRoute.params.subscribe((params) => {
       // Access the current path after navigation
-      this.currentUrl = params['type'];
+      let currentUrl = params['type'];
 
-      this.renderer.setProperty(this.adminFrame.nativeElement, "src", environment.serviceUrl + this.currentUrl);
+      if (currentUrl == 'grafana') {
+        currentUrl += '/d/spingbit/spring-bit-metrics';
+      }
+      if (!currentUrl.startsWith("/")) {
+        currentUrl = "/" + currentUrl;
+      }
+
+      //this.renderer.setProperty(this.adminFrame.nativeElement, "src", window.location.origin + currentUrl);
+      window.open(window.location.origin + currentUrl, "_blank");
+
+      this.router.navigate(['/']);
     });
   }
 }

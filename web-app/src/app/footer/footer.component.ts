@@ -20,7 +20,7 @@ export class FooterComponent {
   links = [
     {
       name: 'Grafana',
-      url: '/grafana/d/spingbit/spring-bit-metrics',
+      url: '/grafana',
       icon: 'assets/logos/icons8-grafana-96.png'
     },
     {

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
-import { faGoogle, faFacebookF, faGithub } from '@fortawesome/free-brands-svg-icons';
+import {Component} from '@angular/core';
+import {faGithub} from '@fortawesome/free-brands-svg-icons';
 import {FaIconComponent} from "@fortawesome/angular-fontawesome";
-import {AuthType, AuthService} from "../service/auth.service";
+import {AuthService} from "../service/auth.service";
+import {AuthType} from "../service/service.types";
 
 @Component({
     selector: 'app-login',
@@ -13,15 +14,13 @@ import {AuthType, AuthService} from "../service/auth.service";
     styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  // Icons for buttons
-  googleIcon = faGoogle;
-  facebookIcon = faFacebookF;
-  githubIcon = faGithub;
+  protected readonly githubIcon = faGithub;
 
   constructor(private authService: AuthService) {
   }
 
   loginWithGitHub() {
-      this.authService.login(AuthType.Github);
+    this.authService.login(AuthType.Github);
   }
+
 }

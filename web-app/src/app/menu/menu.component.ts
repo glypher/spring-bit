@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {CryptoService} from "../service/crypto.service";
-import {CryptoType} from "../service/crypto.types";
+import {CryptoType} from "../service/service.types";
 
 @Component({
   selector: 'app-menu',

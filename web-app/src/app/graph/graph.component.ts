@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {NgForOf} from "@angular/common";
-import {CryptoQuote} from "../service/crypto.types";
+import {CryptoQuote} from "../service/service.types";
 import {CryptoService} from "../service/crypto.service";
 
 @Component({

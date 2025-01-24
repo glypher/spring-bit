@@ -25,3 +25,20 @@ export class CryptoType {
     return CryptoType.TYPES.get(symbol.toLowerCase())!;
   }
 }
+
+export enum AuthType {
+  Github
+}
+
+export class UserDetails {
+  username: string;
+  avatarUrl: string;
+
+  constructor(username: string, avatarUrl: string) {
+    this.username = username;
+    this.avatarUrl = avatarUrl;
+  }
+
+  public static readonly DEFAULT_USER = new UserDetails("", "");
+}
+
