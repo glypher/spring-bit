@@ -141,6 +141,7 @@ services:
           memory: 256M
     networks:
       - internal
+      - default
     ports:
      - 9411:9411
 
@@ -158,6 +159,7 @@ services:
           memory: 256M
     networks:
       - internal
+      - default
     ports:
     - 3000:3000
 
@@ -190,5 +192,6 @@ services:
           memory: 256M
     networks:
       - internal
+      - default
     ports:
     - 9090:9090

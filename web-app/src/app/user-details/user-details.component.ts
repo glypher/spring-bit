@@ -29,6 +29,8 @@ export class UserDetailsComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+
+    this.router.navigate(['/']);
   }
 
   // Check if user is logged in or not

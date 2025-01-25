@@ -4,22 +4,35 @@ import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.ReactiveAuthenticationManagerResolver;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.InMemoryReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.server.DefaultServerOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.AuthenticationMethod;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerReactiveAuthenticationManagerResolver;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.savedrequest.ServerRequestCache;
 import org.springframework.security.web.server.savedrequest.WebSessionServerRequestCache;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
@@ -31,102 +44,91 @@ import java.time.Duration;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
-    @Value("${spring-bit.auth.public-auth-server}")
+    @Value("${spring-bit.public-domain}")
     private String publicDomain;
 
     @Bean
+    @Order(1)
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http,
                                                          ReactiveClientRegistrationRepository clientRegistrationRepository) {
+
+        JwtIssuerReactiveAuthenticationManagerResolver authenticationManagerResolver = JwtIssuerReactiveAuthenticationManagerResolver
+                .fromTrustedIssuers("https://github.com/login/oauth");
+
         ServerRequestCache requestCache = new WebSessionServerRequestCache();
 
-        http
+
+        return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(authorize -> authorize
-                        .pathMatchers("/discovery/**","/tracing/**", "/grafana/**", "/prometheus/**").authenticated()
-                        .anyExchange().permitAll()
-                )
-                .oauth2Login(oauth2Login -> oauth2Login
-                        .loginPage("/oauth2/authorization/springbit-openid")
+                .headers(headers -> headers.frameOptions(ServerHttpSecurity.HeaderSpec.FrameOptionsSpec::disable))
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationRequestResolver(new ServerOAuth2AuthorizationRequestResolver() {
+                            private final DefaultServerOAuth2AuthorizationRequestResolver defaultResolver = new DefaultServerOAuth2AuthorizationRequestResolver(clientRegistrationRepository);
+
+                            @Override
+                            public Mono<OAuth2AuthorizationRequest> resolve(ServerWebExchange exchange) {
+                                String path = exchange.getRequest().getPath().toString();
+                                if (path.startsWith("/user")) {
+                                    if (path.contains("keycloak")) {
+                                        return resolve(exchange, "keycloak");
+                                    } else if (path.contains("google")) {
+                                        return resolve(exchange, "google");
+                                    } else if (path.contains("github")) {
+                                        return resolve(exchange, "github");
+                                    } else if (path.contains("facebook")) {
+                                        return resolve(exchange, "facebook");
+                                    }
+                                }
+                                return Mono.empty();
+                            }
+
+                            @Override
+                            public Mono<OAuth2AuthorizationRequest> resolve(ServerWebExchange exchange, String clientRegistrationId) {
+                                return this.defaultResolver.resolve(exchange, clientRegistrationId);
+                            }
+                        })
                         .authenticationSuccessHandler(
-                                (webFilterExchange, authentication) -> requestCache
-                                        .getRedirectUri(webFilterExchange.getExchange())
-                                        .defaultIfEmpty(URI.create("/")) // Redirect here if no saved request
-                                        .flatMap(redirectUrl -> {
-                                            webFilterExchange.getExchange().getResponse()
-                                                    .setStatusCode(org.springframework.http.HttpStatus.FOUND);
-                                            webFilterExchange.getExchange().getResponse()
-                                                    .getHeaders().setLocation(redirectUrl);
-                                            return Mono.empty();
-                                        })))
-                .oauth2Client(Customizer.withDefaults())
-                .logout(logout -> {
-                    OidcClientInitiatedServerLogoutSuccessHandler logoutSuccessHandler =
-                            new OidcClientInitiatedServerLogoutSuccessHandler(clientRegistrationRepository);
-                    logoutSuccessHandler.setPostLogoutRedirectUri("http://localhost:8080/");
-                    logout.logoutSuccessHandler(logoutSuccessHandler);
-                });
-
-        return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        // Needed to hash the oauth2 client secret {bcrypt}....
-        return new BCryptPasswordEncoder();
-    }
-
-
-    @Bean
-    public ReactiveClientRegistrationRepository reactiveClientRegistrationRepository(
-            WebClient.Builder webClientBuilder,
-            @Value("${spring-bit.auth.gateway}") String gateway,
-            @Value("${spring-bit.auth.server}") String server
-    ) {
-        WebClient webClient = webClientBuilder.baseUrl(server).build();
-        return webClient.get()
-                .uri("/.well-known/openid-configuration")
-                .retrieve()
-                .bodyToMono(JSONObject.class)
-                .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)))
-                .map(jsonBody -> new InMemoryReactiveClientRegistrationRepository(
-                        ClientRegistration
-                                .withRegistrationId("springbit-openid")
-                                .clientName("springbit-openid")
-                                .clientId("springbit-openid")
-                                .clientSecret("secret")
-                                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                                .scope("openid", "profile", "monitoring.read")
-                                .redirectUri(gateway + "/login/oauth2/code/springbit-openid")
-                                .issuerUri(jsonBody.getAsString("issuer"))
-                                .authorizationUri(replaceDomain(jsonBody.getAsString("authorization_endpoint")))
-                                .tokenUri(jsonBody.getAsString("token_endpoint"))
-                                .jwkSetUri(jsonBody.getAsString("jwks_uri"))
-                                .userInfoUri(jsonBody.getAsString("userinfo_endpoint"))
-                                .userInfoAuthenticationMethod(AuthenticationMethod.HEADER)
-                                .userNameAttributeName("sub")
-                                .build())
-                ).block();
-    }
-
-    private String replaceDomain(String originalUrl) {
-        try {
-            // Create a URI object from the original URL
-            URI uri = new URI(originalUrl);
-
-            // Create a new URI with the same components but replacing the host (domain)
-            URI modifiedUri = new URI(
-                    uri.getScheme(),
-                    publicDomain,
-                    uri.getPath(),
-                    uri.getQuery(),
-                    uri.getFragment()
+                                (webFilterExchange, authentication) -> {
+                                        webFilterExchange.getExchange().getResponse()
+                                                .setStatusCode(org.springframework.http.HttpStatus.FOUND);
+                                        webFilterExchange.getExchange().getResponse()
+                                                .getHeaders().setLocation(URI.create(publicDomain + "/loginCallback"));
+                                        if (authentication.getPrincipal() instanceof OAuth2User) {
+                                            /*
+                                             OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
+                    clientRegistrationId,
+                    oidcUser.getName()
             );
 
-            return modifiedUri.toString();
-        } catch (URISyntaxException e) {
-            return originalUrl;
-        }
-    }
+            if (authorizedClient != null) {
+                // Get the access token
+                String accessToken = authorizedClient.getAccessToken().getTokenValue();
+                System.out.println("Access Token: " + accessToken);
+            }
+                                             */
+                                        }
+                                        return Mono.empty();
+                                }))
+                .oauth2Client(Customizer.withDefaults())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .authenticationManagerResolver(authenticationManagerResolver)
+                )
+                .authorizeExchange(authorize -> authorize
+                        // Paths requiring OAuth2 login
+                        .pathMatchers("/user/**").authenticated()
 
+                        // Paths acting as a resource server (JWT validation)
+                        .pathMatchers("/discovery/**","/tracing/**", "/grafana/**", "/prometheus/**").hasAuthority("OAUTH2_USER")
+                        .anyExchange().permitAll()
+                )
+                .logout(logoutSpec -> logoutSpec.logoutUrl("/user/logout")
+                        .logoutSuccessHandler((webFilterExchange, authentication) -> Mono.fromRunnable(() -> {
+                            webFilterExchange.getExchange().getResponse().setStatusCode(HttpStatus.OK);
+                            // Optionally, clear any custom session data here
+
+                            webFilterExchange.getExchange().getResponse().getHeaders().setLocation(URI.create(publicDomain));
+                        }
+                    )))
+                .build();
+    }
 }

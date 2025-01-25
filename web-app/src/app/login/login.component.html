@@ -1,15 +1,35 @@
 <div class="flex items-center justify-center min-h-screen bg-gray-100">
   <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
     <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">Welcome Back</h2>
-    <p class="text-center text-gray-500 mb-8">Login to your account</p>
+    <p class="text-center text-gray-500 mb-8">Login to <b>springbit</b> account</p>
+
+    <!-- Keycloak Login Button -->
+    <button
+      (click)="loginWithKeycloak()"
+      class="w-full h-16 flex items-center justify-center bg-gray-100 text-white hover:bg-gray-200 py-3 px-4 rounded-lg shadow-md mb-4"
+    >
+      <img src="assets/logos/keycloak.svg" alt="Keycloak login" class="h-10 max-w-full"/>
+    </button>
+
+
+    <!-- Facebook Login Button -->
+    <button
+      (click)="loginWithFacebook()"
+      class="w-full flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700 py-3 px-4 rounded-lg mb-4 shadow-md"
+    >
+      <fa-icon [icon]="facebookIcon" class="text-2xl mr-4"></fa-icon>
+      <span class="text-lg font-medium">Login with Facebook</span>
+    </button>
 
     <!-- GitHub Login Button -->
     <button
       (click)="loginWithGitHub()"
       class="w-full flex items-center justify-center bg-gray-800 text-white hover:bg-gray-900 py-3 px-4 rounded-lg shadow-md"
     >
-      <fa-icon [icon]="githubIcon" class="text-xl mr-4"></fa-icon>
+      <fa-icon [icon]="githubIcon" class="text-2xl mr-4"></fa-icon>
       <span class="text-lg font-medium">Login with GitHub</span>
     </button>
   </div>
 </div>
+
+

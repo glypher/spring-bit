@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {AuthType, UserDetails} from "./service.types";
@@ -22,9 +22,10 @@ export class AuthService {
 
   login(provider: AuthType) {
     this.hasLoggedIn = false;
-    if (provider == AuthType.Github) {
-      window.location.href = environment.serviceUrl + '/user/githubLogin';
-      return;
+    switch (provider) {
+      case AuthType.Github:   window.location.href = environment.serviceUrl + '/user/githubLogin';   break;
+      case AuthType.Facebook: window.location.href = environment.serviceUrl + '/user/facebookLogin'; break;
+      case AuthType.Keycloak: window.location.href = environment.serviceUrl + '/user/keycloakLogin'; break;
     }
   }
 

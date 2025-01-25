@@ -1,4 +1,3 @@
 package com.springbit.gateway.controller.dto;
 
-public class UserInfo {
-}
+public record UserInfo(String username, String avatarUrl) {}

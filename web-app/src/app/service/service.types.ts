@@ -27,7 +27,10 @@ export class CryptoType {
 }
 
 export enum AuthType {
-  Github
+  Github,
+  Facebook,
+  Google,
+  Keycloak
 }
 
 export class UserDetails {

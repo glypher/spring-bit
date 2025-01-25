@@ -25,10 +25,10 @@ export class AdminComponent implements AfterViewInit {
         currentUrl = "/" + currentUrl;
       }
 
-      //this.renderer.setProperty(this.adminFrame.nativeElement, "src", window.location.origin + currentUrl);
-      window.open(window.location.origin + currentUrl, "_blank");
+      this.renderer.setProperty(this.adminFrame.nativeElement, "src", window.location.origin + currentUrl);
+      //window.open(window.location.origin + currentUrl, "_blank");
 
-      this.router.navigate(['/']);
+      //this.router.navigate(['/']);
     });
   }
 }
