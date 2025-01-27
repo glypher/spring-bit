@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.server.DefaultServerOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizationRequestResolver;
@@ -15,7 +16,10 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerReactiveAuthenticationManagerResolver;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
+import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -86,7 +90,13 @@ public class SecurityConfig {
                                         }
                                         */
                                         return Mono.empty();
-                                }))
+                                })
+                        .authenticationFailureHandler((WebFilterExchange webFilterExchange, AuthenticationException ex) -> {
+                            webFilterExchange.getExchange().getResponse().setStatusCode(HttpStatus.FOUND);
+                            webFilterExchange.getExchange().getResponse().getHeaders().setLocation(
+                                    UriComponentsBuilder.fromUriString(publicDomain + "/loginCallback").queryParam("error", ex.getMessage()).build().toUri());
+                            return Mono.empty();
+                        }))
                 .oauth2Client(Customizer.withDefaults())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .authenticationManagerResolver(authenticationManagerResolver)
@@ -108,8 +118,15 @@ public class SecurityConfig {
                         }
                     )))
                 .exceptionHandling(exceptionHandlingSpec ->
-                        exceptionHandlingSpec.accessDeniedHandler((ServerWebExchange exchange, AccessDeniedException denied) -> {
-                            exchange.getResponse().getHeaders().setLocation(URI.create(publicDomain));
+                        exceptionHandlingSpec.accessDeniedHandler((ServerWebExchange exchange, AccessDeniedException ex) -> {
+                            exchange.getResponse().setStatusCode(HttpStatus.FOUND);
+                            exchange.getResponse().getHeaders().setLocation(
+                                    UriComponentsBuilder.fromUriString(publicDomain + "/loginCallback").queryParam("error", ex.getMessage()).build().toUri());
+                            return Mono.empty();
+                        }).authenticationEntryPoint((ServerWebExchange exchange, AuthenticationException ex) -> {
+                            exchange.getResponse().setStatusCode(HttpStatus.FOUND);
+                            exchange.getResponse().getHeaders().setLocation(
+                                    UriComponentsBuilder.fromUriString(publicDomain + "/loginCallback").queryParam("error", ex.getMessage()).build().toUri());
                             return Mono.empty();
                         }))
                 .build();

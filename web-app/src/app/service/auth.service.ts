@@ -14,6 +14,9 @@ export class AuthService {
   private userDetailsSource = new BehaviorSubject<UserDetails>(UserDetails.DEFAULT_USER);
   userDetails = this.userDetailsSource.asObservable();
 
+  private loginErrorSource = new BehaviorSubject<string>("");
+  loginError = this.loginErrorSource.asObservable();
+
   constructor(private http: HttpClient) { }
 
   isLoggedIn() {
@@ -37,6 +40,10 @@ export class AuthService {
         console.log(userDetails);
       }
     )
+  }
+
+  loginFailure(error: string) {
+    this.loginErrorSource.next(error);
   }
 
   logout() {

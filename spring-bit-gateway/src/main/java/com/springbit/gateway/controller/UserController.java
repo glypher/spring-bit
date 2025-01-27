@@ -15,11 +15,6 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserController {
 
-    @GetMapping("/loginGithub")
-    public String login() {
-        return "redirect:/loginCallback";
-    }
-
     //@PreAuthorize("hasAuthority('SCOPE_read:user')")
     @GetMapping("/info")
     public Mono<UserInfo> info(@AuthenticationPrincipal  OAuth2User oAuth2User) {
