@@ -10,10 +10,28 @@ spring:
             clientSecret:
           facebook:
             client-id:
-            client-secret: 
+            client-secret:
+          keycloak:
+            client-id: springbit-openid
+            client-secret:
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://localhost:8080/login/oauth2/code/springbit-openid"
+            scope: openid
+            provider: keycloak
+
         provider:
           facebook:
-            user-info-uri: https://graph.facebook.com/me?fields=id,name,email,picture
+            user-info-uri: https://graph.facebook.com/me?fields=id,name,picture
+
+          keycloak:
+            authorization-uri: http://localhost:8080/keycloak/realms/springbit/protocol/openid-connect/auth
+            token-uri: http://localhost:9080/keycloak/realms/springbit/protocol/openid-connect/token
+            user-info-uri: http://localhost:9080/keycloak/realms/springbit/protocol/openid-connect/userinfo
+            jwk-set-uri: http://localhost:9080/keycloak/realms/springbit/protocol/openid-connect/certs
+            user-name-attribute: name
+
+#            authorization-uri: http://localhost:8080/keycloak/realms/springbit/protocol/openid-connect/auth
+
 ---
 spring:
   config:
@@ -58,6 +76,13 @@ spring:
             - Path=/prometheus/**
           filters:
             - StripPrefix=1
+
+        - id: keycloak
+          uri: http://localhost:9080
+          predicates:
+            - Path=/keycloak/**
+          filters:
+            - StripPrefix=0
 
     discovery:
       enabled: false

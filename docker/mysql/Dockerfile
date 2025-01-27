@@ -2,15 +2,20 @@ FROM mysql:9.1-oracle
 
 ARG ROOT_PASSWORD=spring-bit-mysql-root
 ARG USER_PASSWORD=spring-bit-mysql
+ARG KEYCLOAK_PASSWORD=keycloak-pass
 
 # Set environment variables for MySQL root user
 ENV MYSQL_ROOT_PASSWORD=$ROOT_PASSWORD \
     MYSQL_USER=spring-bit-user \
-    MYSQL_PASSWORD=$USER_PASSWORD
+    MYSQL_PASSWORD=$USER_PASSWORD \
+    KEYCLOAK_PASSWORD=$KEYCLOAK_PASSWORD
 
 
 # Copy initialization scripts to the container
 COPY config/init.sql /docker-entrypoint-initdb.d/
+COPY config/keycloak.sh /docker-entrypoint-initdb.d/
+RUN chmod a-x /docker-entrypoint-initdb.d/keycloak.sh
+
 COPY config/my.cnf /etc/mysql/conf.d/my.cnf
 COPY config/spring-bit-start.sh /usr/local/bin/
 RUN chmod a+x /usr/local/bin/spring-bit-start.sh

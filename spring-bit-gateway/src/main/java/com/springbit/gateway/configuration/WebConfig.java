@@ -29,6 +29,7 @@ public class WebConfig {
                         RequestPredicates.GET("/web-app")
                                 .or(RequestPredicates.GET("/web-app/"))
                                 .or(RequestPredicates.GET("/"))
+                                .or(RequestPredicates.GET("/login"))
                                 .or(RequestPredicates.GET("/loginCallback")),
                         request -> {
                             try {

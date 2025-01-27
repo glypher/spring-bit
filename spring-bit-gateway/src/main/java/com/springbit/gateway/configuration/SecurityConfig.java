@@ -1,44 +1,24 @@
 package com.springbit.gateway.configuration;
 
-import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.ReactiveAuthenticationManagerResolver;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.InMemoryReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.server.DefaultServerOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizationRequestResolver;
-import org.springframework.security.oauth2.core.AuthenticationMethod;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerReactiveAuthenticationManagerResolver;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.web.server.WebFilterExchange;
-import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
-import org.springframework.security.web.server.savedrequest.ServerRequestCache;
-import org.springframework.security.web.server.savedrequest.WebSessionServerRequestCache;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.Duration;
 
 
 @Configuration
@@ -55,12 +35,12 @@ public class SecurityConfig {
         JwtIssuerReactiveAuthenticationManagerResolver authenticationManagerResolver = JwtIssuerReactiveAuthenticationManagerResolver
                 .fromTrustedIssuers("https://github.com/login/oauth");
 
-        ServerRequestCache requestCache = new WebSessionServerRequestCache();
-
 
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .headers(headers -> headers.frameOptions(ServerHttpSecurity.HeaderSpec.FrameOptionsSpec::disable))
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationRequestResolver(new ServerOAuth2AuthorizationRequestResolver() {
                             private final DefaultServerOAuth2AuthorizationRequestResolver defaultResolver = new DefaultServerOAuth2AuthorizationRequestResolver(clientRegistrationRepository);
@@ -93,20 +73,18 @@ public class SecurityConfig {
                                                 .setStatusCode(org.springframework.http.HttpStatus.FOUND);
                                         webFilterExchange.getExchange().getResponse()
                                                 .getHeaders().setLocation(URI.create(publicDomain + "/loginCallback"));
+                                        /*
                                         if (authentication.getPrincipal() instanceof OAuth2User) {
-                                            /*
                                              OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
-                    clientRegistrationId,
-                    oidcUser.getName()
-            );
-
-            if (authorizedClient != null) {
-                // Get the access token
-                String accessToken = authorizedClient.getAccessToken().getTokenValue();
-                System.out.println("Access Token: " + accessToken);
-            }
-                                             */
+                                                        clientRegistrationId,
+                                                        oidcUser.getName());
+                                            if (authorizedClient != null) {
+                                                // Get the access token
+                                                String accessToken = authorizedClient.getAccessToken().getTokenValue();
+                                                System.out.println("Access Token: " + accessToken);
+                                            }
                                         }
+                                        */
                                         return Mono.empty();
                                 }))
                 .oauth2Client(Customizer.withDefaults())
@@ -118,7 +96,7 @@ public class SecurityConfig {
                         .pathMatchers("/user/**").authenticated()
 
                         // Paths acting as a resource server (JWT validation)
-                        .pathMatchers("/discovery/**","/tracing/**", "/grafana/**", "/prometheus/**").hasAuthority("OAUTH2_USER")
+                        .pathMatchers("/discovery/**","/tracing/**", "/grafana/**", "/prometheus/**").hasAnyAuthority("OAUTH2_USER", "OIDC_USER")
                         .anyExchange().permitAll()
                 )
                 .logout(logoutSpec -> logoutSpec.logoutUrl("/user/logout")
@@ -129,6 +107,11 @@ public class SecurityConfig {
                             webFilterExchange.getExchange().getResponse().getHeaders().setLocation(URI.create(publicDomain));
                         }
                     )))
+                .exceptionHandling(exceptionHandlingSpec ->
+                        exceptionHandlingSpec.accessDeniedHandler((ServerWebExchange exchange, AccessDeniedException denied) -> {
+                            exchange.getResponse().getHeaders().setLocation(URI.create(publicDomain));
+                            return Mono.empty();
+                        }))
                 .build();
     }
 }

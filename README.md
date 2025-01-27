@@ -23,7 +23,7 @@ First we need to create the PKI self-signed certificates keystores and trust sto
 ```shell
 sudo rm -rf data/ ; mkdir -p data
 cd scripts
-chmod a+x gen_key_stores.sh init_vault.sh
+chmod a+x gen_key_stores.sh init_vault.sh init_keycloak.sh
 ./gen_key_stores.sh
 
 # Add tokens
@@ -32,6 +32,8 @@ echo "coinmarketcap.api-token=REPLACE_ME" >> ../data/secrets.prop
 echo "mysql.password=spring-bit-mysql" >> ../data/secrets.prop
 
 ./init_vault.sh
+
+sudo rm -rf ../data/mysql/storage/ ; ./init_keycloak.sh
 cd ..
 ```
 

@@ -55,18 +55,24 @@ services:
       - ./data/mysql/:/mysql-data
 
   ## OpenId backend
-  auth-server:
-    container_name: auth-server
-    image: springbit/spring-bit-auth-server
-    pull_policy: never
+  keycloak-server:
+    container_name: keycloak-server
+    image: quay.io/keycloak/keycloak:26.1.0
+    command: >
+      start --http-enabled true
+            --hostname http://localhost:8080/keycloak --hostname-admin http://localhost:9080/keycloak
+            --http-relative-path /keycloak
+            --db mysql --db-url jdbc:mysql://mysql-server:3306/keycloak?ssl-mode=DISABLED
+            --db-username keycloak-user --db-password keycloak-pass
+            --verbose
     depends_on:
-      config-service:
-        condition: service_started
+      - mysql-server
+    ports:
+      - 9080:8080
+      #- 9443:8443
     networks:
       - internal
       - default
-    ports:
-      - 9443:9443
 
   discovery-service:
     container_name: discovery-service
@@ -95,8 +101,6 @@ services:
       config-service:
         condition: service_started
       crypto-service:
-        condition: service_started
-      auth-server:
         condition: service_started
     networks:
       - internal
