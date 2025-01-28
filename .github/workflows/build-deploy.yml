@@ -48,7 +48,7 @@ jobs:
         sudo apt update && sudo apt install vault
         # Add config secrets
         cp config/config.properties.template config/config.properties
-        echo "spring-bit.public-domain=${{SPRINGBIT_DOMAIN}}" >> config/config.properties
+        echo "spring-bit.public-domain=${{secrets.SPRINGBIT_DOMAIN}}" >> config/config.properties
         echo "spring-bit.db.mysql.root.password=${{secrets.MYSQL_ROOT_PASSWORD}}" >> config/config.properties
         echo "spring-bit.db.mysql.springbit.password=${{secrets.MYSQL_SPRINGBIT_PASSWORD}}" >> config/config.properties
         echo "spring-bit.db.mysql.keycloak.password=${{secrets.MYSQL_KEYCLOAK_PASSWORD}}" >> config/config.properties

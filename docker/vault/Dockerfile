@@ -4,9 +4,6 @@ FROM hashicorp/vault
 COPY config/start-vault-unsealed.sh /usr/local/bin/.
 RUN chmod 755 /usr/local/bin/start-vault-unsealed.sh
 
-COPY unseal/unseal.sh /usr/local/bin/.
-RUN chmod 755 /usr/local/bin/unseal.sh
-
 # Copy certificates
 COPY certs /etc/vault/certs
 RUN chown -R vault:vault /etc/vault/certs

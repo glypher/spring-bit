@@ -7,7 +7,7 @@ VAULT_DATA=$DATA_DIR/vault/storage
 
 VAULT_KEYS=$DATA_DIR/vault-keys
 
-VAULT_UNSEAL_DIR=../docker/vault/unseal
+VAULT_UNSEAL_DIR=$DATA_DIR/vault/unseal
 VAULT_CONFIG_DIR=../docker/vault/config
 VAULT_CONFIG=$VAULT_CONFIG_DIR/vault-server-init.hcl
 VAULT_POLICY=$VAULT_CONFIG_DIR/spring-bit-policy.hcl
