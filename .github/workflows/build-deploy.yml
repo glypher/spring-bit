@@ -63,6 +63,8 @@ jobs:
         ./init_vault.sh
         # Initialize keycloak
         ./init_keycloak.sh
+        cd ..
+        sudo chown -R $USER data
       shell: bash
       
       # Install the cosign tool except on PR
