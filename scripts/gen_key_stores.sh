@@ -2,7 +2,6 @@
 CONFIG_DIR=../spring-bit-config/src/main/resources/stores
 CRYPTO_DIR=../spring-bit-crypto/src/main/resources/stores
 GATEWAY_DIR=../spring-bit-gateway/src/main/resources/stores
-AUTH_SERVER_DIR=../spring-bit-auth-server/src/main/resources/stores
 VAULT_DIR=../docker/vault/certs
 MYSQL_DIR=../docker/mysql/certs
 
@@ -25,10 +24,6 @@ keytool -genkeypair -noprompt -keyalg EC -alias spring-bit-crypto -dname "CN=cry
 rm -rf $GATEWAY_DIR ; mkdir -p $GATEWAY_DIR
 keytool -genkeypair -noprompt -keyalg EC -alias spring-bit-gateway -dname "CN=gateway-service" -validity 365 -keypass springbit -keystore $GATEWAY_DIR/gateway-keystore.p12 -storepass springbit  -deststoretype pkcs12
 
-# Auth Server key pair
-rm -rf $AUTH_SERVER_DIR ; mkdir -p $AUTH_SERVER_DIR
-keytool -genkeypair -noprompt -keyalg EC -alias spring-bit-auth-server -dname "CN=auth-server" -validity 365 -keypass springbit -keystore $AUTH_SERVER_DIR/auth-server-keystore.p12 -storepass springbit  -deststoretype pkcs12
-
 # Trust store config service
 keytool -exportcert -noprompt -rfc -alias spring-bit-crypto -file spring-bit-crypto.crt -keystore $CRYPTO_DIR/crypto-keystore.p12 -storepass springbit
 keytool -importcert -noprompt -alias spring-bit-crypto -file spring-bit-crypto.crt -keystore $CONFIG_DIR/config-truststore.p12 -storepass springbit -deststoretype pkcs12
@@ -37,10 +32,6 @@ rm spring-bit-crypto.crt
 keytool -exportcert -noprompt -rfc -alias spring-bit-gateway -file spring-bit-gateway.crt -keystore $GATEWAY_DIR/gateway-keystore.p12 -storepass springbit
 keytool -importcert -noprompt -alias spring-bit-gateway -file spring-bit-gateway.crt -keystore $CONFIG_DIR/config-truststore.p12 -storepass springbit -deststoretype pkcs12
 rm spring-bit-gateway.crt
-
-keytool -exportcert -noprompt -rfc -alias spring-bit-auth-server -file spring-bit-auth-server.crt -keystore $AUTH_SERVER_DIR/auth-server-keystore.p12 -storepass springbit
-keytool -importcert -noprompt -alias spring-bit-auth-server -file spring-bit-auth-server.crt -keystore $CONFIG_DIR/config-truststore.p12 -storepass springbit -deststoretype pkcs12
-rm spring-bit-auth-server.crt
 
 openssl x509 -outform der -in $VAULT_DIR/vault-cert.pem -out vault-server.crt
 keytool -importcert -noprompt -alias spring-bit-vault-server -file vault-server.crt -keystore $CONFIG_DIR/config-truststore.p12 -storepass springbit -deststoretype pkcs12
@@ -52,8 +43,6 @@ keytool -exportcert -noprompt -rfc -alias spring-bit-config -file spring-bit-con
 keytool -importcert -noprompt -alias spring-bit-config -file spring-bit-config.crt -keystore $CRYPTO_DIR/crypto-truststore.p12 -storepass springbit -deststoretype pkcs12
 
 keytool -importcert -noprompt -alias spring-bit-config -file spring-bit-config.crt -keystore $GATEWAY_DIR/gateway-truststore.p12 -storepass springbit -deststoretype pkcs12
-
-keytool -importcert -noprompt -alias spring-bit-config -file spring-bit-config.crt -keystore $AUTH_SERVER_DIR/auth-server-truststore.p12 -storepass springbit -deststoretype pkcs12
 
 rm spring-bit-config.crt
 

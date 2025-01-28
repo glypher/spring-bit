@@ -18,26 +18,30 @@ The development environment requires:
 - [optional] Terraform and AWS client - see [README.devel web development](README.devel.md#terraform-aws-deployment)
 - [optional] Intellij
 
-First we need to create the PKI self-signed certificates keystores and trust stores that hold them.
+1. Configure secrets in config.properties file
+```shell
+cp scripts/config/config.properties.template scripts/config/config.properties
+# REPLACE SECRETS to fully configure all services like oauth2
+```
 
+2. Create PKI self-signed certificates and init vault and keycloak server
 ```shell
 sudo rm -rf data/ ; mkdir -p data
 cd scripts
 chmod a+x gen_key_stores.sh init_vault.sh init_keycloak.sh
+# generate key pairs
 ./gen_key_stores.sh
-
-# Add tokens
-echo "bitquery.api-token=REPACE_ME" >> ../data/secrets.prop
-echo "coinmarketcap.api-token=REPLACE_ME" >> ../data/secrets.prop
-echo "mysql.password=spring-bit-mysql" >> ../data/secrets.prop
 
 ./init_vault.sh
 
-sudo rm -rf ../data/mysql/storage/ ; ./init_keycloak.sh
+# Initialize keycloak
+./init_keycloak.sh
 cd ..
+
+sudo chown -R $USER data
 ```
 
-Then we can actually build the jars and deploy them in the docker containers.
+3. Build all jars and create docker containers
 
 ```shell
 cd web-app; ng build --base-href=/web-app/ --configuration=production ; cd ..
@@ -110,6 +114,9 @@ kubectl apply -f k8s -R
 kubectl -n springbit set env deployment/config-service VAULT_USER_TOKEN=$(grep vault.token data/secrets.prop | cut -d'=' -f 2-)
 kubectl -n springbit rollout restart deployment config-service
 
+kubectl -n springbit set env deployment/keycloak-server SPRINGBIT_DOMAIN=http://localhost:8080
+kubectl -n springbit rollout restart deployment keycloak-server
+
 # Check out deployment
 kubectl get nodes --show-labels
 kubectl get pods -A -o wide
@@ -120,7 +127,6 @@ kubectl get pv
 ```shell
 # Tunnel gateway service pod port to hosts localhost:8080
 kubectl -n springbit port-forward deployment/gateway-service 8080:8080 &
-kubectl -n springbit port-forward deployment/auth-server 9443:9443 &
 ```
 Now you can access the app through localhost:8080 like before see [Service table](#Services)
 

@@ -1,21 +1,103 @@
 spring:
   application:
     name: spring-bit-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: crypto-service
+          uri: ${spring-bit.services.crypto-service.url}
+          enabled: ${spring-bit.services.crypto-service.enabled}
+          predicates:
+            - Path=/api/v1/crypto/**
+          filters:
+            - StripPrefix=2
+        - id: crypto-service-docs
+          uri: ${spring-bit.services.crypto-service.url}
+          enabled: ${spring-bit.services.crypto-service.enabled}
+          predicates:
+            - Path=/api/v1/docs/**
+          filters:
+            - StripPrefix=3
+            - RewriteResponseHeader=Location, ^/, /api/v1/docs/
+
+        - id: discovery
+          uri: ${spring-bit.services.discovery-service.url}
+          enabled: ${spring-bit.services.discovery-service.enabled}
+          predicates:
+            - Path=/discovery/**
+          filters:
+            - StripPrefix=1
+        - id: discovery-res
+          uri: ${spring-bit.services.discovery-service.url}
+          enabled: ${spring-bit.services.discovery-service.enabled}
+          predicates:
+            - Path=/eureka/**
+
+        - id: tracing
+          uri: ${spring-bit.services.tracing-server.url}
+          enabled: ${spring-bit.services.tracing-server.enabled}
+          predicates:
+            - Path=/tracing/**
+          filters:
+            - StripPrefix=1
+            - RewriteResponseHeader=Location, /zipkin, /tracing/zipkin
+
+        - id: grafana
+          uri: ${spring-bit.services.grafana-server.url}
+          enabled: ${spring-bit.services.grafana-server.enabled}
+          predicates:
+            - Path=/grafana/**
+          filters:
+            - SetRequestHostHeader=localhost:8080
+
+        - id: prometheus
+          uri: ${spring-bit.services.prometheus-server.url}
+          enabled: ${spring-bit.services.prometheus-server.enabled}
+          predicates:
+            - Path=/prometheus/**
+          filters:
+            - StripPrefix=1
+
+        - id: keycloak
+          uri: ${spring-bit.services.keycloak-server.url}
+          enabled: ${spring-bit.services.keycloak-server.enabled}
+          predicates:
+            - Path=/keycloak/**
+          filters:
+            - StripPrefix=0
+
+        - id: bitquery
+          uri: ${spring-bit.services.bitquery.url}
+          enabled: ${spring-bit.services.bitquery.enabled}
+          predicates:
+            - Path=/bitquery/**
+          filters:
+            - StripPrefix=1
+
+        - id: coinmarketcap
+          uri: ${spring-bit.services.coinmarketcap.url}
+          enabled: ${spring-bit.services.coinmarketcap.enabled}
+          predicates:
+            - Path=/coinmarketcap/**
+          filters:
+            - StripPrefix=1
+
   security:
     oauth2:
       client:
         registration:
           github:
-            clientId:
-            clientSecret:
+            clientId: ${spring-bit.auth.github.client-id}
+            clientSecret: ${spring-bit.auth.github.client-secret}
           facebook:
-            client-id:
-            client-secret:
+            client-id: ${spring-bit.auth.facebook.client-id}
+            client-secret: ${spring-bit.auth.facebook.client-secret}
           keycloak:
             client-id: springbit-openid
-            client-secret:
+            client-secret: ${spring-bit.auth.keycloak.client-secret}
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:8080/login/oauth2/code/springbit-openid"
+            redirect-uri: ${spring-bit.public-domain}/login/oauth2/code/springbit-openid
             scope: openid
             provider: keycloak
 
@@ -24,71 +106,22 @@ spring:
             user-info-uri: https://graph.facebook.com/me?fields=id,name,picture
 
           keycloak:
-            authorization-uri: http://localhost:8080/keycloak/realms/springbit/protocol/openid-connect/auth
-            token-uri: http://localhost:9080/keycloak/realms/springbit/protocol/openid-connect/token
-            user-info-uri: http://localhost:9080/keycloak/realms/springbit/protocol/openid-connect/userinfo
-            jwk-set-uri: http://localhost:9080/keycloak/realms/springbit/protocol/openid-connect/certs
+            authorization-uri: ${spring-bit.public-domain}/keycloak/realms/springbit/protocol/openid-connect/auth
+            token-uri: ${spring-bit.services.keycloak-server.url}/keycloak/realms/springbit/protocol/openid-connect/token
+            user-info-uri: ${spring-bit.services.keycloak-server.url}/keycloak/realms/springbit/protocol/openid-connect/userinfo
+            jwk-set-uri: ${spring-bit.services.keycloak-server.url}/keycloak/realms/springbit/protocol/openid-connect/certs
             user-name-attribute: name
-
-#            authorization-uri: http://localhost:8080/keycloak/realms/springbit/protocol/openid-connect/auth
 
 ---
 spring:
   config:
     activate:
       on-profile: default
-  cloud:
-    gateway:
-      routes:
-        - id: crypto-service
-          uri: http://localhost:8090
-          predicates:
-            - Path=/api/v1/crypto/**
-          filters:
-            - StripPrefix=2
-
-        - id: crypto-service-docs
-          uri: http://localhost:8090
-          predicates:
-            - Path=/api/v1/docs/**
-          filters:
-            - StripPrefix=3
-            - RewriteResponseHeader=Location, ^/, /api/v1/docs/
-
-        - id: tracing
-          uri: http://localhost:9411
-          predicates:
-            - Path=/tracing/**
-          filters:
-            - StripPrefix=1
-            - RewriteResponseHeader=Location, /zipkin, /tracing/zipkin
-
-        - id: grafana
-          uri: http://localhost:3000
-          predicates:
-            - Path=/grafana/**
-          filters:
-            - SetRequestHostHeader=localhost:8080
-
-        - id: prometheus
-          uri: http://localhost:9090
-          predicates:
-            - Path=/prometheus/**
-          filters:
-            - StripPrefix=1
-
-        - id: keycloak
-          uri: http://localhost:9080
-          predicates:
-            - Path=/keycloak/**
-          filters:
-            - StripPrefix=0
+    # get secret keys from local disk - in production they are in vault-server
+    additional-location: file:${user.dir}/scripts/config/config.properties
 
     discovery:
       enabled: false
-
-spring-bit:
-  public-domain: http://localhost:8080
 
 management:
   prometheus:
@@ -98,6 +131,34 @@ management:
   tracing:
     enabled:
       false
+
+spring-bit:
+  public-domain: http://localhost:8080
+  services:
+    crypto-service:
+      enabled: true
+      url: http://localhost:8090
+    discovery-service:
+      enabled: true
+      url: http://localhost:8888
+    tracing-server:
+      enabled: true
+      url: http://localhost:9411
+    grafana-server:
+      enabled: true
+      url: http://localhost:3000
+    prometheus-server:
+      enabled: true
+      url: http://localhost:9090
+    keycloak-server:
+      enabled: true
+      url: http://localhost:9080
+    bitquery:
+      enabled: false
+      url: https://graphql.bitquery.io
+    coinmarketcap:
+      enabled: false
+      url: https://pro-api.coinmarketcap.com
 
 # Logging
 logging.level.org.springframework: DEBUG

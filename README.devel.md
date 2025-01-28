@@ -97,3 +97,20 @@ terraform destroy
 systemctl status kubelet
 journalctl -xeu kubelet
 ```
+
+### Keycloak
+
+To export a real and user start keycloak-server docker image 
+
+```shell
+docker-compose up mysql-server keycloak-server
+
+docker exec -it keycloak-server bash
+/opt/keycloak/bin/kc.sh export --dir /opt/keycloak/data/import --users realm_file --realm springbit \
+  --db mysql --db-url jdbc:mysql://mysql-server:3306/keycloak?ssl-mode=DISABLED \
+  --db-username keycloak-user --db-password keycloak-pass
+
+exit
+
+docker cp keycloak-server:/opt/keycloak/data/import/springbit-realm.json scripts/config/springbit-realm.json
+```

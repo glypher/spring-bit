@@ -1,6 +1,7 @@
 #!/bin/bash
 
-DATA_DIR=$PWD/../data
+DATA_DIR=../data
+CONFIG_FILE=config/config.properties
 
 VAULT_DATA=$DATA_DIR/vault/storage
 
@@ -15,7 +16,7 @@ mkdir -p $DATA_DIR/mysql/storage
 
 rm -rf $VAULT_DATA ; mkdir -p $VAULT_DATA
 
-sed -e "s|REPLACE_ME|\"$VAULT_DATA\"|g" $VAULT_CONFIG > tmp-config.hcl
+sed -e "s|REPLACE_ME|\"$PWD/$VAULT_DATA\"|g" $VAULT_CONFIG > tmp-config.hcl
 
 vault server -config=tmp-config.hcl &
 sleep 2
@@ -30,9 +31,9 @@ vault operator init -key-shares=3 -key-threshold=3  &> $VAULT_KEYS/unseal-keys.t
 
 # Unseal vault
 mapfile -t keyArray < <( grep "Unseal Key " < $VAULT_KEYS/unseal-keys.txt  | cut -c15- )
-vault operator unseal ${keyArray[0]}
-vault operator unseal ${keyArray[1]}
-vault operator unseal ${keyArray[2]}
+vault operator unseal "${keyArray[0]}"
+vault operator unseal "${keyArray[1]}"
+vault operator unseal "${keyArray[2]}"
 
 mapfile -t rootToken < <(grep "Initial Root Token: " < $VAULT_KEYS/unseal-keys.txt  | cut -c21- )
 export VAULT_TOKEN=${rootToken[0]}
@@ -53,7 +54,7 @@ vault kv put -mount=spring-bit-config keys spring.bit=init
 while IFS='=' read -r key value; do
   echo "Setting key $key..."
   [[ -n $key ]] && [[ -n $value ]] && vault kv patch -mount=spring-bit-config keys $key=$value
-done < "$DATA_DIR/secrets.prop"
+done < "$CONFIG_FILE"
 #echo "Keys...."
 #vault kv get -mount spring-bit-config keys
 
@@ -61,7 +62,7 @@ done < "$DATA_DIR/secrets.prop"
 echo "vault.token=${userToken[0]}" > $DATA_DIR/secrets.prop
 
 
-# Copy useal script as well
+# Copy unseal script as well
 rm -rf $VAULT_UNSEAL_DIR ; mkdir -p $VAULT_UNSEAL_DIR
 cp $VAULT_CONFIG_DIR/unseal.sh $VAULT_UNSEAL_DIR/.
 

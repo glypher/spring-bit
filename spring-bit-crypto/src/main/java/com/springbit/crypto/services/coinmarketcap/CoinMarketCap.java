@@ -24,7 +24,7 @@ import java.util.List;
 
 
 @Service
-@ConditionalOnProperty(name="spring-bit.services.coinmarketcap.enable")
+@ConditionalOnProperty(name="spring-bit.services.coinmarketcap.enabled")
 public class CoinMarketCap implements ICryptoService {
 
     private final DtoMapper mapper;

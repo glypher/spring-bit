@@ -9,84 +9,44 @@ spring:
       - classpath:microservices/common/discovery.yml
       - classpath:microservices/common/logging.yml
 
-  cloud:
-    gateway:
-      routes:
-        - id: crypto-service
-          uri: lb://spring-bit-crypto
-          predicates:
-            - Path=/api/v1/crypto/**
-          filters:
-            - StripPrefix=2
-
-        - id: crypto-service-docs
-          uri: lb://spring-bit-crypto
-          predicates:
-            - Path=/api/v1/docs/**
-          filters:
-            - StripPrefix=3
-            - RewriteResponseHeader=Location, ^/, /api/v1/docs/
-
-        - id: discovery
-          uri: http://discovery-service:8888
-          predicates:
-            - Path=/discovery/**
-          filters:
-            - StripPrefix=1
-        - id: discovery-res
-          uri: http://discovery-service:8888
-          predicates:
-            - Path=/eureka/**
-
-        - id: openid
-          uri: http://auth-server:9443
-          predicates:
-            - Path=/oauth2/**
-            - Path=/userInfo/**
-          filters:
-            - StripPrefix=0
-
-        - id: tracing
-          uri: http://tracing-server:9411
-          predicates:
-            - Path=/tracing/**
-          filters:
-            - StripPrefix=1
-            - RewriteResponseHeader=Location, /zipkin, /tracing/zipkin
-
-        - id: grafana
-          uri: http://grafana-server:3000
-          predicates:
-            - Path=/grafana/**
-          filters:
-            - SetRequestHostHeader=localhost:8080
-
-        - id: prometheus
-          uri: http://prometheus-server:9090
-          predicates:
-            - Path=/prometheus/**
-          filters:
-            - StripPrefix=1
-
-        - id: bitquery
-          uri: https://graphql.bitquery.io
-          predicates:
-            - Path=/bitquery/**
-          filters:
-            - StripPrefix=1
-
-        - id: coinmarketcap
-          uri: https://pro-api.coinmarketcap.com
-          predicates:
-            - Path=/coinmarketcap/**
-          filters:
-            - StripPrefix=1
-
 spring-bit:
+  public-domain: ${SPRINGBIT_DOMAIN:http://localhost:8080}
+
+  services:
+    crypto-service:
+      enabled: true
+      url: lb://spring-bit-crypto
+    discovery-service:
+      enabled: true
+      url: http://discovery-service:8888
+    tracing-server:
+      enabled: true
+      url: http://tracing-server:9411
+    grafana-server:
+      enabled: true
+      url: http://grafana-server:3000
+    prometheus-server:
+      enabled: true
+      url: http://prometheus-server:9090
+    keycloak-server:
+      enabled: true
+      url: http://keycloak-server:9080
+    bitquery:
+      enabled: false
+      url: https://graphql.bitquery.io
+    coinmarketcap:
+      enabled: true
+      url: https://pro-api.coinmarketcap.com
+
   auth:
-    gateway: ${SPRINGBIT_DOMAIN:http://localhost:8080}
-    server: http://auth-server:9443
-    public-auth-server: ${SPRINGBIT_AUTH_DOMAIN:localhost:9443}
+    github:
+      client-id: '{vault}:keys#spring-bit.auth.github.client-id'
+      client-secret: '{vault}:keys#spring-bit.auth.github.client-secret'
+    facebook:
+      client-id: '{vault}:keys#spring-bit.auth.facebook.client-id'
+      client-secret: '{vault}:keys#spring-bit.auth.facebook.client-secret'
+    keycloak:
+      client-secret: '{vault}:keys#spring-bit.auth.keycloak.client-secret'
 
 # Logging
 logging.level.org.springframework: ${LOG_LEVEL:INFO}

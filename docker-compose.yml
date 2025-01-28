@@ -61,14 +61,14 @@ services:
     command: >
       start --http-enabled true
             --hostname http://localhost:8080/keycloak --hostname-admin http://localhost:9080/keycloak
-            --http-relative-path /keycloak
+            --http-relative-path /keycloak --http-port 9080
             --db mysql --db-url jdbc:mysql://mysql-server:3306/keycloak?ssl-mode=DISABLED
             --db-username keycloak-user --db-password keycloak-pass
             --verbose
     depends_on:
       - mysql-server
     ports:
-      - 9080:8080
+      - 9080:9080
       #- 9443:8443
     networks:
       - internal
@@ -145,7 +145,6 @@ services:
           memory: 256M
     networks:
       - internal
-      - default
     ports:
      - 9411:9411
 
@@ -163,7 +162,6 @@ services:
           memory: 256M
     networks:
       - internal
-      - default
     ports:
     - 3000:3000
 
@@ -196,6 +194,5 @@ services:
           memory: 256M
     networks:
       - internal
-      - default
     ports:
     - 9090:9090

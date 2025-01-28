@@ -47,12 +47,10 @@ springdoc:
 spring-bit:
   services:
     bitquery:
-      enable: false
+      enabled: false
       url: https://graphql.bitquery.io
-      api-token:
     coinmarketcap:
-      enable: false
+      enabled: false
       url: https://pro-api.coinmarketcap.com
-      api-token:
 
 # Config server loads spring-bit-config/src/main/resources/microservices/spring-bit-crypto-production.yml

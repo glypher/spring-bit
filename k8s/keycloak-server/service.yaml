@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-server
+  namespace: springbit
+spec:
+  selector:
+    app: keycloak-server
+  ports:
+    - protocol: TCP
+      port: 9080
+      targetPort: 9080
+  type: ClusterIP

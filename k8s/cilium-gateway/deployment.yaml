@@ -25,17 +25,6 @@ spec:
             name: springbit-tls
             namespace: springbit
 
-    - name: https-auth
-      protocol: HTTPS
-      port: 9443
-      allowedRoutes:
-        namespaces:
-          from: All
-      tls:
-        certificateRefs:
-          - kind: Secret
-            name: springbit-tls
-            namespace: springbit
 
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -57,27 +46,6 @@ spec:
         - name: gateway-service
           namespace: springbit
           port: 8080
-
----
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind: HTTPRoute
-metadata:
-  name: auth-server-route
-  namespace: springbit
-spec:
-  parentRefs:
-    - name: cilium-gateway
-      namespace: springbit
-      sectionName: https-auth
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: auth-server
-          namespace: springbit
-          port: 9443
 
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1

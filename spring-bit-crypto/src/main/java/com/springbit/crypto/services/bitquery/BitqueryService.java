@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 
 @Service
-@ConditionalOnProperty(name="spring-bit.services.bitquery.enable")
+@ConditionalOnProperty(name="spring-bit.services.bitquery.enabled")
 public class BitqueryService implements ICryptoService {
 
     private final WebClient webClient;

@@ -12,20 +12,15 @@ sleep 2
 
 # Set the environment values required for public access
 kubectl -n springbit set env deployment/config-service   VAULT_USER_TOKEN=$(sudo grep vault.token /hostdata/secrets.prop | cut -d'=' -f 2-)
-kubectl -n springbit set env deployment/auth-server      SPRINGBIT_DOMAIN=$1
-kubectl -n springbit set env deployment/auth-server      SPRINGBIT_AUTH_DOMAIN=$2
-kubectl -n springbit set env deployment/gateway-service  SPRINGBIT_DOMAIN=$1
-kubectl -n springbit set env deployment/gateway-service  SPRINGBIT_AUTH_DOMAIN=$2
+kubectl -n springbit set env deployment/keycloak-server  SPRINGBIT_DOMAIN=https://www.springbit.org
 
 # Debug logging
 kubectl -n springbit set env deployment/config-service   LOG_LEVEL=DEBUG
-kubectl -n springbit set env deployment/auth-server      LOG_LEVEL=DEBUG
 kubectl -n springbit set env deployment/gateway-service  LOG_LEVEL=DEBUG
 
 # Restart the services to load the above envs
 kubectl -n springbit rollout restart deployment config-service
-kubectl -n springbit rollout restart deployment auth-server
-kubectl -n springbit rollout restart deployment gateway-service
+kubectl -n springbit rollout restart deployment keycloak-server
 
 
 kubectl get pods -A -o wide

@@ -1,0 +1,23 @@
+spring-bit.public-domain=https://www.springbit.org
+
+# Database connection
+spring-bit.db.mysql.root.password=spring-bit-mysql-root
+spring-bit.db.mysql.springbit.password=spring-bit-mysql
+spring-bit.db.mysql.keycloak.password=keycloak-pass
+
+# Keycloak admin
+spring-bit.keycloak.admin.url=http://localhost:9080
+spring-bit.keycloak.admin.password=admin
+
+# Auth secrets
+spring-bit.auth.github.client-id=
+spring-bit.auth.github.client-secret=
+
+spring-bit.auth.facebook.client-id=
+spring-bit.auth.facebook.client-secret=
+
+spring-bit.auth.keycloak.client-secret=
+
+# 3rd party apis
+spring-bit.services.bitquery.api-token=
+spring-bit.services.coinmarketcap.api-token=

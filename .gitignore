@@ -41,7 +41,8 @@ scripts/secrets.prop
 docker/**/certs/
 docker/vault/unseal/
 spring-bit-gateway/src/main/resources/web-app/
-scripts/realm-export.json
+scripts/config/config.properties
+scripts/config/toimport-realm.json
 
 terraform/.terraform/
 terraform/.terraform.lock.hcl

@@ -15,7 +15,7 @@ spring:
   r2dbc:
     url: r2dbc:mysql://mysql-server:3306/springbit
     username: spring-bit-user
-    password: '{vault}:keys#mysql.password'
+    password: '{vault}:keys#spring-bit.db.mysql.springbit.password'
     properties.ssl: true
     pool:
       initial-size: 5
@@ -33,13 +33,13 @@ springdoc:
 spring-bit:
   services:
     bitquery:
-      enable: false
+      enabled: false
       url: http://gateway-service:8080/bitquery
-      api-token: '{vault}:keys#bitquery.api-token'
+      api-token: '{vault}:keys#spring-bit.services.bitquery.api-token'
     coinmarketcap:
-      enable: true
+      enabled: true
       url: http://gateway-service:8080/coinmarketcap
-      api-token: '{vault}:keys#coinmarketcap.api-token'
+      api-token: '{vault}:keys#spring-bit.services.coinmarketcap.api-token'
 
 # Logging
 logging.level.org.springframework: ${LOG_LEVEL:INFO}

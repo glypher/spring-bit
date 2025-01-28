@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-server
+  namespace: springbit
+  labels:
+    app: keycloak-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak-server
+  template:
+    metadata:
+      labels:
+        app: keycloak-server
+    spec:
+      containers:
+        - name: keycloak-server
+          image: quay.io/keycloak/keycloak:26.1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPRINGBIT_DOMAIN
+              value: http://localhost:8080
+          args: [
+            "start",
+            "--http-enabled", "true",
+            "--hostname", "$(SPRINGBIT_DOMAIN)/keycloak",
+            "--hostname-admin", "http://localhost:9080/keycloak",
+            "--http-relative-path", "/keycloak",
+            "--http-port", "9080",
+            "--db", "mysql",
+            "--db-url", "jdbc:mysql://mysql-server:3306/keycloak?ssl-mode=DISABLED",
+            "--db-username", "keycloak-user",
+            "--db-password", "keycloak-pass"
+          ]
+          ports:
+            - containerPort: 9080
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: springbit.org/frontend
+                    operator: In
+                    values:
+                      - "yes"
