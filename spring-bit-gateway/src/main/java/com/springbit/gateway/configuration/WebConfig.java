@@ -16,15 +16,19 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 @Configuration
 public class WebConfig {
     @Value("${spring-bit.public-domain}")
     private String publicDomain;
+    private UriComponents publicDomainUri;
 
     @Bean
     RouterFunction<?> routerFunction() {
@@ -53,9 +57,11 @@ public class WebConfig {
     }
 
     @Bean
-    public WebFilter wwwRedirectFilter() {
+    public WebFilter wwwRedirectFilter() throws IOException {
+        publicDomainUri = UriComponentsBuilder.fromUriString(publicDomain).build();
+
         return  (ServerWebExchange exchange, WebFilterChain chain) -> {
-            if (publicDomain.startsWith("http://localhost"))
+            if ((publicDomainUri.getHost() == null) || publicDomainUri.getHost().contains("localhost"))
                 return chain.filter(exchange);
 
             ServerHttpRequest request = exchange.getRequest();
@@ -63,7 +69,7 @@ public class WebConfig {
             if (hostHeader != null) {
                 String host = hostHeader.getHostName();
 
-                if (!host.startsWith("www.")) {
+                if (host.contains(publicDomainUri.getHost()) && !host.startsWith("www.")) {
                     String newUrl = request.getURI().toString().replaceFirst("://", "://www.");
                     exchange.getResponse().setStatusCode(HttpStatus.MOVED_PERMANENTLY);
                     exchange.getResponse().getHeaders().setLocation(URI.create(newUrl));
