@@ -76,7 +76,8 @@ public class SecurityConfig {
                                         webFilterExchange.getExchange().getResponse()
                                                 .setStatusCode(org.springframework.http.HttpStatus.FOUND);
                                         webFilterExchange.getExchange().getResponse()
-                                                .getHeaders().setLocation(URI.create(publicDomain + "/loginCallback"));
+                                                .getHeaders().setLocation(
+                                                        UriComponentsBuilder.fromUriString(publicDomain + "/web-app").queryParam("login", "ok").build().toUri());
                                         /*
                                         if (authentication.getPrincipal() instanceof OAuth2User) {
                                              OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
@@ -94,7 +95,7 @@ public class SecurityConfig {
                         .authenticationFailureHandler((WebFilterExchange webFilterExchange, AuthenticationException ex) -> {
                             webFilterExchange.getExchange().getResponse().setStatusCode(HttpStatus.FOUND);
                             webFilterExchange.getExchange().getResponse().getHeaders().setLocation(
-                                    UriComponentsBuilder.fromUriString(publicDomain + "/loginCallback").queryParam("error", ex.getMessage()).build().toUri());
+                                    UriComponentsBuilder.fromUriString(publicDomain + "/web-app").queryParam("loginError", ex.getMessage()).build().toUri());
                             return Mono.empty();
                         }))
                 .oauth2Client(Customizer.withDefaults())
@@ -121,12 +122,12 @@ public class SecurityConfig {
                         exceptionHandlingSpec.accessDeniedHandler((ServerWebExchange exchange, AccessDeniedException ex) -> {
                             exchange.getResponse().setStatusCode(HttpStatus.FOUND);
                             exchange.getResponse().getHeaders().setLocation(
-                                    UriComponentsBuilder.fromUriString(publicDomain + "/loginCallback").queryParam("error", ex.getMessage()).build().toUri());
+                                    UriComponentsBuilder.fromUriString(publicDomain + "/web-app").queryParam("loginError", ex.getMessage()).build().toUri());
                             return Mono.empty();
                         }).authenticationEntryPoint((ServerWebExchange exchange, AuthenticationException ex) -> {
                             exchange.getResponse().setStatusCode(HttpStatus.FOUND);
                             exchange.getResponse().getHeaders().setLocation(
-                                    UriComponentsBuilder.fromUriString(publicDomain + "/loginCallback").queryParam("error", ex.getMessage()).build().toUri());
+                                    UriComponentsBuilder.fromUriString(publicDomain + "/web-app").queryParam("loginError", ex.getMessage()).build().toUri());
                             return Mono.empty();
                         }))
                 .build();

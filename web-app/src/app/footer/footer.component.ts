@@ -4,19 +4,21 @@
 // server-footer.component.ts
 import { Component } from '@angular/core';
 import {NgForOf} from "@angular/common";
-import {RouterLink} from "@angular/router";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-footer',
   imports: [
     NgForOf,
-    RouterLink
   ],
   templateUrl: './footer.component.html',
   standalone: true,
   styleUrls: ['./footer.component.css']
 })
 export class FooterComponent {
+
+  constructor(private router: Router) {
+  }
   links = [
     {
       name: 'Grafana',
@@ -39,4 +41,8 @@ export class FooterComponent {
       icon: 'assets/logos/eureka-logo-150.png'
     }
   ];
+
+  onClick(url: string) {
+    this.router.navigate(['/admin' + url], { skipLocationChange: true });
+  }
 }

@@ -24,13 +24,13 @@ export class UserDetailsComponent implements OnInit {
   }
 
   login() {
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login'], { skipLocationChange: true });
   }
 
   logout() {
     this.authService.logout();
 
-    this.router.navigate(['/']);
+    this.router.navigate([''], { skipLocationChange: true });
   }
 
   // Check if user is logged in or not

@@ -12,7 +12,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     // Save current url for redirect after login
     localStorage.setItem("returnUrlLogin", state.url)
     // Redirect to login if not authenticated
-    router.navigate(['/login']);
+    router.navigate(['/login'],  { skipLocationChange: true });
     return false;
   }
 };

@@ -7,10 +7,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -18,18 +16,14 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
-import reactor.netty.http.client.HttpClient;
-import reactor.netty.resources.ConnectionProvider;
 
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.Objects;
 
 @Configuration
 public class WebConfig {
-    @Value("${spring-bit.public-domain")
+    @Value("${spring-bit.public-domain}")
     private String publicDomain;
 
     @Bean
