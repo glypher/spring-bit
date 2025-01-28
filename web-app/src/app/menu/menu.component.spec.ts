@@ -3,7 +3,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import { MenuComponent } from './menu.component';
 import {CryptoService} from "../service/crypto.service";
 import {BehaviorSubject, of} from "rxjs";
-import {CryptoType} from "../service/crypto.types";
+import {CryptoType} from "../service/service.types";
 
 describe('MenuComponent', () => {
   let component: MenuComponent;

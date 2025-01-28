@@ -1,10 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GraphComponent } from './graph.component';
-import {MenuComponent} from "../menu/menu.component";
 import {CryptoService} from "../service/crypto.service";
 import {BehaviorSubject, of} from "rxjs";
-import {CryptoQuote, CryptoType} from "../service/crypto.types";
+import {CryptoQuote, CryptoType} from "../service/service.types";
 
 describe('GraphComponent', () => {
   let component: GraphComponent;

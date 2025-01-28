@@ -11,7 +11,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 export class AdminComponent implements AfterViewInit {
   @ViewChild('adminFrame') adminFrame: any;
 
-  constructor(private renderer: Renderer2, private router: Router, private activatedRoute: ActivatedRoute) {}
+  constructor(private renderer: Renderer2, private activatedRoute: ActivatedRoute) {}
 
   ngAfterViewInit() {
     this.activatedRoute.params.subscribe((params) => {
@@ -26,8 +26,8 @@ export class AdminComponent implements AfterViewInit {
       }
 
       this.renderer.setProperty(this.adminFrame.nativeElement, "src", window.location.origin + currentUrl);
-      //window.open(window.location.origin + currentUrl, "_blank");
 
+      //window.open(window.location.origin + currentUrl, "_blank");
       //this.router.navigate(['/']);
     });
   }

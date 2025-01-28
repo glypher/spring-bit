@@ -25,10 +25,10 @@ management:
 spring-bit:
   services:
     bitquery:
-      enable: true
+      enabled: true
       url: http://localhost:5050
       api-token: test-pass-bitquery
     coinmarketcap:
-      enable: true
+      enabled: true
       url: http://localhost:5051
       api-token: test-pass-coinmarketcap

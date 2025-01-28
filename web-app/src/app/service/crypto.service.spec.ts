@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { CryptoService } from './crypto.service';
 import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
 import {environment} from "../../environments/environment";
-import {CryptoQuote, CryptoType} from "./service.types";
+import {CryptoType} from "./service.types";
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('CryptoService', () => {
