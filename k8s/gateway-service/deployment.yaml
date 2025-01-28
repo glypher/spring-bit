@@ -19,6 +19,12 @@ spec:
       - name: gateway-service
         image: springbit/spring-bit-gateway
         imagePullPolicy: IfNotPresent
+        env:
+            - name: SPRINGBIT_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: springbit-secret
+                  key: public-domain
         lifecycle:
           preStop:
             exec:

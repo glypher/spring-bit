@@ -53,8 +53,8 @@ jobs:
         echo "spring-bit.db.mysql.keycloak.password=${{secrets.MYSQL_KEYCLOAK_PASSWORD}}" >> config/config.properties
         echo "spring-bit.keycloak.admin.url=${{secrets.KEYCLOAK_ADMIN_URL}}" >> config/config.properties
         echo "spring-bit.keycloak.admin.password=${{secrets.KEYCLOAK_ADMIN_PASSWORD}}" >> config/config.properties
-        echo "spring-bit.auth.github.client-id=${{secrets.GITHUB_CLIENT_ID}}" >> config/config.properties
-        echo "spring-bit.auth.github.client-secret=${{secrets.GITHUB_CLIENT_SECRET}}" >> config/config.properties
+        echo "spring-bit.auth.github.client-id=${{secrets.SPRINGBIT_GITHUB_CLIENT_ID}}" >> config/config.properties
+        echo "spring-bit.auth.github.client-secret=${{secrets.SPRINGBIT_GITHUB_CLIENT_SECRET}}" >> config/config.properties
         echo "spring-bit.auth.facebook.client-id=${{secrets.FACEBOOK_CLIENT_ID}}" >> config/config.properties
         echo "spring-bit.auth.facebook.client-secret=${{secrets.FACEBOOK_CLIENT_SECRET}}" >> config/config.properties
         echo "spring-bit.auth.keycloak.client-secret=${{secrets.KEYCLOAK_CLIENT_SECRET}}" >> config/config.properties
@@ -148,4 +148,4 @@ jobs:
     - name: Sync files to S3 bucket
       if: github.event_name != 'pull_request'
       run: |
-        aws s3 sync data s3://${{secrets.AWS_S3_BUCKET}}
+        aws s3 sync data s3://${{secrets.AWS_S3_BUCKET}} --delete
