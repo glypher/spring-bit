@@ -47,20 +47,25 @@ vault token create -policy=spring-bit-policy &> $VAULT_KEYS/auth-spring-bit-toke
 
 mapfile -t userToken < <(grep "token     " < $VAULT_KEYS/auth-spring-bit-token.txt  | cut -c21- | sed 's/^\ *//')
 
-sed -i -e "s|^vault.token=.*||g" $DATA_DIR/secrets.prop
+# Add vault token for deployment
+echo "vault.token=${userToken[0]}" > $DATA_DIR/secrets.prop
 
 # PUT ALL SECRETS
 vault kv put -mount=spring-bit-config keys spring.bit=init
 while IFS='=' read -r key value; do
-  echo "Setting key $key..."
-  [[ -n $key ]] && [[ -n $value ]] && vault kv patch -mount=spring-bit-config keys $key=$value
+  if [[ "$key" =~ ^# ]]; then
+    continue
+  fi
+  if [[ "$key" =~ ^docker\. ]] || [[ "$key" == "spring-bit.public-domain" ]]; then
+    echo "Adding $key to deployment secrets"
+    echo "$key=$value" >> $DATA_DIR/secrets.prop
+  else
+    echo "Setting key $key..."
+    [[ -n $key ]] && [[ -n $value ]] && vault kv patch -mount=spring-bit-config keys $key=$value
+  fi
 done < "$CONFIG_FILE"
 #echo "Keys...."
 #vault kv get -mount spring-bit-config keys
-
-# replace it in the spring config server's configuration
-echo "vault.token=${userToken[0]}" > $DATA_DIR/secrets.prop
-
 
 # Copy unseal script as well
 rm -rf $VAULT_UNSEAL_DIR ; mkdir -p $VAULT_UNSEAL_DIR

@@ -110,17 +110,24 @@ kubectl label nodes --all springbit.org/frontend=yes
 kubectl label nodes --all springbit.org/backend=yes
 
 kubectl create namespace springbit
-kubectl apply -f k8s -R 
-kubectl -n springbit set env deployment/config-service VAULT_USER_TOKEN=$(grep vault.token data/secrets.prop | cut -d'=' -f 2-)
-kubectl -n springbit rollout restart deployment config-service
 
-kubectl -n springbit set env deployment/keycloak-server SPRINGBIT_DOMAIN=http://localhost:8080
-kubectl -n springbit rollout restart deployment keycloak-server
+kubectl create secret docker-registry docker-secret \
+  --docker-server=docker.io \
+  --docker-username=$(grep docker.username data/secrets.prop | cut -d'=' -f 2-) \
+  --docker-password=$(grep docker.password data/secrets.prop | cut -d'=' -f 2-) \
+  --namespace springbit
+kubectl create secret generic springbit-secret \
+  --from-literal=vault-token=$(grep vault.token data/secrets.prop | cut -d'=' -f 2-) \
+  --from-literal=public-domain=$(grep spring-bit.public-domain data/secrets.prop | cut -d'=' -f 2-) \
+  --namespace springbit
+
+# Apply the deployment
+kubectl apply -f k8s -R 
 
 # Check out deployment
 kubectl get nodes --show-labels
 kubectl get pods -A -o wide
-kubectl get pv 
+kubectl get pv
 ```
 
 4. Set up development communication channels to the services

@@ -21,7 +21,10 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
           - name: VAULT_USER_TOKEN
-            value: ${VAULT_USER_TOKEN}
+            valueFrom:
+              secretKeyRef:
+                name: springbit-secret
+                key: vault-token
         ports:
         - containerPort: 9095
       affinity:

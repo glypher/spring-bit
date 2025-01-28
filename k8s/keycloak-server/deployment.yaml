@@ -21,7 +21,10 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: SPRINGBIT_DOMAIN
-              value: http://localhost:8080
+              valueFrom:
+                secretKeyRef:
+                  name: springbit-secret
+                  key: public-domain
           args: [
             "start",
             "--http-enabled", "true",

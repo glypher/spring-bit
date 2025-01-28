@@ -1,4 +1,5 @@
-spring-bit.public-domain=https://www.springbit.org
+# Springbit public domain - change this to http://www.springbit.org for deployment
+spring-bit.public-domain=http://localhost:8080
 
 # Database connection
 spring-bit.db.mysql.root.password=spring-bit-mysql-root
@@ -21,3 +22,7 @@ spring-bit.auth.keycloak.client-secret=
 # 3rd party apis
 spring-bit.services.bitquery.api-token=
 spring-bit.services.coinmarketcap.api-token=
+
+# For vault-server private image
+docker.username=
+docker.password=
