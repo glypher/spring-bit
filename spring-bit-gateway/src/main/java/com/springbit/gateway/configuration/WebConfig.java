@@ -1,17 +1,23 @@
 package com.springbit.gateway.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
@@ -19,9 +25,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Objects;
 
 @Configuration
 public class WebConfig {
+    @Value("${spring-bit.public-domain")
+    private String publicDomain;
+
     @Bean
     RouterFunction<?> routerFunction() {
         return RouterFunctions.resources("/web-app/**", new ClassPathResource("web-app/"))
@@ -46,6 +56,29 @@ public class WebConfig {
                             }
                             //return ServerResponse.temporaryRedirect(URI.create("/web-app/index.html")).build();
                         });
+    }
+
+    @Bean
+    public WebFilter wwwRedirectFilter() {
+        return  (ServerWebExchange exchange, WebFilterChain chain) -> {
+            if (publicDomain.startsWith("http://localhost"))
+                return chain.filter(exchange);
+
+            ServerHttpRequest request = exchange.getRequest();
+            var hostHeader = request.getHeaders().getHost();
+            if (hostHeader != null) {
+                String host = hostHeader.getHostName();
+
+                if (!host.startsWith("www.")) {
+                    String newUrl = request.getURI().toString().replaceFirst("://", "://www.");
+                    exchange.getResponse().setStatusCode(HttpStatus.MOVED_PERMANENTLY);
+                    exchange.getResponse().getHeaders().setLocation(URI.create(newUrl));
+                    return exchange.getResponse().setComplete();
+                }
+            }
+
+            return chain.filter(exchange);
+        };
     }
 
     /*
