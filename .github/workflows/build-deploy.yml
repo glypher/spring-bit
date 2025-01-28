@@ -37,19 +37,32 @@ jobs:
       run: |
         mkdir -p data
         cp -r k8s data/.
-        # Run the cert and vault generation
+        # Run the cert, vault and keycloak generation
         cd scripts
-        chmod u+x gen_key_stores.sh init_vault.sh
+        chmod u+x gen_key_stores.sh init_vault.sh init_keycloak.sh
+        # Generate certificates
         ./gen_key_stores.sh
         # Install vault and set up data
         wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
         sudo apt update && sudo apt install vault
-        # Add tokens
-        echo "bitquery.api-token=${{secrets.BITQUERY_TOKEN}}" >> ../data/secrets.prop
-        echo "coinmarketcap.api-token=${{secrets.COINMARKETCAP_TOKEN}}" >> ../data/secrets.prop
-        echo "mysql.password=${{secrets.MYSQL_PASSWORD}}" >> ../data/secrets.prop
+        # Add config secrets
+        cp config/config.properties.template config/config.properties
+        echo "spring-bit.public-domain=${{SPRINGBIT_DOMAIN}}" >> config/config.properties
+        echo "spring-bit.db.mysql.root.password=${{secrets.MYSQL_ROOT_PASSWORD}}" >> config/config.properties
+        echo "spring-bit.db.mysql.springbit.password=${{secrets.MYSQL_SPRINGBIT_PASSWORD}}" >> config/config.properties
+        echo "spring-bit.db.mysql.keycloak.password=${{secrets.MYSQL_KEYCLOAK_PASSWORD}}" >> config/config.properties
+        echo "spring-bit.keycloak.admin.password=${{secrets.KEYCLOAK_ADMIN_PASSWORD}}" >> config/config.properties
+        echo "spring-bit.auth.github.client-id=${{secrets.GITHUB_CLIENT_ID}}" >> config/config.properties
+        echo "spring-bit.auth.github.client-secret=${{secrets.GITHUB_CLIENT_SECRET}}" >> config/config.properties
+        echo "spring-bit.auth.facebook.client-id=${{secrets.FACEBOOK_CLIENT_ID}}" >> config/config.properties
+        echo "spring-bit.auth.facebook.client-secret=${{secrets.FACEBOOK_CLIENT_SECRET}}" >> config/config.properties
+        echo "spring-bit.auth.keycloak.client-secret=${{secrets.KEYCLOAK_CLIENT_SECRET}}" >> config/config.properties
+        echo "spring-bit.services.bitquery.api-token=${{secrets.BITQUERY_TOKEN}}" >> config/config.properties
+        echo "spring-bit.services.coinmarketcap.api-token=${{secrets.COINMARKETCAP_TOKEN}}" >> config/config.properties        
         ./init_vault.sh
+        # Initialize keycloak
+        ./init_keycloak.sh
       shell: bash
       
       # Install the cosign tool except on PR
@@ -110,8 +123,6 @@ jobs:
         docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-discovery:latest
         docker tag springbit/spring-bit-crypto:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-crypto:latest
         docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-crypto:latest
-        docker tag springbit/spring-bit-auth-server:latest ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-auth-server:latest
-        docker push ${{secrets.DOCKERHUB_USERNAME}}/spring-bit-auth-server:latest
         docker tag springbit/mysql-server:latest ${{secrets.DOCKERHUB_USERNAME}}/mysql-server:latest
         docker push ${{secrets.DOCKERHUB_USERNAME}}/mysql-server:latest
         docker tag springbit/vault-server:latest ${{secrets.DOCKERHUB_USERNAME}}/vault-server:latest
