@@ -47,11 +47,11 @@ jobs:
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
         sudo apt update && sudo apt install vault
         # Add config secrets
-        cp config/config.properties.template config/config.properties
         echo "spring-bit.public-domain=${{secrets.SPRINGBIT_DOMAIN}}" >> config/config.properties
         echo "spring-bit.db.mysql.root.password=${{secrets.MYSQL_ROOT_PASSWORD}}" >> config/config.properties
         echo "spring-bit.db.mysql.springbit.password=${{secrets.MYSQL_SPRINGBIT_PASSWORD}}" >> config/config.properties
         echo "spring-bit.db.mysql.keycloak.password=${{secrets.MYSQL_KEYCLOAK_PASSWORD}}" >> config/config.properties
+        echo "spring-bit.keycloak.admin.url=${{secrets.KEYCLOAK_ADMIN_URL}}" >> config/config.properties
         echo "spring-bit.keycloak.admin.password=${{secrets.KEYCLOAK_ADMIN_PASSWORD}}" >> config/config.properties
         echo "spring-bit.auth.github.client-id=${{secrets.GITHUB_CLIENT_ID}}" >> config/config.properties
         echo "spring-bit.auth.github.client-secret=${{secrets.GITHUB_CLIENT_SECRET}}" >> config/config.properties
