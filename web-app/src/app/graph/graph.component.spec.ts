@@ -4,6 +4,8 @@ import { GraphComponent } from './graph.component';
 import {CryptoService} from "../service/crypto.service";
 import {BehaviorSubject, of} from "rxjs";
 import {CryptoQuote, CryptoType} from "../service/service.types";
+import {provideHttpClient} from "@angular/common/http";
+import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
 
 describe('GraphComponent', () => {
   let component: GraphComponent;
@@ -26,7 +28,8 @@ describe('GraphComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [GraphComponent],
-      providers: [{ provide: CryptoService, useValue: mockCryptoService }]
+      providers: [{ provide: CryptoService, useValue: mockCryptoService },
+        provideHttpClient(), provideAnimationsAsync()]
     })
     .compileComponents();
 
@@ -50,13 +53,13 @@ describe('GraphComponent', () => {
     let tags = compiled.querySelectorAll('p');
     expect(tags).toHaveSize(2);
     expect(tags[0].innerText).toEqual("Symbol: BTC");
-    expect(tags[1].innerText).toEqual("Price: $1000");
+    expect(tags[1].innerText).toEqual("Current Price: $1000");
 
     mockSelSymbol.next(new CryptoType("ETHEREUM", "ETH"));
     fixture.detectChanges();
 
     tags = compiled.querySelectorAll('p');
     expect(tags[0].innerText).toEqual("Symbol: ETH");
-    expect(tags[1].innerText).toEqual("Price: $1000");
+    expect(tags[1].innerText).toEqual("Current Price: $1000");
   });
 });

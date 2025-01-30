@@ -18,6 +18,8 @@ spring:
   config:
     activate:
       on-profile: default
+    # get secret keys from local disk - in production they are in vault-server
+    additional-location: file:${user.dir}/scripts/config/config.properties
 
   sql:
     init:
@@ -50,7 +52,10 @@ spring-bit:
       enabled: false
       url: https://graphql.bitquery.io
     coinmarketcap:
-      enabled: false
+      enabled: true
       url: https://pro-api.coinmarketcap.com
+    web-socket-crypto:
+      enabled: true
+      url: 'future'
 
 # Config server loads spring-bit-config/src/main/resources/microservices/spring-bit-crypto-production.yml

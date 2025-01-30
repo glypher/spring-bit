@@ -5,6 +5,15 @@ export class CryptoQuote {
   quotePrice: Number;
 }
 
+export class CryptoAction {
+  name:   string;
+  symbol: string;
+  operation: string;
+  quantity: number;
+  quoteDate: Date;
+  quotePrice: Number;
+}
+
 export class CryptoType {
   name:   string;
   symbol: string;
@@ -44,4 +53,3 @@ export class UserDetails {
 
   public static readonly DEFAULT_USER = new UserDetails("", "");
 }
-

@@ -1,13 +1,23 @@
 
 <div class="p-6 max-w-7xl mx-auto">
-  <h1 class="text-xl lg:text-3xl font-bold mb-4">Crypto Time Series</h1>
+  <div *ngFor="let crypto of cryptoData" class="flex gap-6 bg-white shadow-lg rounded-lg p-4">
+    <p class="text-gray-600"><b>Symbol:</b> {{ crypto.symbol }}</p>
+    <p class="text-gray-600"><b>Current Price:</b> ${{ crypto.quotePrice }}</p>
+  </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div *ngFor="let crypto of cryptoData" class="bg-white shadow-lg rounded-lg p-4">
-      <h2 class="text-xl font-semibold text-gray-800">{{ crypto.name }}</h2>
-      <p class="text-gray-600">Symbol: {{ crypto.symbol }}</p>
-      <p class="text-gray-600">Price: ${{ crypto.quotePrice }}</p>
-
-    </div>
+  <div #graphDiv class="items-center w-full">
+    <h2 class="font-bold text-base text-center">Real-Time Data Graph - press <b>space</b> key to {{lastOperation}}</h2>
+    <ngx-charts-line-chart
+      [view]="view"
+      [results]="data"
+      [scheme]="colorScheme"
+      [autoScale]="true"
+      [xAxis]="true"
+      [yAxis]="true"
+      [legend]="false"
+      [showXAxisLabel]="true"
+      [showYAxisLabel]="true"
+      [gradient]="true">
+    </ngx-charts-line-chart>
   </div>
 </div>

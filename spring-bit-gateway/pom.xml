@@ -57,6 +57,11 @@
         <artifactId>spring-cloud-starter-gateway</artifactId>
     </dependency>
 
+    <dependency>
+        <groupId>com.github.ben-manes.caffeine</groupId>
+        <artifactId>caffeine</artifactId>
+    </dependency>
+
     <!-- Security with OpenId Direct Connect -->
     <dependency>
         <groupId>org.springframework.boot</groupId>

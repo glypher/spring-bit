@@ -1,0 +1,13 @@
+ngx-charts-line-chart .line {
+  stroke-width: 30px; /* Increase the line width */
+}
+.chart-container {
+  background-color: #f3f4f6;  /* Set your desired background color */
+  padding: 10px; /* Optional: adds padding around the chart */
+  border-radius: 8px; /* Optional: adds rounded corners */
+}
+
+/* Optional: If you want to set the background of the SVG inside the chart */
+ngx-charts-line-chart .chart {
+  background-color: #eeeeee;  /* Set background color for chart area */
+}

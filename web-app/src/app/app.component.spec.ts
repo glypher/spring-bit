@@ -3,6 +3,7 @@ import { AppComponent } from './app.component';
 import { provideHttpClient } from "@angular/common/http";
 import {provideRouter, Router} from "@angular/router";
 import {MainComponent} from "./main/main.component";
+import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
 
 describe('AppComponent', () => {
   let router: Router;
@@ -14,7 +15,8 @@ describe('AppComponent', () => {
         provideRouter([
           { path: '', component: MainComponent },
           { path: '**', redirectTo: ''}
-        ])
+        ]),
+        provideAnimationsAsync()
       ]
     }).compileComponents();
 
@@ -32,12 +34,5 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app.title).toEqual('Springbit webapp');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Crypto Time Series');
   });
 });

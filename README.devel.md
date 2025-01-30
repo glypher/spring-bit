@@ -29,6 +29,8 @@ sudo npm install -g @angular/cli@19
 
 cd web-app
 npm install -D tailwindcss postcss autoprefixer
+npm install @swimlane/ngx-charts
+
 npx tailwindcss init
 npm install jasmine-core --save-dev
 

@@ -34,7 +34,6 @@ export class AppComponent {
         }
         this.router.navigate(['/']);
       }
-      console.log(params);  // { param1: "value1", param2: "value2" }
     });
 
     this.router.events

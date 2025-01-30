@@ -1,14 +1,13 @@
 package com.springbit.gateway.configuration;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.context.annotation.*;
+import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.util.StreamUtils;
+import org.springframework.web.reactive.config.ResourceHandlerRegistry;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -16,24 +15,19 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
-public class WebConfig {
-    @Value("${spring-bit.public-domain}")
-    private String publicDomain;
-    private UriComponents publicDomainUri;
+public class WebConfig implements WebFluxConfigurer {
 
     @Bean
-    RouterFunction<?> routerFunction() {
-        return RouterFunctions.resources("/web-app/**", new ClassPathResource("web-app/"))
-                .andRoute(
+    RouterFunction<?> routerFunction(CacheConfig cacheConfig) {
+        return RouterFunctions
+                .route(
                         RequestPredicates.GET("/web-app")
                                 .or(RequestPredicates.GET("/web-app/"))
                                 .or(RequestPredicates.GET("/"))
@@ -41,35 +35,44 @@ public class WebConfig {
                                 .or(RequestPredicates.GET("/loginCallback")),
                         request -> {
                             try {
-                                // Load the file from the classpath
-                                Resource resource = new ClassPathResource("web-app/index.html");
+                                String content = cacheConfig.loadHome();
 
-                                // Read the file content as a string
-                                String content = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
-
-                                // Return the content as a response
                                 return ServerResponse.ok().contentType(MediaType.TEXT_HTML).bodyValue(content);
                             } catch (IOException e) {
                                 return ServerResponse.status(500).bodyValue("Error reading the file: " + e.getMessage());
                             }
-                            //return ServerResponse.temporaryRedirect(URI.create("/web-app/index.html")).build();
                         });
     }
 
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/web-app/**")
+                .addResourceLocations("classpath:web-app/")
+                .setCacheControl(CacheControl.maxAge(10, TimeUnit.MINUTES));
+    }
+
+    static class PublicHost implements Condition {
+        static String publicHost;
+
+        @Override
+        public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+            var publicDomain = context.getEnvironment().getProperty("spring-bit.public-domain");
+            var publicDomainUri = UriComponentsBuilder.fromUriString(publicDomain).build();
+            publicHost = publicDomainUri.getHost();
+            return (publicHost != null) && !publicHost.contains("localhost");
+        }
+    }
+
     @Bean
+    @Conditional(PublicHost.class)
     public WebFilter wwwRedirectFilter() throws IOException {
-        publicDomainUri = UriComponentsBuilder.fromUriString(publicDomain).build();
-
         return  (ServerWebExchange exchange, WebFilterChain chain) -> {
-            if ((publicDomainUri.getHost() == null) || publicDomainUri.getHost().contains("localhost"))
-                return chain.filter(exchange);
-
             ServerHttpRequest request = exchange.getRequest();
             var hostHeader = request.getHeaders().getHost();
             if (hostHeader != null) {
                 String host = hostHeader.getHostName();
 
-                if (host.contains(publicDomainUri.getHost()) && !host.startsWith("www.")) {
+                if (!host.startsWith("www.") && host.contains(PublicHost.publicHost)) {
                     String newUrl = request.getURI().toString().replaceFirst("://", "://www.");
                     exchange.getResponse().setStatusCode(HttpStatus.MOVED_PERMANENTLY);
                     exchange.getResponse().getHeaders().setLocation(URI.create(newUrl));

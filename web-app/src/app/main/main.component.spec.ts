@@ -4,6 +4,7 @@ import { MainComponent } from './main.component';
 import {provideHttpClient, withInterceptorsFromDi} from "@angular/common/http";
 import {provideHttpClientTesting} from "@angular/common/http/testing";
 import {provideRouter} from "@angular/router";
+import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
 
 describe('MainComponent', () => {
   let component: MainComponent;
@@ -12,7 +13,8 @@ describe('MainComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MainComponent],
-      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting(), provideRouter([])]
+      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting(),
+        provideRouter([]), provideAnimationsAsync()]
     })
     .compileComponents();
 
