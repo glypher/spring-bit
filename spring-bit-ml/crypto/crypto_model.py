@@ -1,0 +1,21 @@
+from abc import ABC, abstractmethod
+from typing import AsyncIterable
+
+from crypto.dto.types import Crypto
+
+
+class CryptoModel(ABC):
+    @abstractmethod
+    async def predict(self, **kwargs) -> AsyncIterable[Crypto]:
+        pass
+
+class ModelRegistry:
+    _models = {}
+
+    @staticmethod
+    def get_model(name: str, **kwargs) -> CryptoModel:
+        return ModelRegistry._models[name](**kwargs)
+
+    @staticmethod
+    def register_model(name, model: CryptoModel):
+        ModelRegistry._models[name] = model

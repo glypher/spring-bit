@@ -1,0 +1,6 @@
+fastapi
+aiokafka
+uvicorn
+pydantic
+pydantic-settings
+python-dotenv

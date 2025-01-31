@@ -1,4 +1,3 @@
-logging.level.org.springframework: INFO
 server:
   port: 8090
 
@@ -57,5 +56,16 @@ spring-bit:
     web-socket-crypto:
       enabled: true
       url: 'future'
+    kafka:
+      enabled: true
+      url: localhost:9092
+      topic: crypto-topic
+    ml-service:
+      enabled: true
+      url: http://localhost:8000
+
+
+logging.level.org.springframework: DEBUG
+logging.level.reactor.netty.http.client: DEBUG
 
 # Config server loads spring-bit-config/src/main/resources/microservices/spring-bit-crypto-production.yml

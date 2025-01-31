@@ -43,7 +43,11 @@ export class GraphComponent implements OnInit {
     );
 
     this.webSocketService.isServiceAvailable.subscribe(connected => {
+      // need to let server know that prediction must start for current symbol
+      let action = Object.assign(new CryptoAction(),
+        {...this.cryptoData[0], operation: 'predict', quantity: 50000.0});
 
+      this.webSocketService.sendMessage(action);
     });
 
     this.webSocketService.cryptoQuote.subscribe(cryptoQuote  => {

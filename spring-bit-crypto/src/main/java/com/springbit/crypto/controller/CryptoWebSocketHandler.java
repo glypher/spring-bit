@@ -2,13 +2,13 @@ package com.springbit.crypto.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springbit.crypto.model.dto.Crypto;
 import com.springbit.crypto.model.dto.CryptoAction;
+import com.springbit.crypto.model.dto.ReplyStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
@@ -19,69 +19,79 @@ import java.time.LocalDateTime;
 
 @Component
 public class CryptoWebSocketHandler implements WebSocketHandler {
-    private final Sinks.Many<Crypto> sink = Sinks.many().replay().latest();
-    private final Flux<String> sinkFlux;
-
-    private final Sinks.Many<String> rcvSink = Sinks.many().multicast().onBackpressureBuffer();
-
-    @Autowired
-    ObjectMapper objectMapper;
-
     private static final Logger logger = LoggerFactory.getLogger(CryptoWebSocketHandler.class);
 
-    CryptoWebSocketHandler() {
-        sinkFlux = sink.asFlux().map(crypto -> {
-            try {
-                return objectMapper.writeValueAsString(crypto);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        });
+    private final KafkaService kafkaService;
 
-        rcvSink.asFlux()
-                .map(data -> {
+    private final WebClient webClient;
+
+    private final ObjectMapper objectMapper;
+
+    CryptoWebSocketHandler(
+            KafkaService kafkaService,
+            WebClient.Builder webBuilder,
+            @Value("${spring-bit.services.ml-service.url}") String mlUrl,
+            ObjectMapper objectMapper) {
+
+        this.kafkaService = kafkaService;
+
+        this.webClient = webBuilder.baseUrl(mlUrl).build();
+
+        this.objectMapper = objectMapper;
+    }
+
+    private Mono<Void> startMlService(String symbol, boolean start) {
+        return webClient
+                .post()
+                .uri("/crypto/" + symbol + (start? "/predict" : "stop"))
+                .retrieve()
+                .bodyToMono(ReplyStatus.class)
+                .doOnNext(replyStatus -> {
+                    logger.info("ML service status: {}", replyStatus);
+                }).onErrorContinue(
+                        (error, value) -> logger.warn("ML service status: ", error))
+                .then();
+    }
+
+
+    @Override
+    public Mono<Void> handle(WebSocketSession session) {
+        return session
+                .receive()
+                .map(webSocketMessage -> {
+                    String receivedMessage = webSocketMessage.getPayloadAsText();
+                    logger.info("Received websocket message: {}", receivedMessage);
                     try {
-                        return objectMapper.readValue(data, CryptoAction.class);
+                        return objectMapper.readValue(receivedMessage, CryptoAction.class);
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
                 })
-                .onErrorContinue((error, value) -> {
-                    logger.warn("Error while handling websocket message: ", error);
-                }).subscribe(cryptoAction -> {
-                    logger.info("Crypto action: {}", cryptoAction);
-                });
-    }
-
-    /*
-    @KafkaListener(topics = "data-topic", groupId = "data-group")
-    public void receiveMessage(Integer value) {
-        String message = "{\"value\": " + value + "}";
-        sink.tryEmitNext(message);
-    }
-    */
-    @Scheduled(fixedRate = 5000) // Runs every 5 seconds
-    public void runTask() {
-        sink.tryEmitNext(new Crypto("BTC", "BTC", LocalDateTime.now(), 20.0f));
-    }
-
-    @Override
-    public Mono<Void> handle(WebSocketSession session) {
-        session.receive().doOnNext(webSocketMessage -> {
-            String receivedMessage = webSocketMessage.getPayloadAsText();
-            logger.info("Received websocket message: {}", receivedMessage);
-
-            rcvSink.tryEmitNext(receivedMessage);
-        });
-
-        return session.send(sinkFlux.map(session::textMessage).onErrorContinue((error, value) -> {
-            logger.warn("Error while handling websocket message: ", error);
-        })).then(
-                session.receive().doOnNext(webSocketMessage -> {
-                    String receivedMessage = webSocketMessage.getPayloadAsText();
-                    logger.info("Received websocket message: {}", receivedMessage);
-
-                    rcvSink.tryEmitNext(receivedMessage);
-                }).then());
+                .switchMap(cryptoAction -> {
+                    if ("predict".equalsIgnoreCase(cryptoAction.operation()) && cryptoAction.symbol() != null) {
+                        // Let ML service know to start prediction
+                        return startMlService(cryptoAction.symbol(), true).then(
+                                // Also link the websocket producer to kafka consumer
+                                session.send(
+                                        kafkaService.consumeMessages()
+                                                .doOnNext(logger::info)
+                                                .map(session::textMessage)
+                                                .onErrorContinue((error, value) -> {
+                                                    logger.warn("Error while handling websocket publish message: ", error);
+                                                })
+                        )).flux();
+                    }
+                    // Send this to the kafka topic
+                    try {
+                        return kafkaService.sendMessage("test-topic", objectMapper.writeValueAsString(cryptoAction)).flux();
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .onErrorResume(error -> {
+                    logger.warn("Error while handling websocket receive message: ", error);
+                    return Mono.empty();  // Fallback, just an empty Mono
+                })
+                .then();
     }
 }

@@ -61,6 +61,8 @@ After running the steps in building you can just issue
 
 ```shell
 export VAULT_USER_TOKEN=$(grep vault.token data/secrets.prop | cut -d'=' -f 2-)
+# Kafka user id
+sudo chown -R 1001:1001 ./data/kafka
 docker-compose up
 ```
 
