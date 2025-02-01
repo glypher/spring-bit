@@ -21,7 +21,8 @@ export class WebSocketService {
     }
 
     const wsProto = window.location.protocol == 'https:'? 'wss:' : 'ws:';
-    const url = `${wsProto}//${environment.serviceHost}${environment.wsPath}`
+    const wsHost = environment.serviceHost? environment.serviceHost : window.location.host;
+    const url = `${wsProto}//${wsHost}${environment.wsPath}`
 
     this.socket = new WebSocket(url);
 

@@ -40,6 +40,9 @@ spring-bit:
       enabled: true
       url: http://gateway-service:8080/coinmarketcap
       api-token: '{vault}:keys#spring-bit.services.coinmarketcap.api-token'
+    web-socket-crypto:
+      enabled: true
+      url: 'ws/future'
     kafka:
       enabled: true
       url: kafka-server:9092

@@ -87,6 +87,8 @@ Install Minikube as in [README.devel k8s development](README.devel.md#kubernetes
 1. Setup Minikube environment(container) and mount the volume to the container
 ```shell
 sudo chown -R $USER data/
+# Kafka user id
+sudo chown -R 1001:1001 ./data/kafka
 minikube delete
 minikube start --mount --mount-string="./data:/hostdata" --driver=docker
 minikube status
@@ -135,7 +137,7 @@ kubectl get pv
 4. Set up development communication channels to the services
 ```shell
 # Tunnel gateway service pod port to hosts localhost:8080
-kubectl -n springbit port-forward deployment/gateway-service 8080:8080 &
+kubectl -n springbit port-forward deployment/gateway-service 8080:8080
 ```
 Now you can access the app through localhost:8080 like before see [Service table](#Services)
 

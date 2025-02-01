@@ -23,28 +23,26 @@ spec:
             - mountPath: /bitnami/kafka
               name: kafka-server-volume
           env:
-            - name: KAFKA_KRAFT_MODE
-              value: "true"  # Enable KRaft mode
-            - name: KAFKA_ADVERTISED_LISTENERS
-              value: "INSIDE://kafka-server:9093"
-            - name: KAFKA_LISTENERS
-              value: "INSIDE://0.0.0.0:9093"
-            - name: KAFKA_LISTENER_SECURITY_PROTOCOL
+            - name: KAFKA_CFG_NODE_ID
+              value: "0"
+            - name: KAFKA_CFG_PROCESS_ROLES
+              value: "controller,broker"
+            - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS
+              value: "0@kafka-server:9093"
+            - name: KAFKA_CFG_LISTENERS
+              value: "PLAINTEXT://:9092,CONTROLLER://:9093"
+            - name: KAFKA_CFG_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://kafka-server:9092"
+            - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+            - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
+              value: "CONTROLLER"
+            - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
               value: "PLAINTEXT"
-            - name: KAFKA_LISTENER_NAME_INSIDE
-              value: "INSIDE"
-            - name: KAFKA_LISTENER_PORT_INSIDE
-              value: "9093"
-            - name: KAFKA_LISTENER_INTERFACE
-              value: "INSIDE"
-            - name: KAFKA_ZOOKEEPER_CONNECT
-              value: ""  # Kafka without Zookeeper (KRaft mode)
-            - name: KAFKA_BROKER_ID
-              value: "1"
             - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
               value: "true"
           ports:
-            - containerPort: 9093
+            - containerPort: 9092
       volumes:
         - name: kafka-server-volume
           persistentVolumeClaim:

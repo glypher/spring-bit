@@ -55,7 +55,7 @@ spring-bit:
       url: https://pro-api.coinmarketcap.com
     web-socket-crypto:
       enabled: true
-      url: 'future'
+      url: 'ws/future'
     kafka:
       enabled: true
       url: localhost:9092

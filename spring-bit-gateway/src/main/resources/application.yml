@@ -12,6 +12,11 @@ spring:
             - Path=/api/v1/crypto/**
           filters:
             - StripPrefix=2
+        - id: crypto-service-ws
+          uri: ${spring-bit.services.crypto-service.url}
+          enabled: ${spring-bit.services.crypto-service.enabled}
+          predicates:
+            - Path=/ws/**
         - id: crypto-service-docs
           uri: ${spring-bit.services.crypto-service.url}
           enabled: ${spring-bit.services.crypto-service.enabled}
