@@ -3,7 +3,7 @@ package com.springbit.crypto.model.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record CryptoAction(
     @JsonProperty("name") String name,
@@ -11,7 +11,7 @@ public record CryptoAction(
     @JsonProperty("operation") String operation,
     @JsonProperty("quantity") Float quantity,
     @JsonProperty("quoteDate")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime quoteDate,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "UTC")
+    Instant quoteDate,
     @JsonProperty("quotePrice") Float quotePrice
 ) {}

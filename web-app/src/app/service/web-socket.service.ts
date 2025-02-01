@@ -20,7 +20,10 @@ export class WebSocketService {
       this.socket.close(); // Ensure no duplicate connections
     }
 
-    this.socket = new WebSocket(environment.wsUrl);
+    const wsProto = window.location.protocol == 'https:'? 'wss:' : 'ws:';
+    const url = `${wsProto}//${environment.serviceHost}${environment.wsPath}`
+
+    this.socket = new WebSocket(url);
 
     this.socket.onopen = () => {
       console.log('WebSocket connected');

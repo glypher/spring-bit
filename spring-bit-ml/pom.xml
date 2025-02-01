@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>spring-bit-ml</name>
+    <description>ML microservices directory</description>
+    <artifactId>spring-bit-ml</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>com.springbit</groupId>
+        <artifactId>spring-bit</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <properties>
+        <docker.image.exposed.port>8000</docker.image.exposed.port>
+        <docker.image.dockerfile.dir>${basedir}/../docker/ml</docker.image.dockerfile.dir>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>docker-build</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${container.executable}</executable>
+                            <workingDirectory>${docker.image.dockerfile.dir}</workingDirectory>
+                            <arguments>
+                                <argument>build</argument>
+                                <argument>-f</argument>
+                                <argument>Dockerfile</argument>
+                                <argument>--build-arg</argument>
+                                <argument>EXPOSED_PORT=${docker.image.exposed.port}</argument>
+                                <argument>--platform</argument>
+                                <argument>${container.platform}</argument>
+                                <argument>-t</argument>
+                                <argument>${docker.image.prefix}/${project.artifactId}</argument>
+                                <argument>${basedir}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

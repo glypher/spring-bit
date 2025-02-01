@@ -18,7 +18,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -102,7 +102,8 @@ public class CryptoControllerTest {
         ECrypto mockCrypto = new ECrypto();
         mockCrypto.setName(CryptoType.BITCOIN.name());
         mockCrypto.setSymbol(CryptoType.BITCOIN.getSymbol());
-        mockCrypto.setQuoteDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        var now = ZonedDateTime.now().toInstant();
+        mockCrypto.setQuoteDate(now);
         mockCrypto.setQuotePrice(5f);
         when(quoteRepository.findBySymbol("BTC")).thenReturn(Flux.just(mockCrypto));
 
@@ -113,15 +114,16 @@ public class CryptoControllerTest {
                 .expectBodyList(Crypto.class)
                 .hasSize(1)
                 .contains(new Crypto(mockCrypto.getName(), mockCrypto.getSymbol(),
-                        mockCrypto.getQuoteDate(), mockCrypto.getQuotePrice()));
+                        now.truncatedTo(ChronoUnit.MILLIS), mockCrypto.getQuotePrice()));
     }
 
     @Test
     void testGetLatestQuoteFromServiceDirectory() {
         Crypto mockCrypto = new Crypto(CryptoType.BITCOIN.name(), CryptoType.BITCOIN.getSymbol(),
-                LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), 5f);
+                ZonedDateTime.now().toInstant(), 5f);
         when(quoteRepository.findBySymbol("BTC")).thenReturn(Flux.empty());
         when(cryptoServiceDirectory.getLiveQuote(any())).thenReturn(Flux.just(mockCrypto));
+
 
         webTestClient.get()
                 .uri("/crypto/BTC/quote")
@@ -129,6 +131,7 @@ public class CryptoControllerTest {
                 .expectStatus().isOk()
                 .expectBodyList(Crypto.class)
                 .hasSize(1)
-                .contains(mockCrypto);
+                .contains(new Crypto(mockCrypto.name(), mockCrypto.symbol(),
+                        mockCrypto.quoteDate().truncatedTo(ChronoUnit.MILLIS), mockCrypto.quotePrice()));
     }
 }

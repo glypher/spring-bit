@@ -21,7 +21,7 @@ export class GraphComponent implements OnInit {
   cryptoData: CryptoQuote[] = [];
   lastData: CryptoQuote;
   lastOperation: string = 'buy';
-
+  isWsAvailable = false;
 
   @ViewChild('graphDiv', { static: true }) graphDiv!: ElementRef;
 
@@ -38,16 +38,22 @@ export class GraphComponent implements OnInit {
       ct => {
         this.cryptoService.getCryptoData(ct).subscribe((data: CryptoQuote[]) => {
           this.cryptoData = data;
+
+          if (!this.isWsAvailable)
+            this.webSocketService.connect();
         });
       }
     );
 
     this.webSocketService.isServiceAvailable.subscribe(connected => {
-      // need to let server know that prediction must start for current symbol
-      let action = Object.assign(new CryptoAction(),
-        {...this.cryptoData[0], operation: 'predict', quantity: 50000.0});
+      this.isWsAvailable = connected;
+      if (this.isWsAvailable) {
+        // need to let server know that prediction must start for current symbol
+        let action = Object.assign(new CryptoAction(),
+          {...this.cryptoData[0], operation: 'predict', quantity: 50000.0});
 
-      this.webSocketService.sendMessage(action);
+        this.webSocketService.sendMessage(action);
+      }
     });
 
     this.webSocketService.cryptoQuote.subscribe(cryptoQuote  => {
@@ -65,7 +71,6 @@ export class GraphComponent implements OnInit {
 
     });
 
-    this.webSocketService.connect();
     this.onResize();
   }
 

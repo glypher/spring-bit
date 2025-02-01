@@ -44,6 +44,9 @@ spring-bit:
       enabled: true
       url: kafka-server:9092
       topic: crypto-topic
+    ml-service:
+      enabled: true
+      url: http://ml-service:8000
 
 # Logging
 logging.level.org.springframework: ${LOG_LEVEL:INFO}

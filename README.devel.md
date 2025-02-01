@@ -47,6 +47,12 @@ ng generate service crypto
 ng generate component graph
 ng generate environments
 ```
+#### Python ML development
+
+You need to have python 3 sdk installed and Set up a .venv in current root directory
+```shell
+pip install --upgrade setuptools wheel
+```
 
 ### Kubernetes development
 

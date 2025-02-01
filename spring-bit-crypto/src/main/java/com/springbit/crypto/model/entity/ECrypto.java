@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.mapping.Column;
 import lombok.Data;
-import java.time.LocalDateTime;
+
+import java.time.Instant;
 
 
 @Entity
@@ -23,7 +24,7 @@ public class ECrypto {
 
 
     @Column(value="date")
-    private LocalDateTime quoteDate;
+    private Instant quoteDate;
 
     @Column(value="usd")
     private Float quotePrice;

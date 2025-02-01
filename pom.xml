@@ -20,6 +20,7 @@
         <module>spring-bit-discovery</module>
         <module>spring-bit-gateway</module>
         <module>spring-bit-config</module>
+        <module>spring-bit-ml</module>
     </modules>
 
     <properties>

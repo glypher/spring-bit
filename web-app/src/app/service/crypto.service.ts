@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class CryptoService {
-  private apiUrl = environment.serviceUrl + environment.apiPath;
+  private apiUrl = environment.serviceHost? `${window.location.protocol}//${environment.serviceHost}${environment.apiPath}` : environment.apiPath;
   private liveTTL = environment.liveTTL
 
   private selectedSymbolSource = new BehaviorSubject<CryptoType>(CryptoType.DEFAULT_TYPE);

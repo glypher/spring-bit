@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,7 +98,7 @@ class CoinMarketCapTest {
                         "price": 3000.0
                     }}
                 }]
-            ]}""".formatted(JsonCrypto.dateFormatter.format(now), JsonCrypto.dateFormatter.format(now.minusHours(1)));
+            ]}""".formatted(now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME), now.minusHours(1).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
         mockWebServer.enqueue(new MockResponse()
                 .setBody(mockResponse)
@@ -105,17 +108,13 @@ class CoinMarketCapTest {
         // Start request
         Flux<Crypto> liveQuotes = coinMarketCap.getLiveQuote(symbols);
 
-        var date = LocalDateTime.ofInstant(ZonedDateTime.parse(JsonCrypto.dateFormatter.format(now),
-                JsonCrypto.dateFormatter).toInstant(), ZoneOffset.UTC);
-        var date1 = LocalDateTime.ofInstant(ZonedDateTime.parse(JsonCrypto.dateFormatter.format(now.minusHours(1)),
-                JsonCrypto.dateFormatter).toInstant(), ZoneOffset.UTC);
 
         StepVerifier.create(liveQuotes)
                 .expectNextMatches(crypto -> crypto.name().equals("BITCOIN") && crypto.symbol().equals("BTC")
-                        && crypto.quoteDate().equals(date)
+                        && crypto.quoteDate().equals(now.toInstant())
                         && crypto.quotePrice() == 5000.0)
                 .expectNextMatches(crypto -> crypto.name().equals("ETHEREUM") && crypto.symbol().equals("ETH")
-                        && crypto.quoteDate().equals(date1)
+                        && crypto.quoteDate().equals(now.minusHours(1).toInstant())
                         && crypto.quotePrice() == 3000.0)
                 .verifyComplete();
 

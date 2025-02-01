@@ -1,6 +1,6 @@
 export const environment = {
-  serviceUrl: '',
+  serviceHost: '',
   apiPath: '/api/v1/crypto/',
-  wsUrl: 'ws://localhost:8080/ws/v1/future',
+  wsPath: '/api/v1/ws/future',
   liveTTL: 5000
 };

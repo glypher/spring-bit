@@ -130,6 +130,19 @@ services:
     ports:
      - 8090:8090
 
+  ml-service:
+    container_name: ml-service
+    image: springbit/spring-bit-ml
+    pull_policy: never
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    networks:
+      - internal
+    ports:
+      - 8000:8000
+
   kafka-server:
     image: bitnami/kafka:latest
     container_name: kafka-server
