@@ -85,8 +85,8 @@ resource "aws_instance" "k8s_node" {
 
   iam_instance_profile = aws_iam_instance_profile.k8s_instance_profile.name
 
-  # Associate the Elastic IP
-  associate_public_ip_address = true
+  # No public IP needed
+  associate_public_ip_address = false
 
   # Configure the root EBS volume
   root_block_device {

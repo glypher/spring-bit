@@ -9,5 +9,9 @@ sudo mkdir -p /hostdata
 sudo aws s3 sync s3://"$1" /hostdata --quiet
 
 sudo mkdir -p /hostdata/mysql/storage
+sudo mkdir -p /hostdata/kafka
 
 sudo chmod u+rw -R /hostdata
+
+# Kafka user id
+sudo chown -R 1001:1001 /hostdata/kafka
