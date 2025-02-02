@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 describe('CryptoService', () => {
   let service: CryptoService;
   let httpMock: HttpTestingController;
-  let apiUrl: string = environment.serviceUrl + environment.apiPath;
+  let apiUrl: string = environment.apiPath;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -19,6 +19,8 @@ describe('CryptoService', () => {
 
     service = TestBed.inject(CryptoService);
     httpMock = TestBed.inject(HttpTestingController);
+
+    service.checkServiceStatus();
 
     httpMock.expectOne(apiUrl + 'live');
     httpMock.verify();

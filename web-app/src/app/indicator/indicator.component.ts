@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {CryptoService} from "../service/crypto.service";
+import {timer} from "rxjs";
+import {environment} from "../../environments/environment";
 
 @Component({
     selector: 'app-indicator',
@@ -14,7 +16,15 @@ export class IndicatorComponent implements OnInit {
 
   ngOnInit(): void {
     this.cryptoService.isServiceAvailable.subscribe(
-      status => this.isServiceAvailable = status
+      status => {
+        this.isServiceAvailable = status;
+
+        if (!status) {
+          timer(environment.liveTTL).subscribe(() => this.cryptoService.checkServiceStatus());
+        }
+      }
     )
+
+    this.cryptoService.checkServiceStatus();
   }
 }

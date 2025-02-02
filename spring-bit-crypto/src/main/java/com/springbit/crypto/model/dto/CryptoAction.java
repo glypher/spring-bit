@@ -11,7 +11,7 @@ public record CryptoAction(
     @JsonProperty("operation") String operation,
     @JsonProperty("quantity") Float quantity,
     @JsonProperty("quoteDate")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX", timezone = "UTC")
     Instant quoteDate,
     @JsonProperty("quotePrice") Float quotePrice
 ) {}

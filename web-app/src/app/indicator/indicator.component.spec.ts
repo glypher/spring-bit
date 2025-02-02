@@ -1,6 +1,6 @@
 import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
 
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, of} from 'rxjs';
 
 import { IndicatorComponent } from './indicator.component';
 import {CryptoService} from "../service/crypto.service";
@@ -14,7 +14,8 @@ describe('IndicatorComponent', () => {
   beforeEach(async () => {
     // Mock the BehaviorSubject to simulate observable changes
     mockCryptoService = {
-      isServiceAvailable: mockIsAlive.asObservable()
+      isServiceAvailable: mockIsAlive.asObservable(),
+      checkServiceStatus:  jasmine.createSpy('checkServiceStatus').and.callFake(() => {})
     };
 
     await TestBed.configureTestingModule({

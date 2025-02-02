@@ -6,7 +6,8 @@
   </div>
 
   <div #graphDiv class="items-center w-full">
-    <h2 class="font-bold text-base text-center">Real-Time Data Graph - press <b>space</b> key to {{lastOperation}}</h2>
+    <h2 class="font-bold text-base text-center">Future Crypto Graph - press <b>space</b> key to {{lastOperation}} in 3 steps</h2>
+    <h2 *ngIf="countOps > 0" class="font-bold text-base text-center">{{lastOperation}} in {{countOps}} steps</h2>
     <ngx-charts-line-chart
       [view]="view"
       [results]="data"

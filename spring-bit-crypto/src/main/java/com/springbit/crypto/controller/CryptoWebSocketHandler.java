@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -67,6 +68,7 @@ public class CryptoWebSocketHandler implements WebSocketHandler {
                 })
                 .switchMap(cryptoAction -> {
                     if ("predict".equalsIgnoreCase(cryptoAction.operation()) && cryptoAction.symbol() != null) {
+
                         // Let ML service know to start prediction
                         return startMlService(cryptoAction.symbol(), true).then(
                                 // Also link the websocket producer to kafka consumer
@@ -79,12 +81,14 @@ public class CryptoWebSocketHandler implements WebSocketHandler {
                                                 })
                         )).flux();
                     }
-                    // Send this to the kafka topic
-                    try {
-                        return kafkaService.sendMessage("test-topic", objectMapper.writeValueAsString(cryptoAction)).flux();
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
+                    return session.send(
+                            kafkaService.consumeMessages()
+                                    .doOnNext(logger::info)
+                                    .map(session::textMessage)
+                                    .onErrorContinue((error, value) -> {
+                                        logger.warn("Error while handling websocket publish message: ", error);
+                                    })
+                    ).then(kafkaService.sendMessage("test-topic", cryptoAction)).flux();
                 })
                 .onErrorResume(error -> {
                     logger.warn("Error while handling websocket receive message: ", error);

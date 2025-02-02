@@ -10,7 +10,6 @@ import { environment } from '../../environments/environment';
 })
 export class CryptoService {
   private apiUrl = environment.serviceHost? `${window.location.protocol}//${environment.serviceHost}${environment.apiPath}` : environment.apiPath;
-  private liveTTL = environment.liveTTL
 
   private selectedSymbolSource = new BehaviorSubject<CryptoType>(CryptoType.DEFAULT_TYPE);
   selectedSymbol = this.selectedSymbolSource.asObservable();
@@ -19,17 +18,11 @@ export class CryptoService {
   private isServiceAvailableSource = new BehaviorSubject<boolean>(false);
   isServiceAvailable = this.isServiceAvailableSource.asObservable();
 
-  private readonly timerId;
-
-  constructor(private http: HttpClient) {
-    this.checkServiceStatus();
-    this.timerId = setInterval(() => this.checkServiceStatus(), this.liveTTL); // Poll every 5 seconds
-  }
+  constructor(private http: HttpClient) {}
 
   checkServiceStatus(): void {
     this.isAlive().subscribe({
       next: () => {
-        clearInterval(this.timerId);
         this.isServiceAvailableSource.next(true)
       },
       error: () => this.isServiceAvailableSource.next(false)
@@ -53,7 +46,13 @@ export class CryptoService {
 
   getCryptoData(crypto: CryptoType): Observable<CryptoQuote[]> {
     return this.http.get<CryptoQuote>(this.apiUrl + crypto.symbol + "/quote").pipe(
-      map(reply => Object.assign(new Array<CryptoQuote>(), reply))
+      map(reply => {
+        let cryptoQuotes = Object.assign(new Array<CryptoQuote>(), reply);
+        for (let cryptoQuote of cryptoQuotes) {
+          cryptoQuote.quoteDate = new Date(cryptoQuote.quoteDate);
+        }
+        return cryptoQuotes;
+      })
     );
   }
 }

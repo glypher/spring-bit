@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {CryptoQuote} from "./service.types";
 import {environment} from "../../environments/environment";
-import {BehaviorSubject, map, Subject, timer} from "rxjs";
+import {BehaviorSubject, Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +13,11 @@ export class WebSocketService {
   private isServiceAvailableSource = new BehaviorSubject<boolean>(false);
   isServiceAvailable = this.isServiceAvailableSource.asObservable();
 
-  private socket: WebSocket;
+  private socket: WebSocket  | null = null;
 
   connect() {
     if (this.socket) {
-      this.socket.close(); // Ensure no duplicate connections
+      return;
     }
 
     const wsProto = window.location.protocol == 'https:'? 'wss:' : 'ws:';
@@ -48,7 +48,6 @@ export class WebSocketService {
     this.socket.onclose = (event) => {
       //console.log('WebSocket closed', event.reason);
       this.isServiceAvailableSource.next(false);
-      timer(environment.liveTTL).subscribe(() => this.connect());
     };
 
   }
@@ -64,6 +63,7 @@ export class WebSocketService {
   close(): void {
     if (this.socket) {
       this.socket.close();
+      this.socket = null;
     }
   }
 }

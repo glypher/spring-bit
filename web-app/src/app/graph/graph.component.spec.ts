@@ -12,11 +12,14 @@ describe('GraphComponent', () => {
   let fixture: ComponentFixture<GraphComponent>;
   let mockCryptoService: Partial<CryptoService>;
   let mockSelSymbol = new BehaviorSubject<CryptoType>(new CryptoType("BITCOIN", "BTC"));
+  let mockServiceAvailable = new BehaviorSubject<boolean>(true);
 
   beforeEach(async () => {
     // Mock the BehaviorSubject to simulate observable changes
     mockCryptoService = {
       selectedSymbol: mockSelSymbol.asObservable(),
+      isServiceAvailable: mockServiceAvailable.asObservable(),
+      checkServiceStatus:  jasmine.createSpy('checkServiceStatus').and.callFake(() => {}),
       getCryptoData:  jasmine.createSpy('getCryptoData').and.callFake((cryptoType) => {
         return of([{
           name: cryptoType.name,
