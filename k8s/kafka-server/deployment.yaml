@@ -43,6 +43,7 @@ spec:
               value: "true"
           ports:
             - containerPort: 9092
+            - containerPort: 9093
       volumes:
         - name: kafka-server-volume
           persistentVolumeClaim:
