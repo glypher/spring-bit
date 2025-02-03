@@ -26,7 +26,4 @@ export class PortfolioComponent {
     })
   }
 
-  getProfitColor(): string {
-    return this.profit >= 0 ? 'text-green-500' : 'text-red-500';
-  }
 }

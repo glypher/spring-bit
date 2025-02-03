@@ -72,9 +72,9 @@ class CryptoService:
             cryptos = None
             self._logger.error(f"Exception in getting crypto quotes {e}")
 
-        model = ModelRegistry.get_model('random', symbol=symbol, cryptos=cryptos)
+        model = ModelRegistry.get_model('random', cryptos=cryptos)
         task['model'] = model
-        async for crypto in model.predict(symbol=symbol, min=10000, max=200000, delay=1):
+        async for crypto in model.predict(symbol=symbol, delay=1):
             try:
                 await kafka.produce(crypto)
             except Exception as e:

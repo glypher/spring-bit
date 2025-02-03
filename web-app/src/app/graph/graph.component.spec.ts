@@ -54,15 +54,15 @@ describe('GraphComponent', () => {
 
     const compiled = fixture.nativeElement as HTMLElement; // Access the native DOM
     let tags = compiled.querySelectorAll('p');
-    expect(tags).toHaveSize(2);
+    expect(tags).toHaveSize(3);
     expect(tags[0].innerText).toEqual("Symbol: BTC");
-    expect(tags[1].innerText).toEqual("Current Price: $1000");
+    expect(tags[1].innerText).toEqual("Live Price: $1000");
 
     mockSelSymbol.next(new CryptoType("ETHEREUM", "ETH"));
     fixture.detectChanges();
 
     tags = compiled.querySelectorAll('p');
     expect(tags[0].innerText).toEqual("Symbol: ETH");
-    expect(tags[1].innerText).toEqual("Current Price: $1000");
+    expect(tags[1].innerText).toEqual("Live Price: $1000");
   });
 });

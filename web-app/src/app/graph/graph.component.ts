@@ -1,30 +1,30 @@
-import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
-import {NgForOf} from "@angular/common";
+import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import {CryptoAction, CryptoQuote} from "../service/service.types";
 import {CryptoService} from "../service/crypto.service";
 import {WebSocketService} from "../service/web-socket.service";
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import {User} from "../user/user";
-import {timer} from "rxjs";
-import {environment} from "../../environments/environment";
+import {Portfolio} from "../user/user.types";
 
 @Component({
   selector: 'app-graph',
   imports: [
-    NgForOf,
     NgxChartsModule
   ],
   templateUrl: './graph.component.html',
   standalone: true,
   styleUrl: './graph.component.css'
 })
-export class GraphComponent implements OnInit {
+export class GraphComponent implements OnInit, AfterViewInit {
 
   cryptoData: CryptoQuote[] = [];
   lastData: CryptoQuote;
-  lastOperation: string = 'buy';
+  lastOperation: string = 'Buy';
   countOps: number = 0;
   isWsAvailable = false;
+
+  //game = {win: 100000, loose: 30.0};
+  game = {win: 110, loose: 90.0};
 
   @ViewChild('graphDiv', { static: true }) graphDiv!: ElementRef;
 
@@ -35,6 +35,10 @@ export class GraphComponent implements OnInit {
   colorScheme = 'cool';
 
   constructor(private cryptoService: CryptoService, private webSocketService: WebSocketService, private user: User) {}
+
+  ngAfterViewInit(): void {
+    this.graphDiv.nativeElement.focus();
+  }
 
   ngOnInit(): void {
 
@@ -52,6 +56,9 @@ export class GraphComponent implements OnInit {
           this.data[0].name = this.cryptoData[0].name;
           this.data[0].series = [];
           this.addCryptoToGraph(this.cryptoData[0]);
+
+          this.lastOperation = 'Buy';
+          this.countOps = 0;
 
           if (!this.isWsAvailable) {
             this.webSocketService.connect();
@@ -89,6 +96,10 @@ export class GraphComponent implements OnInit {
       this.addCryptoToGraph(cryptoQuote);
     });
 
+    this.user.portfolio.subscribe(portfolio => {
+      this.nextLastOp(portfolio);
+    });
+
     this.onResize();
   }
 
@@ -96,9 +107,7 @@ export class GraphComponent implements OnInit {
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent): void {
     if (event.code === 'Space' || event.key === ' ') {
-      this.countOps = this.countOps <= 0? 3 : this.countOps;
-      this.colorScheme = 'vivid';
-
+      this.doAction();
       event.preventDefault();
     }
   }
@@ -108,17 +117,55 @@ export class GraphComponent implements OnInit {
     this.view = [this.graphDiv.nativeElement.offsetWidth , Math.min(window.innerHeight / 3, 700)];
   }
 
+  doAction() {
+    let reset = this.lastOperation == 'Won' || this.lastOperation == 'Try Again';
+    if (reset)
+      this.user.resetPortfolio();
+    else {
+      this.countOps = this.countOps <= 0? 3 : this.countOps;
+    }
+    this.nextLastOp(null);
+
+    this.colorScheme = 'vivid';
+  }
+
   private portfolioAction() {
+    let op = ''
+    if (this.lastOperation == 'Buying')
+      op = 'Buy';
+    if (this.lastOperation == 'Selling')
+      op = 'Sell';
+    this.nextLastOp(null);
+
     let action = Object.assign(new CryptoAction(),
-      {...this.lastData, operation: this.lastOperation, quantity: 100});
+      {...this.lastData, operation: op, quantity: 100000});
 
     this.colorScheme = 'cool';
+
     // First update portfolio to check availability
     action = this.user.addCryptoAction(action);
     if (action.quantity > 0) {
-      this.lastOperation = this.lastOperation == 'buy'? 'sell' : 'buy';
-
       this.webSocketService.sendMessage(action);
+    }
+  }
+
+  private nextLastOp(portfolio: Portfolio | null) {
+    if (portfolio) {
+      let usd = portfolio.getMoney();
+      if (usd >= this.game.win) {
+        this.lastOperation = 'Won';
+      } else if ((usd < this.game.loose) && !portfolio.hasCrypto()) {
+        this.lastOperation = 'Try Again';
+      }
+      return;
+    }
+    switch (this.lastOperation) {
+      case 'Buy': this.lastOperation = 'Buying'; break;
+      case 'Buying': this.lastOperation = 'Sell'; break;
+      case 'Sell': this.lastOperation = 'Selling'; break;
+      case 'Selling':
+      case 'Won':
+      case 'Try Again': this.lastOperation = 'Buy'; break;
     }
   }
 
@@ -135,4 +182,5 @@ export class GraphComponent implements OnInit {
       value: cryptoQuote.quotePrice.valueOf()});
     this.data = [...this.data]; // Refresh the chart
   }
+
 }

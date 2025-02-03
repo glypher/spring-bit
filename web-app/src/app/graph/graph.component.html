@@ -1,13 +1,13 @@
 
 <div class="p-6 max-w-7xl mx-auto">
-  <div *ngFor="let crypto of cryptoData" class="flex gap-6 bg-white shadow-lg rounded-lg p-4">
+  <div *ngFor="let crypto of cryptoData" class="flex gap-6 text-sm lg:text-base bg-white shadow-lg rounded-lg p-4">
     <p class="text-gray-600"><b>Symbol:</b> {{ crypto.symbol }}</p>
-    <p class="text-gray-600"><b>Current Price:</b> ${{ crypto.quotePrice }}</p>
+    <p class="text-gray-600"><b>Live Price:</b> ${{ crypto.quotePrice }}</p>
+    <p class="text-red-500">Play a demo Crypto Game. Try to reach $100k or loose if you are under $30</p>
   </div>
 
   <div #graphDiv class="items-center w-full">
-    <h2 class="font-bold text-base text-center">Future Crypto Graph - press <b>space</b> key to {{lastOperation}} in 3 steps</h2>
-    <h2 *ngIf="countOps > 0" class="font-bold text-base text-center">{{lastOperation}} in {{countOps}} steps</h2>
+    <h2 class="font-bold text-base text-center">Future Crypto Graph - press <b>space</b> key to buy/sell in <b>3 future steps</b></h2>
     <ngx-charts-line-chart
       [view]="view"
       [results]="data"
@@ -21,4 +21,25 @@
       [gradient]="true">
     </ngx-charts-line-chart>
   </div>
+
+  <div class="flex justify-center items-center">
+    <button
+      (click)="doAction()"
+      [ngClass]="{
+      'bg-blue-500': lastOperation === 'Buy',
+      'bg-purple-500': lastOperation === 'Sell',
+      'bg-gray-500': lastOperation === 'Buying' || lastOperation === 'Selling',
+      'bg-red-500': lastOperation === 'Try Again',
+      'bg-green-500': lastOperation === 'Won'
+    }"
+      [disabled]="lastOperation === 'Buying' || lastOperation === 'Selling'"
+      class="px-4 py-2 font-bold text-white"
+    >
+      {{ lastOperation }}
+    </button>
+    <h2 *ngIf="countOps > 0" class="ml-4 font-bold text-base text-center">{{lastOperation}} in {{countOps}} steps</h2>
+  </div>
+  <h2 *ngIf="lastOperation==='Won'" class="font-bold text-base text-center text-green-700">You won! Congrats.</h2>
+  <h2 *ngIf="lastOperation==='Try Again'" class="font-bold text-base text-center text-red-700">You lost! Don't buy crypto.</h2>
+
 </div>

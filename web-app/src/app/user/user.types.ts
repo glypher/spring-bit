@@ -51,5 +51,20 @@ export class Portfolio {
     let usd = this.stocks.get('usd') || Object.assign(new Stock(), {symbol: 'usd', quantity: 0});
     this.stocks.set('usd', usd);
     usd.quantity += quantity;
+    return this;
+  }
+
+  getMoney() {
+    return this.stocks.get('usd')?.quantity || 0;
+  }
+
+  hasCrypto() {
+    for (let [key, stock] of this.stocks) {
+      if (key != 'usd') {
+        if (stock.quantity > 0)
+          return true;
+      }
+    }
+    return false;
   }
 }
