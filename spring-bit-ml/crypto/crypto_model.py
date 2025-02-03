@@ -9,6 +9,10 @@ class CryptoModel(ABC):
     async def predict(self, **kwargs) -> AsyncIterable[Crypto]:
         pass
 
+    @abstractmethod
+    async def receive(self, **kwargs) -> AsyncIterable[Crypto]:
+        pass
+
 class ModelRegistry:
     _models = {}
 

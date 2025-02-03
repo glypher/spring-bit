@@ -50,10 +50,17 @@ export class GraphComponent implements OnInit {
           this.cryptoData = data;
           // reinitialize the graph
           this.data[0].name = this.cryptoData[0].name;
+          this.data[0].series = [];
           this.addCryptoToGraph(this.cryptoData[0]);
 
           if (!this.isWsAvailable) {
             this.webSocketService.connect();
+          } else {
+            // need to let server know that prediction must start for current symbol
+            let action = Object.assign(new CryptoAction(),
+              {...this.cryptoData[0], operation: 'predict', quantity: 50000.0});
+
+            this.webSocketService.sendMessage(action);
           }
         });
       }
@@ -89,7 +96,7 @@ export class GraphComponent implements OnInit {
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent): void {
     if (event.code === 'Space' || event.key === ' ') {
-      this.countOps = 3;
+      this.countOps = this.countOps <= 0? 3 : this.countOps;
 
       event.preventDefault();
     }

@@ -9,8 +9,10 @@ load_dotenv(env_file)
 class Settings(BaseSettings):
     ENV: str
     KAFKA_BOOTSTRAP_SERVERS: str
-    TOPIC_NAME: str
-    DEBUG: bool
+    TOPIC_CRYPTO: str
+    TOPIC_ACTION: str
+    CRYPTO_SERVICE: str
+    LOG_LEVEL: str
 
     class Config:
         env_file = env_file

@@ -52,3 +52,4 @@ terraform/terraform.tfstate.backup
 # Python ml
 .venv
 **/__pycache__/
+spring-bit-ml/logs/

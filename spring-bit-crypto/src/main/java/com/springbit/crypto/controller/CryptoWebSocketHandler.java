@@ -14,6 +14,10 @@ import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @ConditionalOnProperty(name="spring-bit.services.kafka.enabled")
@@ -52,11 +56,15 @@ public class CryptoWebSocketHandler implements WebSocketHandler {
                 .then();
     }
 
+    Flux<String>  cryptoFlux = Flux.just("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+    private Map<WebSocketSession, Sinks.Many<Flux<String>>> sinkMap = new HashMap<>();
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        return session
-                .receive()
+        sinkMap.put(session, Sinks.many().unicast().onBackpressureBuffer());
+
+        Mono<Void> receive = session
+                .receive() // receive a web socket message
                 .map(webSocketMessage -> {
                     String receivedMessage = webSocketMessage.getPayloadAsText();
                     logger.info("Received websocket message: {}", receivedMessage);
@@ -68,32 +76,32 @@ public class CryptoWebSocketHandler implements WebSocketHandler {
                 })
                 .switchMap(cryptoAction -> {
                     if ("predict".equalsIgnoreCase(cryptoAction.operation()) && cryptoAction.symbol() != null) {
-
-                        // Let ML service know to start prediction
-                        return startMlService(cryptoAction.symbol(), true).then(
-                                // Also link the websocket producer to kafka consumer
-                                session.send(
-                                        kafkaService.consumeMessages()
-                                                .doOnNext(logger::info)
-                                                .map(session::textMessage)
-                                                .onErrorContinue((error, value) -> {
-                                                    logger.warn("Error while handling websocket publish message: ", error);
-                                                })
-                        )).flux();
+                        // switch sink receive crypto
+                        sinkMap.get(session).tryEmitNext(kafkaService.consumeMessages(cryptoAction.symbol()));
+                        // post to springbit-ml to start predicting the crypto
+                        return startMlService(cryptoAction.symbol(), true).flux();
                     }
-                    return session.send(
-                            kafkaService.consumeMessages()
-                                    .doOnNext(logger::info)
-                                    .map(session::textMessage)
-                                    .onErrorContinue((error, value) -> {
-                                        logger.warn("Error while handling websocket publish message: ", error);
-                                    })
-                    ).then(kafkaService.sendMessage("test-topic", cryptoAction)).flux();
+                    // or send to the kafka action topic
+                    return kafkaService.sendMessage(cryptoAction);
                 })
                 .onErrorResume(error -> {
                     logger.warn("Error while handling websocket receive message: ", error);
                     return Mono.empty();  // Fallback, just an empty Mono
-                })
-                .then();
+                }).then();
+
+        Mono<Void> send = session.send(
+                                sinkMap.get(session)
+                                        .asFlux()
+                                        .switchMap(flux -> flux)
+                                        .doOnNext(logger::info)
+                                        .map(session::textMessage)
+                                        .onErrorContinue((error, value) -> {
+                                            logger.warn("Error while handling websocket publish message: ", error);
+                                        })
+                                ).onErrorContinue((error, value) -> {
+                                    logger.warn("Error while handling websocket publish message: ", error);
+                                }).then();
+
+        return Mono.zip(receive, send).then();
     }
 }

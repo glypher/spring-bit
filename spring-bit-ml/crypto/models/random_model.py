@@ -10,16 +10,19 @@ from crypto.dto.types import Crypto
 
 @register_model(name='random')
 class RandomModel(CryptoModel):
-    def __init__(self):
+    def __init__(self, **kwargs):
         pass
 
     async def predict(self, **kwargs) -> AsyncIterable[Crypto]:
         min_interval = kwargs.get('min', 10000)
         max_interval = kwargs.get('max', 200000)
-        delay = kwargs.get('delay', 3)
+        delay = kwargs.get('delay', 1)
         symbol = kwargs.get('symbol', 'BTC')
         while True:
             price = random.uniform(min_interval, max_interval)
             crypto = Crypto(name=symbol, symbol=symbol, quoteDate=datetime.datetime.now(), quotePrice=price)
             yield crypto
             await asyncio.sleep(delay)
+
+    async def receive(self, **kwargs) -> AsyncIterable[Crypto]:
+        pass

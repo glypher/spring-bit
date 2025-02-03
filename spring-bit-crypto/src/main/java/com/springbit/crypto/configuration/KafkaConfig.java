@@ -20,30 +20,11 @@ public class KafkaConfig {
             @Value("${spring-bit.services.kafka.url}") String kafkaServer) {
         Map<String, Object> config = Map.of(
                 "bootstrap.servers", kafkaServer,
-                "key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer",
-                "value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer"
+                "key.serializer", "org.apache.kafka.common.serialization.StringSerializer",
+                "value.serializer", "org.apache.kafka.common.serialization.StringSerializer"
         );
 
         SenderOptions<String, String> senderOptions = SenderOptions.create(config);
         return new ReactiveKafkaProducerTemplate<>(senderOptions);
-    }
-
-
-    @Bean
-    public ReactiveKafkaConsumerTemplate<String, String> reactiveKafkaConsumerTemplate(
-            @Value("${spring-bit.services.kafka.url}") String kafkaServer,
-            @Value("${spring-bit.services.kafka.topic}") String kafkaTopic) {
-        Map<String, Object> config = Map.of(
-                "bootstrap.servers", kafkaServer,
-                "group.id", "springbit",
-                "key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer",
-                "value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer",
-                "auto.offset.reset", "latest" // earliest for all
-        );
-
-        ReceiverOptions<String, String> receiverOptions = ReceiverOptions.create(config);
-        receiverOptions = receiverOptions.subscription(List.of(kafkaTopic));
-
-        return new ReactiveKafkaConsumerTemplate<>(receiverOptions);
     }
 }
