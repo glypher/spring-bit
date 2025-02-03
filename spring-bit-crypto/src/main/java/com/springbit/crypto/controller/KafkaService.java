@@ -13,6 +13,7 @@ import org.springframework.kafka.core.reactive.ReactiveKafkaProducerTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 import reactor.kafka.receiver.ReceiverOptions;
 
 import java.util.HashMap;
@@ -61,7 +62,7 @@ public class KafkaService {
             String kafkaTopic) {
         Map<String, Object> config = Map.of(
                 "bootstrap.servers", kafkaServer,
-                "group.id", "springbit",
+                "group.id", "springbit-" + kafkaTopic,
                 "key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer",
                 "value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer",
                 "auto.offset.reset", "latest" // earliest for all
@@ -80,7 +81,7 @@ public class KafkaService {
             rcvFlux = reactiveKafkaConsumerTemplate(cryptoTopic + '-' + symbol)
                     .receive()
                     .map(ConsumerRecord::value)
-                    .doOnNext(logger::info)
+                    .doOnNext(logger::debug)
                     .share();
 
             cryptoReceivers.put(symbol, rcvFlux);

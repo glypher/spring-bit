@@ -31,7 +31,7 @@ export class GraphComponent implements OnInit {
   data: { name: string; series: { name: string; value: number }[] }[] = [
     { name: 'Future Crypto Data', series: [] }
   ];
-  view: [number, number] = [700, 400];
+  view: [number, number] = [Math.min(window.innerWidth/ 3, 700), Math.min(window.innerHeight / 4, 700)];
   colorScheme = 'cool';
 
   constructor(private cryptoService: CryptoService, private webSocketService: WebSocketService, private user: User) {}
@@ -97,6 +97,7 @@ export class GraphComponent implements OnInit {
   handleKeyDown(event: KeyboardEvent): void {
     if (event.code === 'Space' || event.key === ' ') {
       this.countOps = this.countOps <= 0? 3 : this.countOps;
+      this.colorScheme = 'vivid';
 
       event.preventDefault();
     }
@@ -104,17 +105,17 @@ export class GraphComponent implements OnInit {
 
   @HostListener('window:resize', ['$event'])
   onResize() {
-    this.view = [this.graphDiv.nativeElement.offsetWidth , 700];
+    this.view = [this.graphDiv.nativeElement.offsetWidth , Math.min(window.innerHeight / 3, 700)];
   }
 
   private portfolioAction() {
     let action = Object.assign(new CryptoAction(),
       {...this.lastData, operation: this.lastOperation, quantity: 100});
 
+    this.colorScheme = 'cool';
     // First update portfolio to check availability
     action = this.user.addCryptoAction(action);
     if (action.quantity > 0) {
-      this.colorScheme = this.lastOperation == 'buy'? 'vivid' : 'cool';
       this.lastOperation = this.lastOperation == 'buy'? 'sell' : 'buy';
 
       this.webSocketService.sendMessage(action);
@@ -123,11 +124,14 @@ export class GraphComponent implements OnInit {
 
   private addCryptoToGraph(cryptoQuote: CryptoQuote) {
     this.lastData = cryptoQuote;
-    if (this.data[0].series.length >= 40) {
+    if (this.data[0].series.length >= 20) {
       this.data[0].series.shift(); // Keep a fixed number of data points
     }
     this.data[0].series.push({
-      name: cryptoQuote.quoteDate.toLocaleTimeString(),
+      name: cryptoQuote.quoteDate.toLocaleTimeString([], {
+        minute: '2-digit',
+        second: '2-digit',
+      }),
       value: cryptoQuote.quotePrice.valueOf()});
     this.data = [...this.data]; // Refresh the chart
   }

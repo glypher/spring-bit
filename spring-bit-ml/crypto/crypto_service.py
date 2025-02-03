@@ -26,7 +26,7 @@ class CryptoService:
 
             return [Crypto.model_validate(item) for item in data]
 
-    async def start_listener(self):
+    def start_listener(self):
         asyncio.create_task(self._kafka_listener.start_consumer(self._listen_actions))
 
     async def start_predict(self, symbol: str):
@@ -40,6 +40,8 @@ class CryptoService:
             self._tasks[symbol] = task
         else:
             task['count'] += 1
+
+        self._logger.info(f"Started predict for {symbol} count={task['count']}")
         return 'ok'
 
     async def stop(self, symbol: str):
@@ -54,7 +56,8 @@ class CryptoService:
                 except asyncio.CancelledError:
                     self._logger.error("Caught task cancellation.")
                 finally:
-                    del task[symbol]
+                    self._logger.info(f"Stopped predict for {symbol} count={task['count']}")
+                    del self._tasks[symbol]
         return "failed"
 
     async def _consume_model(self, task):
@@ -77,11 +80,18 @@ class CryptoService:
             except Exception as e:
                 self._logger.error(f"Exception in predict {e}")
 
-    async def _listen_actions(self, crypto_action):
-        if not crypto_action is isinstance(CryptoAction):
-            self._logger.warning(f'Error decoding crypto action for {crypto_action}')
-            return
-        task = self._tasks.get(crypto_action.symbol, None)
-        if task and 'model' in task:
-            self._logger.info(f'Received crypto action {crypto_action}')
-            await task['model'].receive(action=crypto_action)
+    async def _listen_actions(self, message: str):
+        try:
+            crypto_action = CryptoAction.model_validate(message)
+            if crypto_action.operation == 'predict':
+                await self.start_predict(crypto_action.symbol)
+                return
+            if crypto_action.operation == 'stop':
+                await self.stop(crypto_action.symbol)
+
+            task = self._tasks.get(crypto_action.symbol, None)
+            if task and 'model' in task:
+                self._logger.info(f'Received crypto action {crypto_action}')
+                await task['model'].receive(action=crypto_action)
+        except Exception as e:
+            self._logger.warning(f"Error in receive crypto action {e}")

@@ -25,6 +25,7 @@ app = FastAPI()
 
 crypto_service = CryptoService()
 
+crypto_service.start_listener()
 
 @app.get("/")
 async def root():
@@ -33,7 +34,6 @@ async def root():
 
 @app.post("/crypto/{symbol}/predict")
 async def start_predictions(symbol: str):
-    await crypto_service.start_listener()
     status = await crypto_service.start_predict(symbol)
     return {'status': status}
 

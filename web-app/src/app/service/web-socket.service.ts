@@ -27,13 +27,10 @@ export class WebSocketService {
     this.socket = new WebSocket(url);
 
     this.socket.onopen = () => {
-      console.log('WebSocket connected');
       this.isServiceAvailableSource.next(true);
     };
 
     this.socket.onmessage = (event) => {
-      console.log('Message received:', event.data);
-
       let cryptoQuote = Object.assign(new CryptoQuote, JSON.parse(event.data));
       if (cryptoQuote) {
         cryptoQuote.quoteDate = new Date(cryptoQuote.quoteDate);

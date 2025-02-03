@@ -16,6 +16,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,25 +46,10 @@ public class CryptoWebSocketHandler implements WebSocketHandler {
         this.objectMapper = objectMapper;
     }
 
-    private Mono<Void> startMlService(String symbol, boolean start) {
-        return webClient
-                .post()
-                .uri("/crypto/" + symbol + (start? "/predict" : "stop"))
-                .retrieve()
-                .bodyToMono(ReplyStatus.class)
-                .doOnNext(replyStatus -> {
-                    logger.info("ML service status: {}", replyStatus);
-                }).onErrorContinue(
-                        (error, value) -> logger.warn("ML service status: ", error))
-                .then();
-    }
-
-    Flux<String>  cryptoFlux = Flux.just("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
-    private Map<WebSocketSession, Sinks.Many<Flux<String>>> sinkMap = new HashMap<>();
-
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        sinkMap.put(session, Sinks.many().unicast().onBackpressureBuffer());
+        final Sinks.Many<Flux<String>> sink = Sinks.many().unicast().onBackpressureBuffer();
+        final String[] currentSymbol = {null};
 
         Mono<Void> receive = session
                 .receive() // receive a web socket message
@@ -74,23 +62,23 @@ public class CryptoWebSocketHandler implements WebSocketHandler {
                         throw new RuntimeException(e);
                     }
                 })
-                .switchMap(cryptoAction -> {
+                .doOnNext(cryptoAction -> {
                     if ("predict".equalsIgnoreCase(cryptoAction.operation()) && cryptoAction.symbol() != null) {
-                        // switch sink receive crypto
-                        sinkMap.get(session).tryEmitNext(kafkaService.consumeMessages(cryptoAction.symbol()));
-                        // post to springbit-ml to start predicting the crypto
-                        return startMlService(cryptoAction.symbol(), true).flux();
+                        currentSymbol[0] = cryptoAction.symbol();
+                        sink.tryEmitNext(kafkaService.consumeMessages(cryptoAction.symbol()));
                     }
-                    // or send to the kafka action topic
-                    return kafkaService.sendMessage(cryptoAction);
                 })
                 .onErrorResume(error -> {
                     logger.warn("Error while handling websocket receive message: ", error);
-                    return Mono.empty();  // Fallback, just an empty Mono
-                }).then();
+                    return Mono.empty();
+                })
+                .concatMap(kafkaService::sendMessage)
+                .then();
 
-        Mono<Void> send = session.send(
-                                sinkMap.get(session)
+        Mono<Void> closed = session.closeStatus().then(kafkaService.sendMessage(
+                new CryptoAction(currentSymbol[0], currentSymbol[0], "stop", 0f, LocalDateTime.now().toInstant(ZoneOffset.UTC), 0f)));
+
+        Mono<Void> send = session.send(sink
                                         .asFlux()
                                         .switchMap(flux -> flux)
                                         .doOnNext(logger::info)
@@ -102,6 +90,6 @@ public class CryptoWebSocketHandler implements WebSocketHandler {
                                     logger.warn("Error while handling websocket publish message: ", error);
                                 }).then();
 
-        return Mono.zip(receive, send).then();
+        return Mono.zip(receive, send, closed).then();
     }
 }
