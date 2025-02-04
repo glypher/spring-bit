@@ -1,10 +1,4 @@
 #!/bin/bash
-if [[ $# -ne 2 ]]; then
-  echo "Usage: $0 springbit-domain auth-server-domain"
-  echo "Eg: $0 https://springbit.org  springbit.org:9443"
-  exit 1
-fi
-
 kubectl create namespace springbit
 
 kubectl create secret docker-registry docker-secret \
@@ -21,8 +15,8 @@ kubectl apply -f /hostdata/k8s -R
 sleep 2
 
 # Debug logging
-kubectl -n springbit set env deployment/config-service   LOG_LEVEL=DEBUG
-kubectl -n springbit set env deployment/gateway-service  LOG_LEVEL=DEBUG
+#kubectl -n springbit set env deployment/config-service   LOG_LEVEL=DEBUG
+#kubectl -n springbit set env deployment/gateway-service  LOG_LEVEL=DEBUG
 
 # Restart the services to load the above envs
 #kubectl -n springbit rollout restart deployment config-service

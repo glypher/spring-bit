@@ -60,7 +60,7 @@ resource "aws_instance" "k8s_control_plane" {
       "/tmp/scripts/fix-coredns.sh",
       "/tmp/scripts/pull-s3-bucket.sh ${var.springbit_s3_bucket}",
       "/tmp/scripts/create-certs-secret.sh ${var.springbit_certs_s3_bucket}",
-      "/tmp/scripts/springbit-k8s.sh https://${var.springbit_domain}  ${var.springbit_domain}:9443",
+      "/tmp/scripts/springbit-k8s.sh",
 #      "/tmp/hubble-setup.sh",
     ]
   }
