@@ -23,8 +23,7 @@ export class GraphComponent implements OnInit, AfterViewInit {
   countOps: number = 0;
   isWsAvailable = false;
 
-  //game = {win: 100000, loose: 30.0};
-  game = {win: 110, loose: 90.0};
+  game = {win: 100000, loose: 30.0};
 
   @ViewChild('graphDiv', { static: true }) graphDiv!: ElementRef;
 
