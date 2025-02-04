@@ -95,9 +95,11 @@ spring:
           github:
             clientId: ${spring-bit.auth.github.client-id}
             clientSecret: ${spring-bit.auth.github.client-secret}
+            redirect-uri: ${spring-bit.public-domain}/login/oauth2/code/github
           facebook:
             client-id: ${spring-bit.auth.facebook.client-id}
             client-secret: ${spring-bit.auth.facebook.client-secret}
+            redirect-uri: ${spring-bit.public-domain}/login/oauth2/code/facebook
           keycloak:
             client-id: springbit-openid
             client-secret: ${spring-bit.auth.keycloak.client-secret}
