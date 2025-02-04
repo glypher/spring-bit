@@ -1,11 +1,13 @@
+import asyncio
 import logging
 
 from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 import json
 
+from aiokafka.errors import KafkaConnectionError
 from pydantic import BaseModel
 
-from config import settings
+from config.config import settings
 
 class KafkaService:
     def __init__(self, topic: str):
@@ -29,14 +31,21 @@ class KafkaService:
 
     async def produce(self, message: BaseModel):
         """Send a message to the Kafka topic"""
-        if not self.producer:
-            await self.start_producer()
+        while True:
+            try:
+                if not self.producer:
+                    await self.start_producer()
 
-        try:
-            await self.producer.send_and_wait(self.topic, message)
-            self._logger.info(f"Sent: {message.model_dump_json()}")
-        except Exception as e:
-            self._logger.error(f"Error sending message: {e}")
+                await self.producer.send_and_wait(self.topic, message)
+                self._logger.debug(f"Sent: {message.model_dump_json()}")
+                break
+            except KafkaConnectionError as e:
+                self._logger.error(f"Connection error: {e}")
+                self._logger.info("Retrying connection in 5 seconds...")
+                await asyncio.sleep(5)
+            except Exception as e:
+                self._logger.error(f"Error sending message: {e}")
+                break
 
     async def start_consumer(self, callback):
         if self.consumer:
@@ -47,17 +56,30 @@ class KafkaService:
             self.topic,
             bootstrap_servers=self.bootstrap_servers,
             value_deserializer=lambda m: json.loads(m.decode("utf-8")),
-            auto_offset_reset="earliest",
+            auto_offset_reset="latest", # earliest
         )
-        await self.consumer.start()
-        self._logger.info(f"Kafka Consumer started on {self.bootstrap_servers}")
+        while True:
+            try:
+                await self.consumer.start()
+            except KafkaConnectionError as e:
+                self._logger.error(f"Connection error: {e}")
+                self._logger.info("Retrying connection in 5 seconds...")
+                await asyncio.sleep(5)
+                continue
 
-        try:
-            async for msg in self.consumer:
-                self._logger.info(f"Received: {msg.value}")
-                await callback(msg.value)  # Process message with callback
-        finally:
-            await self.consumer.stop()
+            self._logger.info(f"Kafka Consumer started on {self.bootstrap_servers}")
+
+            try:
+                async for msg in self.consumer:
+                    self._logger.info(f"Received: {msg.value}")
+                    await callback(msg.value)  # Process message with callback
+            except KafkaConnectionError as e:
+                self._logger.error(f"Connection error: {e}")
+                self._logger.info("Retrying connection in 5 seconds...")
+                await asyncio.sleep(5)
+                continue
+            finally:
+                await self.consumer.stop()
 
     async def stop_producer(self):
         """Shutdown Kafka Producer"""

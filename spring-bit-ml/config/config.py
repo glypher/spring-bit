@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 # Load the correct environment file
-env_file = f".env.{os.getenv('ENV', 'development')}"
+env_file = f"config/.env.{os.getenv('ENV', 'development')}"
 load_dotenv(env_file)
 
 class Settings(BaseSettings):
@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     TOPIC_CRYPTO: str
     TOPIC_ACTION: str
     CRYPTO_SERVICE: str
+    LOG_DIR: str
     LOG_LEVEL: str
 
     class Config:

@@ -1,11 +1,10 @@
 import asyncio
-import json
 import logging
 from typing import List
 
 import httpx
 
-from config import settings
+from config.config import settings
 from crypto import ModelRegistry
 from crypto.dto.types import Crypto, CryptoAction
 from crypto.kafka_service import KafkaService

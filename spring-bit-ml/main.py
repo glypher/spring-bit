@@ -2,7 +2,7 @@ import sys
 
 from fastapi import FastAPI
 
-from config import settings
+from config.config import settings
 from crypto.crypto_service import CryptoService
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -12,8 +12,11 @@ from pathlib import Path
 logger = logging.getLogger('springbit-ml')
 logger.setLevel(settings.LOG_LEVEL)
 
-log_dir = Path(__file__).resolve().parent / 'logs'
-log_dir.mkdir(exist_ok=True)
+if settings.LOG_DIR:
+    log_dir = settings.LOG_DIR
+else:
+    log_dir = Path(__file__).resolve().parent / 'logs'
+    log_dir.mkdir(exist_ok=True)
 
 handler = TimedRotatingFileHandler(f'{log_dir}/springbit-ml.log', when='midnight', interval=1, backupCount=7)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

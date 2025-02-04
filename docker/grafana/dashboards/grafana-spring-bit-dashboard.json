@@ -532,7 +532,7 @@
             "uid": "P8E80F9AEF21F6940"
           },
           "editorMode": "builder",
-          "expr": "{app=\"spring-bit-auth-server\"} |= ``",
+          "expr": "{service_name=\"ml\"} |= ``",
           "hide": false,
           "queryType": "range",
           "refId": "D"
