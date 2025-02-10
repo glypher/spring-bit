@@ -28,6 +28,10 @@ export class Portfolio {
       let usd = this.stocks.get('usd')!;
       usd.quantity += price * count;
 
+      if (stock.quantity == 0) {
+        this.stocks.delete(symbol);
+      }
+
       return count;
     }
 
@@ -37,12 +41,14 @@ export class Portfolio {
   buyStock(symbol: string, quantity: number, price: number) {
     let stock = this.stocks.get(symbol) || Object.assign(new Stock(), {symbol: symbol, quantity: 0});
     this.stocks.set(symbol, stock);
-    let usd = this.stocks.get('usd')!;
 
-    let maxCount = usd.quantity / price;
-    let count = Math.max(maxCount, stock.quantity);
+    let usd = this.stocks.get('usd')!;
+    quantity = Math.min(usd.quantity, quantity);
+
+    let count = quantity / price;
     stock.quantity += count;
     usd.quantity -= price * count;
+    usd.quantity = Math.max(usd.quantity, 0);
 
     return count;
   }
@@ -57,6 +63,11 @@ export class Portfolio {
   getMoney() {
     return this.stocks.get('usd')?.quantity || 0;
   }
+
+  getStock(symbol: string) {
+    return this.stocks.get(symbol)?.quantity || 0;
+  }
+
 
   hasCrypto() {
     for (let [key, stock] of this.stocks) {

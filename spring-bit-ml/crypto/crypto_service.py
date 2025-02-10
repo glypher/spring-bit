@@ -34,6 +34,7 @@ class CryptoService:
             task = {'count': 1,
                     'symbol': symbol,
                     'kafka': KafkaService(f'{settings.TOPIC_CRYPTO}-{symbol}'),
+                    'model': settings.MODEL,
                     'task': None }
             task['task'] = asyncio.create_task(self._consume_model(task))
             self._tasks[symbol] = task
@@ -64,6 +65,7 @@ class CryptoService:
         symbol = task['symbol']
         await kafka.start_producer()
 
+        model = task.get('model', 'random')
         try:
             # get the latest quote
             cryptos = await CryptoService.fetch_crypto_quote(symbol)
@@ -71,7 +73,7 @@ class CryptoService:
             cryptos = None
             self._logger.error(f"Exception in getting crypto quotes {e}")
 
-        model = ModelRegistry.get_model('random', cryptos=cryptos)
+        model = ModelRegistry.get_model(model, cryptos=cryptos)
         task['model'] = model
         async for crypto in model.predict(symbol=symbol, delay=1):
             try:

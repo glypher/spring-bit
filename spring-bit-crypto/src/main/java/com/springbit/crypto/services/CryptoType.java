@@ -10,7 +10,13 @@ import lombok.Getter;
 public enum CryptoType {
     BITCOIN("BTC"),
     ETHEREUM("ETH"),
+    TETHER("USDT"),
+    RIPPLE("XRP"),
+    SOLANA("SOL"),
+    CARDANO("ADA"),
+    POLKADOT("DOT"),
     DOGECOIN("DOGE"),
+    PEPE("PEPE"),
     UNKNOWN("UNKNOWN");
 
     private final String symbol;

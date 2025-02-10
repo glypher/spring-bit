@@ -1,13 +1,13 @@
 
-<div class="p-6 max-w-7xl mx-auto">
+<div class="p-3 lg:p-6 max-w-7xl mx-auto">
   <div *ngFor="let crypto of cryptoData" class="flex gap-6 text-sm lg:text-base bg-white shadow-lg rounded-lg p-4">
     <p class="text-gray-600"><b>Symbol:</b> {{ crypto.symbol }}</p>
     <p class="text-gray-600"><b>Live Price:</b> ${{ crypto.quotePrice }}</p>
-    <p class="text-red-500">Play a demo Crypto Game. Try to reach $100k or loose if you are under $30</p>
+    <p class="text-red-500">Play a demo Crypto Game. Try to reach $100k or loose if you are under $30.</p>
   </div>
 
   <div #graphDiv class="items-center w-full">
-    <h2 class="font-bold text-base text-center">Future Crypto Graph - press <b>space</b> key to buy/sell in <b>3 future steps</b></h2>
+    <h2 class="font-bold text-base text-center">Future Crypto Graph - buy/sell crypto in <b>3 future steps</b></h2>
     <ngx-charts-line-chart
       [view]="view"
       [results]="data"
@@ -22,24 +22,45 @@
     </ngx-charts-line-chart>
   </div>
 
-  <div class="flex justify-center items-center">
-    <button
-      (click)="doAction()"
-      [ngClass]="{
-      'bg-blue-500': lastOperation === 'Buy',
-      'bg-purple-500': lastOperation === 'Sell',
-      'bg-gray-500': lastOperation === 'Buying' || lastOperation === 'Selling',
-      'bg-red-500': lastOperation === 'Try Again',
-      'bg-green-500': lastOperation === 'Won'
-    }"
-      [disabled]="lastOperation === 'Buying' || lastOperation === 'Selling'"
-      class="px-4 py-2 font-bold text-white"
-    >
-      {{ lastOperation }}
-    </button>
-    <h2 *ngIf="countOps > 0" class="ml-4 font-bold text-base text-center">{{lastOperation}} in {{countOps}} steps</h2>
+  <div class="flex flex-row items-center justify-between p-2 lg:p-4 bg-gray-100 rounded-lg shadow-md w-full">
+    <div *ngIf="game.state < 3" class="flex items-center space-x-2 lg:space-x-4">
+      <button (click)="doAction(true)" [disabled]="game.state > 0" [ngClass]="{
+      'bg-gray-800': game.state > 0,
+      'bg-green-500 hover:bg-green-600': game.state == 0
+    }" class="px-6 lg:px-12 py-3 lg:py-6 text-white text-basic lg:text-lg font-semibold rounded-lg shadow-md transition flex items-center justify-center">
+        Buy
+      </button>
+      <div class="text-center">
+        <input type="number" [(ngModel)]="game.buyQuantity" [disabled]="game.state > 0" class="w-16 lg:w-32 p-1 lg:p-2 border rounded text-center text-sm lg:text-basic font-bold text-green-600">
+      </div>
+    </div>
+
+    <div class="flex items-center justify-center w-full space-x-2 lg:space-x-4">
+      <h2 class="font-bold text-base text-center" [ngClass]="{
+      'bg-black-500': game.state < 3,
+      'bg-red-500': game.state == 3,
+      'bg-green-500': game.state == 4
+    }">{{game.infoText}}</h2>
+      <button (click)="tryAgain()" *ngIf="game.state > 2" [ngClass]="{
+      'bg-gray-800': game.state < 3,
+      'bg-red-800 hover:bg-red-900': game.state==3,
+      'bg-green-800 hover:bg-green-900': game.state == 4
+      }" class="px-6 lg:px-12 py-3 lg:py-6 text-white text-basic lg:text-lg font-semibold rounded-lg shadow-md transition flex items-center justify-center">
+        Try Again
+      </button>
+    </div>
+
+    <div *ngIf="game.state < 3" class="flex items-center space-x-2 lg:space-x-4">
+      <div class="text-center">
+        <input type="number" [(ngModel)]="game.sellQuantity" [disabled]="game.state > 0" class="w-16 lg:w-32 p-1 lg:p-2 border rounded text-center text-sm lg:text-basic font-bold text-red-600">
+      </div>
+      <button (click)="doAction(false)" [disabled]="game.state > 0" [ngClass]="{
+      'bg-gray-800': game.state > 0,
+      'bg-red-500 hover:bg-red-600': game.state == 0
+    }" class="px-6 lg:px-12 py-3 lg:py-6 text-white text-basic lg:text-lg font-semibold rounded-lg shadow-md transition">
+        Sell
+      </button>
+    </div>
   </div>
-  <h2 *ngIf="lastOperation==='Won'" class="font-bold text-base text-center text-green-700">You won! Congrats.</h2>
-  <h2 *ngIf="lastOperation==='Try Again'" class="font-bold text-base text-center text-red-700">You lost! Don't buy crypto.</h2>
 
 </div>

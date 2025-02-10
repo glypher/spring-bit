@@ -18,6 +18,8 @@ class ModelRegistry:
 
     @staticmethod
     def get_model(name: str, **kwargs) -> CryptoModel:
+        if name not in ModelRegistry._models:
+            raise Exception(f"Model {name} not found!")
         return ModelRegistry._models[name](**kwargs)
 
     @staticmethod

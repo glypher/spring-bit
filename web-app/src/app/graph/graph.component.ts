@@ -5,11 +5,13 @@ import {WebSocketService} from "../service/web-socket.service";
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import {User} from "../user/user";
 import {Portfolio} from "../user/user.types";
+import {FormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-graph',
   imports: [
-    NgxChartsModule
+    NgxChartsModule,
+    FormsModule
   ],
   templateUrl: './graph.component.html',
   standalone: true,
@@ -19,11 +21,17 @@ export class GraphComponent implements OnInit, AfterViewInit {
 
   cryptoData: CryptoQuote[] = [];
   lastData: CryptoQuote;
-  lastOperation: string = 'Buy';
-  countOps: number = 0;
   isWsAvailable = false;
 
-  game = {win: 100000, loose: 30.0};
+  game = {
+    win: 100000,
+    loose: 30,
+    state: 0, // 0 - init, 1-buy, 2-sell, 3 - lost, 4 - won
+    countOps: 0,
+    buyQuantity: 0,
+    sellQuantity: 0,
+    infoText: ''
+  };
 
   @ViewChild('graphDiv', { static: true }) graphDiv!: ElementRef;
 
@@ -56,8 +64,9 @@ export class GraphComponent implements OnInit, AfterViewInit {
           this.data[0].series = [];
           this.addCryptoToGraph(this.cryptoData[0]);
 
-          this.lastOperation = 'Buy';
-          this.countOps = 0;
+          this.game.state = 0;
+          this.game.infoText = '';
+          this.game.countOps = 0;
 
           if (!this.isWsAvailable) {
             this.webSocketService.connect();
@@ -86,29 +95,37 @@ export class GraphComponent implements OnInit, AfterViewInit {
     });
 
     this.webSocketService.cryptoQuote.subscribe(cryptoQuote  => {
-      if (this.countOps) {
-        this.countOps -= 1;
-        if (this.countOps == 0) {
+      if (this.game.countOps) {
+        this.game.countOps -= 1;
+        if (this.game.countOps == 0) {
           this.portfolioAction();
+        } else {
+          this.game.infoText = (this.game.state==1? 'Buying in ' : 'Selling in ') + this.game.countOps + ' steps';
         }
       }
       this.addCryptoToGraph(cryptoQuote);
     });
 
     this.user.portfolio.subscribe(portfolio => {
-      this.nextLastOp(portfolio);
+      // update according to portfolio change
+
+      let usd = portfolio.getMoney();
+      this.game.buyQuantity = usd;
+      this.game.sellQuantity = portfolio.getStock(this.cryptoData[0].symbol || '');
+
+      if (usd >= this.game.win) {
+        this.game.state = 4;
+        this.game.infoText = 'You won! Congrats.';
+      } else if ((usd < this.game.loose) && !portfolio.hasCrypto()) {
+        this.game.state = 3;
+        this.game.infoText = "You lost! Don't buy crypto.";
+      } else {
+        this.game.state = 0;
+        this.game.infoText = '';
+      }
     });
 
     this.onResize();
-  }
-
-
-  @HostListener('window:keydown', ['$event'])
-  handleKeyDown(event: KeyboardEvent): void {
-    if (event.code === 'Space' || event.key === ' ') {
-      this.doAction();
-      event.preventDefault();
-    }
   }
 
   @HostListener('window:resize', ['$event'])
@@ -116,28 +133,24 @@ export class GraphComponent implements OnInit, AfterViewInit {
     this.view = [this.graphDiv.nativeElement.offsetWidth , Math.min(window.innerHeight / 3, 700)];
   }
 
-  doAction() {
-    let reset = this.lastOperation == 'Won' || this.lastOperation == 'Try Again';
-    if (reset)
-      this.user.resetPortfolio();
-    else {
-      this.countOps = this.countOps <= 0? 3 : this.countOps;
-    }
-    this.nextLastOp(null);
+  doAction(buy: boolean) {
+    this.game.state = buy? 1 : 2;
+    this.game.countOps = this.game.countOps <= 0? 3 : this.game.countOps;
+    this.game.infoText = (this.game.state==1? 'Buying in ' : 'Selling in ') + this.game.countOps + ' steps';
 
     this.colorScheme = 'vivid';
   }
 
+  tryAgain() {
+    this.game.state = 0;
+    this.user.resetPortfolio();
+  }
+
   private portfolioAction() {
-    let op = ''
-    if (this.lastOperation == 'Buying')
-      op = 'Buy';
-    if (this.lastOperation == 'Selling')
-      op = 'Sell';
-    this.nextLastOp(null);
 
     let action = Object.assign(new CryptoAction(),
-      {...this.lastData, operation: op, quantity: 100000});
+      {...this.lastData, operation: this.game.state==1? 'Buy' : 'Sell',
+        quantity: this.game.state == 1? this.game.buyQuantity : this.game.sellQuantity});
 
     this.colorScheme = 'cool';
 
@@ -145,26 +158,6 @@ export class GraphComponent implements OnInit, AfterViewInit {
     action = this.user.addCryptoAction(action);
     if (action.quantity > 0) {
       this.webSocketService.sendMessage(action);
-    }
-  }
-
-  private nextLastOp(portfolio: Portfolio | null) {
-    if (portfolio) {
-      let usd = portfolio.getMoney();
-      if (usd >= this.game.win) {
-        this.lastOperation = 'Won';
-      } else if ((usd < this.game.loose) && !portfolio.hasCrypto()) {
-        this.lastOperation = 'Try Again';
-      }
-      return;
-    }
-    switch (this.lastOperation) {
-      case 'Buy': this.lastOperation = 'Buying'; break;
-      case 'Buying': this.lastOperation = 'Sell'; break;
-      case 'Sell': this.lastOperation = 'Selling'; break;
-      case 'Selling':
-      case 'Won':
-      case 'Try Again': this.lastOperation = 'Buy'; break;
     }
   }
 

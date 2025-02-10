@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     TOPIC_CRYPTO: str
     TOPIC_ACTION: str
     CRYPTO_SERVICE: str
+    MODEL: str
     LOG_DIR: str
     LOG_LEVEL: str
 

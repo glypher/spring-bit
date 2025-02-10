@@ -17,7 +17,13 @@ public interface DtoMapper {
         return switch (type) {
             case BITCOIN -> "BTC";
             case ETHEREUM -> "ETH";
+            case TETHER -> "USDT";
+            case RIPPLE -> "XRP";
+            case SOLANA -> "SOL";
+            case CARDANO -> "ADA";
+            case POLKADOT -> "DOT";
             case DOGECOIN -> "DOGE";
+            case PEPE -> "PEPE";
             case UNKNOWN -> "";
         };
     }
