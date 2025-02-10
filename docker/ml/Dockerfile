@@ -29,6 +29,7 @@ RUN chmod a+x /usr/local/bin/promtail && chmod a+x /usr/local/bin/start.sh
 
 COPY config/ /app/config
 COPY crypto/ /app/crypto
+COPY data/   /app/data
 COPY main.py /app
 
 # Use the same virtual environment

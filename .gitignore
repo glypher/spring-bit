@@ -36,6 +36,7 @@ build/
 **/resources/stores
 
 data/
+!spring-bit-ml/data/
 scripts/secrets.prop
 docker/**/certs/
 docker/vault/unseal/
