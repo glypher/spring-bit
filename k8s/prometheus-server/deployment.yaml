@@ -22,6 +22,13 @@ spec:
         args: [ "--config.file=/etc/prometheus/prometheus.yml", "--web.route-prefix=/",  "--web.external-url=/prometheus"]
         ports:
         - containerPort: 9090
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

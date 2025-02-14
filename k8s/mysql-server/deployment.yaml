@@ -24,6 +24,13 @@ spec:
             name: mysql-server-volume
         ports:
         - containerPort: 3306
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
       volumes:
         - name: mysql-server-volume
           persistentVolumeClaim:

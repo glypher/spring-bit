@@ -27,6 +27,13 @@ spec:
                 key: vault-token
         ports:
         - containerPort: 9095
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

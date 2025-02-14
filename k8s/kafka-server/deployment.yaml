@@ -44,6 +44,13 @@ spec:
           ports:
             - containerPort: 9092
             - containerPort: 9093
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
       volumes:
         - name: kafka-server-volume
           persistentVolumeClaim:

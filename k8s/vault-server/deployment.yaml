@@ -28,6 +28,13 @@ spec:
               - IPC_LOCK
         ports:
         - containerPort: 8200
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
       volumes:
         - name: vault-server-volume
           persistentVolumeClaim:

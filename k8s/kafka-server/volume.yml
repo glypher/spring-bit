@@ -7,7 +7,7 @@ spec:
   volumeMode: Filesystem
   storageClassName: local-storage
   capacity:
-    storage: 50Mi
+    storage: 200Mi
   accessModes:
     - ReadWriteOnce  # The volume can be mounted as read-write by a single node
   persistentVolumeReclaimPolicy: Retain
@@ -36,4 +36,4 @@ spec:
     - ReadWriteOnce  # The claim needs to be mounted as read-write by a single node
   resources:
     requests:
-      storage: 50Mi
+      storage: 200Mi
