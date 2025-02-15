@@ -122,3 +122,20 @@ exit
 
 docker cp keycloak-server:/opt/keycloak/data/import/springbit-realm.json scripts/config/springbit-realm.json
 ```
+
+### K6 testing
+
+Install K6
+```shell
+sudo gpg -k | grep "Grafana"
+curl -s https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+sudo apt update
+sudo apt install k6
+```
+
+Running performance tests requires starting a k8s cluster first so check out Minikube setup
+```shell
+cd qa/k6
+k6 run crypto_api.js
+```

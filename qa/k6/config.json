@@ -1,0 +1,6 @@
+{
+  "HOST": "localhost:8080",
+  "USERS": 50,
+  "DURATION": "30s",
+  "SYMBOLS": ["BTC", "ETH", "USDT", "XRP", "SOL", "ADA", "DOT", "DODGE", "PEPE"]
+}
