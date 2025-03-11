@@ -36,8 +36,8 @@ describe('IndicatorComponent', () => {
   it('should have indicator change', fakeAsync(() => {
 
     const compiled = fixture.nativeElement as HTMLElement; // Access the native DOM
-    const indicator = compiled.querySelector('.rounded-full');
-    expect(indicator).toHaveClass('bg-red-500');
+    const indicator = compiled.querySelector('img');
+    expect(indicator).toHaveClass('invert');
 
     setTimeout(() => {
       mockIsAlive.next(true);
@@ -49,7 +49,7 @@ describe('IndicatorComponent', () => {
     mockIsAlive.asObservable().subscribe((done) => {
       expect(done).toEqual(true);
 
-      expect(indicator).toHaveClass('bg-green-500');
+      expect(indicator).toHaveClass('brightness-100');
     })
 
   }));

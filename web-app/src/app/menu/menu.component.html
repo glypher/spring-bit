@@ -6,7 +6,7 @@
     </div>
     <!-- Crypto Icons -->
     <div class="flex space-x-2 items-left">
-      <img *ngFor="let crypto of cryptoIcons" [src]="crypto.src" [alt]="crypto.alt" (click)="setSymbol(crypto.symbol)" class="h-6 w-6">
+      <img *ngFor="let crypto of cryptoIcons" [src]="crypto.src" [alt]="crypto.name" (click)="setSymbol(crypto.symbol)" class="h-6 w-6">
     </div>
   </nav>
 

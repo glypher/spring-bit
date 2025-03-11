@@ -3,20 +3,21 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import { MenuComponent } from './menu.component';
 import {CryptoService} from "../service/crypto.service";
 import {BehaviorSubject, of} from "rxjs";
-import {CryptoType} from "../service/service.types";
+import {CryptoType, CryptoTypeImg} from "../service/service.types";
 
 describe('MenuComponent', () => {
   let component: MenuComponent;
   let fixture: ComponentFixture<MenuComponent>;
   let mockCryptoService: Partial<CryptoService>;
-  let mockIsAlive = new BehaviorSubject<boolean>(false);
+  let mockCryptoTypes = new BehaviorSubject<CryptoTypeImg[]>([]);
 
   beforeEach(async () => {
     // Mock the BehaviorSubject to simulate observable changes
     mockCryptoService = {
-      isServiceAvailable: mockIsAlive.asObservable(),
+      cryptoTypes: mockCryptoTypes.asObservable(),
+      isAlive: jasmine.createSpy('isAlive').and.callFake(() => { return "Server alive!" }),
       loadCryptos:  jasmine.createSpy('loadCryptos').and.callFake(() => {
-        return of([new CryptoType("BITCOIN", "BTC"), new CryptoType("ETHEREUM", "ETH")]);
+        mockCryptoTypes.next([new CryptoTypeImg("BITCOIN", "BTC"), new CryptoTypeImg("ETHEREUM", "ETH")]);
       }),
       onSymbolChange: jasmine.createSpy('onSymbolChange')
     };
@@ -41,7 +42,7 @@ describe('MenuComponent', () => {
     let imgs = compiled.querySelectorAll('img');
     expect(imgs).toHaveSize(0);
 
-    mockIsAlive.next(true);
+    mockCryptoTypes.next([new CryptoTypeImg("BITCOIN", "BTC"), new CryptoTypeImg("ETHEREUM", "ETH")]);
     fixture.detectChanges();
 
     imgs = compiled.querySelectorAll('img');

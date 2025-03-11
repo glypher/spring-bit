@@ -3,17 +3,23 @@
 
     <div class="flex items-center space-x-4">
       <!-- Logo and App Name -->
-      <div class="flex items-center">
+      <div class="flex items-center space-x-4">
         <a href="javascript:void(0)" (click)="onHome()" class="flex items-center">
-          <img ngSrc="assets/spring-bit.png" alt="Spring-Bit Logo" class="h-10 w-10 mr-3" height="1024" width="1024">
-          <span class="text-xl lg:text-2xl font-semibold">Spring-Bit Crypto</span>
+          <!-- Service indicator -->
+          <app-indicator></app-indicator>
+          <span class="text-xl lg:text-2xl font-semibold">Spring-Bit</span>
+        </a>
+
+        <a href="javascript:void(0)" (click)="onGame()" class="text-base lg:text-xl font-semibold text-white px-4 py-2 rounded-lg hover:text-green hover:bg-green-600 transition">
+          Crypto Game
+        </a>
+
+        <a href="javascript:void(0)" (click)="onInfo()" class="text-base lg:text-xl font-semibold text-white px-4 py-2 rounded-lg hover:text-green hover:bg-green-600 transition">
+          Crypto Info
         </a>
       </div>
 
-      <!-- Service indicator -->
-      <div>
-        <app-indicator></app-indicator>
-      </div>
+
     </div>
 
     <!-- User details -->

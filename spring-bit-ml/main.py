@@ -1,9 +1,12 @@
 import sys
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from config.config import settings
 from crypto.crypto_service import CryptoService
+from crypto.dto.types import CryptoInfoRequest, CryptoInfo
+from crypto.statistics.CryptoSeries import CryptoSeries
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
@@ -26,6 +29,15 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 
 app = FastAPI()
 
+# Add CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (use specific domains for production)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
+
 crypto_service = CryptoService()
 
 crypto_service.start_listener()
@@ -44,3 +56,10 @@ async def start_predictions(symbol: str):
 async def stop_predictions(symbol: str):
     status = await crypto_service.stop(symbol)
     return {'status': status}
+
+@app.post("/crypto/info")
+async def crypto_info(request: CryptoInfoRequest) -> CryptoInfo:
+    try:
+        return CryptoSeries.get().correlation(request.symbols, request.start_date, request.end_date)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

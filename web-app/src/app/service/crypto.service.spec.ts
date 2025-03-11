@@ -46,14 +46,22 @@ describe('CryptoService', () => {
 
   it('load cryptos', () => {
 
-    service.loadCryptos().subscribe((data) => {
-      expect(data).toContain(new CryptoType("BITCOIN", "BTC"));
-      expect(data).toContain(new CryptoType("ETHEREUM", "ETH"));
-    });
+    service.checkServiceStatus();
+
+    const req1 = httpMock.expectOne(apiUrl + 'live');
+    expect(req1.request.method).toBe('GET');
+    req1.flush("Server alive!");
 
     const req = httpMock.expectOne(apiUrl + 'cryptos');
     expect(req.request.method).toBe('GET');
     req.flush([new CryptoType("BITCOIN", "BTC"), new CryptoType("ETHEREUM", "ETH")]);
+
+    service.cryptoTypes.subscribe((arr) => {
+      let data : CryptoType[] = arr.map(d => new CryptoType(d.name, d.symbol));
+      expect(data).toContain(new CryptoType("BITCOIN", "BTC"));
+      expect(data).toContain(new CryptoType("ETHEREUM", "ETH"));
+    });
+
   });
 
   it('get crypto data', () => {

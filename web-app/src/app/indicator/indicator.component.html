@@ -1,7 +1,8 @@
 <div class="flex items-center justify-center min-h-screen">
-  <div
-    [class.bg-green-500]="isServiceAvailable"
-    [class.bg-red-500]="!isServiceAvailable"
-    class="h-4 lg:h-8 w-4 lg:w-8 rounded-full transition-colors duration-500"
-  ></div>
+
+  <img ngSrc="assets/spring-bit.png" alt="Spring-Bit Logo" class="h-10 w-10 mr-3"
+       [ngClass]="{
+    'filter invert': !isServiceAvailable,
+    'filter brightness-100': isServiceAvailable
+  }" height="1024" width="1024">
 </div>

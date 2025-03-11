@@ -22,4 +22,12 @@ export class HeaderComponent {
     this.router.navigate(["/"], { skipLocationChange: true });
   }
 
+  onGame() {
+    this.router.navigate(["game"], { skipLocationChange: true });
+  }
+
+  onInfo() {
+    this.router.navigate(["info"], { skipLocationChange: true });
+  }
+
 }

@@ -14,6 +14,11 @@ export class CryptoAction {
   quotePrice: Number;
 }
 
+export class CryptoInfo {
+  correlation: { [key: string]: { [key: string]: number } };
+}
+
+
 export class CryptoType {
   name:   string;
   symbol: string;
@@ -33,6 +38,10 @@ export class CryptoType {
   static getType(symbol: string) {
     return CryptoType.TYPES.get(symbol.toLowerCase())!;
   }
+}
+
+export class CryptoTypeImg extends CryptoType {
+  src:    string;
 }
 
 export enum AuthType {
