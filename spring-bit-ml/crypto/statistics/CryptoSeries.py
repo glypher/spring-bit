@@ -75,7 +75,7 @@ class CryptoSeries:
         result = CryptoInfo(correlation={})
         for i in range(len(symbols)):
             corr = {}
-            for j in range(i+1, len(symbols)):
+            for j in range(len(symbols)):
                 corr[symbols[j]] = corr_matrix[i][j]
             result.correlation[symbols[i]] = corr
 

@@ -5,8 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config.config import settings
 from crypto.crypto_service import CryptoService
-from crypto.dto.types import CryptoInfoRequest, CryptoInfo
+from crypto.dto.types import CryptoInfoRequest, CryptoInfo, ChatRequest, ChatReply
 from crypto.statistics.CryptoSeries import CryptoSeries
+from crypto.chat.Chat import Chat
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
@@ -61,5 +62,12 @@ async def stop_predictions(symbol: str):
 async def crypto_info(request: CryptoInfoRequest) -> CryptoInfo:
     try:
         return CryptoSeries.get().correlation(request.symbols, request.start_date, request.end_date)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/crypto/chat")
+async def crypto_chat(request: ChatRequest) -> ChatReply:
+    try:
+        return await Chat.get().chat(request)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

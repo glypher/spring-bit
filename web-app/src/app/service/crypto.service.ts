@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
 import {BehaviorSubject, map, Observable} from 'rxjs';
-import {CryptoInfo, CryptoQuote, CryptoType, CryptoTypeImg} from "./service.types";
+import {Chat, CryptoInfo, CryptoQuote, CryptoType, CryptoTypeImg} from "./service.types";
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -90,6 +90,13 @@ export class CryptoService {
     };
 
     return this.http.post<CryptoInfo>(this.mlUrl + "/crypto/info", cryptoInfoRequest);
+  }
+
+  sendPrompt(prompt: string) {
+    const promptRequest = {
+      prompt: prompt
+    };
+    return this.http.post<Chat>(this.mlUrl + "/crypto/chat", promptRequest);
   }
 
 }

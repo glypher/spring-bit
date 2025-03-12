@@ -18,6 +18,10 @@ export class CryptoInfo {
   correlation: { [key: string]: { [key: string]: number } };
 }
 
+export class Chat {
+  reply: string;
+}
+
 
 export class CryptoType {
   name:   string;

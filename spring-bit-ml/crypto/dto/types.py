@@ -32,3 +32,9 @@ class CryptoInfoRequest(BaseModel):
 
 class CryptoInfo(BaseModel):
     correlation: Dict[str, Dict[str, float]]  # Outer dict: symbol -> (Inner dict: symbol -> correlation)
+
+class ChatRequest(BaseModel):
+    prompt: str
+
+class ChatReply(BaseModel):
+    reply: str

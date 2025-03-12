@@ -7,3 +7,7 @@ python-dotenv
 httpx
 pandas
 numpy
+langchain
+langchain-core
+langchain-community
+openai
