@@ -106,6 +106,7 @@ kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 NODE_NAME=$(hostname)
 kubectl label nodes "$NODE_NAME" springbit.org/publichost=yes
 kubectl label nodes "$NODE_NAME" springbit.org/monitoring=yes
+kubectl label nodes "$NODE_NAME" springbit.org/frontend=yes
 
 # Cilium CNI setup
 retry_command "kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.1.0/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml"

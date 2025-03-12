@@ -97,5 +97,4 @@ sudo chmod a+r /var/lib/kubelet/pki/kubelet-client-current.pem
 
 NODE_NAME=$(hostname)
 kubectl label nodes "$NODE_NAME" springbit.org/volume=yes
-kubectl label nodes "$NODE_NAME" springbit.org/frontend=yes
 kubectl label nodes "$NODE_NAME" springbit.org/backend=yes

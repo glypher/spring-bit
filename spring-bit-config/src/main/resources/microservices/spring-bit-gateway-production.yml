@@ -16,6 +16,9 @@ spring-bit:
     crypto-service:
       enabled: true
       url: lb://spring-bit-crypto
+    ml-service:
+      enabled: true
+      url: http://ml-service:8000
     discovery-service:
       enabled: true
       url: http://discovery-service:8888

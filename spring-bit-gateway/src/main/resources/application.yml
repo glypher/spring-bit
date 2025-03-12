@@ -26,6 +26,14 @@ spring:
             - StripPrefix=3
             - RewriteResponseHeader=Location, ^/, /api/v1/docs/
 
+        - id: ml-service
+          uri: ${spring-bit.services.ml-service.url}
+          enabled: ${spring-bit.services.ml-service.enabled}
+          predicates:
+            - Path=/api/v1/ml/**
+          filters:
+            - StripPrefix=3
+
         - id: discovery
           uri: ${spring-bit.services.discovery-service.url}
           enabled: ${spring-bit.services.discovery-service.enabled}
@@ -145,6 +153,9 @@ spring-bit:
     crypto-service:
       enabled: true
       url: http://localhost:8090
+    ml-service:
+      enabled: true
+      url: http://localhost:8000
     discovery-service:
       enabled: true
       url: http://localhost:8888

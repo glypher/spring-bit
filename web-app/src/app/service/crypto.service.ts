@@ -89,14 +89,14 @@ export class CryptoService {
       symbols: cryptos.map(ct => ct.symbol)
     };
 
-    return this.http.post<CryptoInfo>(this.mlUrl + "/crypto/info", cryptoInfoRequest);
+    return this.http.post<CryptoInfo>(this.mlUrl + "crypto/info", cryptoInfoRequest);
   }
 
   sendPrompt(prompt: string) {
     const promptRequest = {
       prompt: prompt
     };
-    return this.http.post<Chat>(this.mlUrl + "/crypto/chat", promptRequest);
+    return this.http.post<Chat>(this.mlUrl + "crypto/chat", promptRequest);
   }
 
 }

@@ -56,7 +56,7 @@ while IFS='=' read -r key value; do
   if [[ "$key" =~ ^# ]]; then
     continue
   fi
-  if [[ "$key" =~ ^docker\. ]] || [[ "$key" == "spring-bit.public-domain" ]]; then
+  if [[ "$key" =~ ^docker\. ]] || [[ "$key" == "spring-bit.public-domain" ]] || [[ "$key" == "openai.key" ]]; then
     echo "Adding $key to deployment secrets"
     echo "$key=$value" >> $DATA_DIR/secrets.prop
   else

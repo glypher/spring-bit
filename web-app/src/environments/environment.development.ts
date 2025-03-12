@@ -3,6 +3,6 @@ export const environment = {
   mlHost: 'localhost:8000',
   apiPath: '/crypto/',
   wsPath: '/ws/future',
-  mlPath: '',
+  mlPath: '/',
   liveTTL: 6000
 };
