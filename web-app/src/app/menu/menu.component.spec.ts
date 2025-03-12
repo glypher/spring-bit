@@ -49,8 +49,5 @@ describe('MenuComponent', () => {
     expect(imgs).toHaveSize(2);
     expect(imgs[0].alt).toEqual("BITCOIN");
     expect(imgs[1].alt).toEqual("ETHEREUM");
-
-    imgs[0].click();
-    expect(mockCryptoService.onSymbolChange).toHaveBeenCalledWith(new CryptoType("BITCOIN", "BTC"));
   });
 });

@@ -9,6 +9,7 @@ kubectl create secret docker-registry docker-secret \
 kubectl create secret generic springbit-secret \
   --from-literal=vault-token=$(grep vault.token /hostdata/secrets.prop | cut -d'=' -f 2-) \
   --from-literal=public-domain=$(grep spring-bit.public-domain /hostdata/secrets.prop | cut -d'=' -f 2-) \
+  --from-literal=openai-key=$(grep openai.key /hostdata/secrets.prop | cut -d'=' -f 2-) \
   --namespace springbit
 
 kubectl apply -f /hostdata/k8s -R

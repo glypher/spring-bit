@@ -61,6 +61,7 @@ After running the steps in building you can just issue
 
 ```shell
 export VAULT_USER_TOKEN=$(grep vault.token data/secrets.prop | cut -d'=' -f 2-)
+export OPENAI_API_KEY=$(grep openai.key data/secrets.prop | cut -d'=' -f 2-)
 # Kafka user id
 sudo chown -R 1001:1001 ./data/kafka
 docker-compose up
@@ -123,6 +124,7 @@ kubectl create secret docker-registry docker-secret \
 kubectl create secret generic springbit-secret \
   --from-literal=vault-token=$(grep vault.token data/secrets.prop | cut -d'=' -f 2-) \
   --from-literal=public-domain=$(grep spring-bit.public-domain data/secrets.prop | cut -d'=' -f 2-) \
+  --from-literal=openai-key=$(grep openai.key data/secrets.prop | cut -d'=' -f 2-) \
   --namespace springbit
 
 # Apply the deployment

@@ -62,6 +62,7 @@ jobs:
         echo "spring-bit.services.coinmarketcap.api-token=${{secrets.COINMARKETCAP_TOKEN}}" >> config/config.properties
         echo "docker.username=${{secrets.DOCKERHUB_USERNAME}}" >> config/config.properties
         echo "docker.password=${{secrets.DOCKERHUB_PASSWORD}}" >> config/config.properties
+        echo "openai.key=${{secrets.OPENAI_API_KEY}}" >> config/config.properties
         ./init_vault.sh
         # Initialize keycloak
         ./init_keycloak.sh

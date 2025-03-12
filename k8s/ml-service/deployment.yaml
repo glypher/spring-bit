@@ -19,6 +19,12 @@ spec:
       - name: ml-service
         image: springbit/spring-bit-ml
         imagePullPolicy: IfNotPresent
+        env:
+          - name: OPENAI_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: springbit-secret
+                key: openai-key
         ports:
         - containerPort: 8000
         resources:
