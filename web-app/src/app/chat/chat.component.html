@@ -1,8 +1,8 @@
-<div class="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
-  <h2 class="text-xl font-semibold mb-4">Chat with OpenAI</h2>
+<div class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+  <h2 class="text-xl font-semibold mb-4">Chat with SpringBit</h2>
   <textarea
     [(ngModel)]="prompt"
-    placeholder="Enter your prompt..."
+    placeholder="What is the correlation between bitcoin and ethereum last year?..."
     class="w-full p-3 border border-gray-300 rounded-md"
   ></textarea>
   <button
@@ -12,8 +12,19 @@
   >
     {{ loading ? 'Loading...' : 'Send' }}
   </button>
-  <div *ngIf="response" class="mt-4 p-3 bg-gray-100 rounded-md">
-    <strong>Crypto Chat:</strong>
-    <p>{{ response }}</p>
+  <!-- Chat Messages Container -->
+  <div
+    #chatContainer
+    class="flex flex-col space-y-3 overflow-y-auto max-h-[400px] pr-2"
+    (scroll)="checkScrollHeight()"
+  >
+    <div
+      *ngFor="let msg of history; let i = index"
+      [@fadeIn]
+      class="mt-4 p-3 rounded-md max-w-full"
+      [ngClass]="msg.sender === 'user' ? 'bg-gray-50 text-blue-900 self-end' : 'bg-gray-100 text-gray-900 self-start'"
+    >
+      <p class="whitespace-pre-wrap break-words">{{ msg.text }}</p>
+    </div>
   </div>
 </div>

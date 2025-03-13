@@ -92,9 +92,10 @@ export class CryptoService {
     return this.http.post<CryptoInfo>(this.mlUrl + "crypto/info", cryptoInfoRequest);
   }
 
-  sendPrompt(prompt: string) {
+  sendPrompt(prompt: string, history: {sender: string, text: string}[]) {
     const promptRequest = {
-      prompt: prompt
+      prompt: prompt,
+      history: history
     };
     return this.http.post<Chat>(this.mlUrl + "crypto/chat", promptRequest);
   }

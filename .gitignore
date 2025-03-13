@@ -53,3 +53,4 @@ terraform/terraform.tfstate.backup
 .venv
 **/__pycache__/
 spring-bit-ml/logs/
+spring-bit-ml/notebooks/.env
