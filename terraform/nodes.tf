@@ -9,6 +9,7 @@ resource "aws_iam_instance_profile" "k8s_instance_profile" {
   role = "SpringbitInstanceRole"
 }
 
+
 # Associate the Elastic IP with the EC2 instance
 resource "aws_eip_association" "control_plane_eip_association" {
   instance_id   = aws_instance.k8s_control_plane.id
@@ -26,7 +27,7 @@ resource "aws_instance" "k8s_control_plane" {
   iam_instance_profile = aws_iam_instance_profile.k8s_instance_profile.name
 
   # Associate the Elastic IP
-  associate_public_ip_address = true
+  associate_public_ip_address = false
 
 #  instance_market_options {
 #    market_type = "spot"
@@ -47,30 +48,30 @@ resource "aws_instance" "k8s_control_plane" {
     Value = "${var.springbit_tag}-k8s-master"
   }
 
-  provisioner "file" {
-    source      = "scripts"
-    destination = "/tmp"
-  }
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo apt-get update -y -qq > /dev/null 2>&1
+              sudo apt-get install -y -qq apt-transport-https ca-certificates curl unzip net-tools
 
-  provisioner "remote-exec" {
-    inline = [
-      "chmod -R +x /tmp/scripts/",
-      "/tmp/scripts/master-setup.sh",
-      "/tmp/scripts/create-k8s-join.sh ${var.springbit_s3_bucket}",
-      "/tmp/scripts/fix-coredns.sh",
-      "/tmp/scripts/pull-s3-bucket.sh ${var.springbit_s3_bucket}",
-      "/tmp/scripts/create-certs-secret.sh ${var.springbit_certs_s3_bucket}",
-      "/tmp/scripts/springbit-k8s.sh",
-#      "/tmp/hubble-setup.sh",
-    ]
-  }
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = file(var.instance_ssh_key)
-    host        = self.public_ip
-  }
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip -q awscliv2.zip
+              sudo ./aws/install
+              rm -rf awscliv2.zip aws
+
+              sudo mkdir -p /hostdata
+              sudo aws s3 sync s3://${var.springbit_s3_bucket} /hostdata --quiet
+
+              chmod -R +x /hostdata/scripts/
+              /hostdata/scripts/master-setup.sh
+              /hostdata/scripts/fix-coredns.sh
+              /hostdata/scripts/create-k8s-join.sh ${var.springbit_s3_bucket}
+              /hostdata/scripts/pull-s3-bucket.sh ${var.springbit_s3_bucket}
+              /hostdata/scripts/create-certs-secret.sh ${var.springbit_certs_s3_bucket}
+              /hostdata/scripts/springbit-k8s.sh
+              /hostdata/scripts/kubectl-add-user.sh ubuntu
+              EOF
 }
+
 
 
 resource "aws_instance" "k8s_node" {
@@ -84,6 +85,8 @@ resource "aws_instance" "k8s_node" {
   depends_on = [aws_instance.k8s_control_plane]
 
   iam_instance_profile = aws_iam_instance_profile.k8s_instance_profile.name
+
+  associate_public_ip_address = true
 
   # Configure the root EBS volume
   root_block_device {
@@ -113,10 +116,6 @@ resource "aws_instance" "k8s_node" {
               chmod -R +x /hostdata/scripts/
               /hostdata/scripts/worker-setup.sh ${var.springbit_s3_bucket}
               /hostdata/scripts/pull-s3-bucket.sh ${var.springbit_s3_bucket}
+              /hostdata/scripts/kubectl-add-user.sh ubuntu
               EOF
-
-  provisioner "file" {
-    source      = "scripts"
-    destination = "/tmp"
-  }
 }

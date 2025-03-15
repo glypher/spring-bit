@@ -16,12 +16,6 @@ variable "availability_zone"  {
   default     = "us-east-1c"
 }
 
-variable "instance_ssh_key"  {
-  description = "The private key in the used key pair to ssh to the ec2 instances"
-  type        = string
-  default     = "~/.ssh/springbit.key"
-}
-
 variable "master_instance_size"  {
   description = "The EC2 instance to run k8s control plane"
   type        = string

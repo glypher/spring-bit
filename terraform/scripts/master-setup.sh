@@ -2,14 +2,6 @@
 
 source "$(dirname "$0")/utils.sh"
 
-sudo apt-get update -y -qq > /dev/null 2>&1
-sudo apt-get install -y -qq apt-transport-https ca-certificates curl unzip net-tools
-
-# Install aws cli
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip -q awscliv2.zip
-sudo ./aws/install
-rm -rf awscliv2.zip aws
 
 ###############################################################
 # Install K8s, containerd, runc, Cilium CNI and Helm packages #
@@ -87,6 +79,8 @@ sudo kubeadm init \
     --skip-phases=addon/kube-proxy \
     --apiserver-advertise-address=$IPV4 \
     --cri-socket unix:///run/containerd/containerd.sock
+#    --apiserver-cert-extra-sans=springbit.org \
+
 # Force to listen to IPV4
 sudo sed -i "/- kube-apiserver/a\ \ \ \ - --bind-address=$IPV4" /etc/kubernetes/manifests/kube-apiserver.yaml
 sudo systemctl restart kubelet

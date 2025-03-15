@@ -1,6 +1,7 @@
 # Create a VPC
 resource "aws_vpc" "k8s_vpc" {
   cidr_block           = "172.20.0.0/16"
+
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
@@ -13,7 +14,8 @@ resource "aws_vpc" "k8s_vpc" {
 resource "aws_subnet" "k8s_subnet" {
   vpc_id                  = aws_vpc.k8s_vpc.id
   cidr_block              = "172.20.1.0/24"
-  map_public_ip_on_launch = true
+
+  map_public_ip_on_launch = false
   availability_zone       = var.availability_zone
   tags = {
     Name = var.springbit_tag
@@ -38,7 +40,7 @@ resource "aws_route_table" "k8s_route_table" {
     gateway_id = aws_internet_gateway.k8s_igw.id
   }
   tags = {
-    Name = var.springbit_tag
+    Name  = var.springbit_tag
     Value = "${var.springbit_tag}-k8s-route-table"
   }
 }
@@ -78,6 +80,7 @@ resource "aws_security_group" "k8s_sg" {
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
   }
+
 
   # Allow all traffic within the VPC
   ingress {
