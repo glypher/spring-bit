@@ -152,3 +152,4 @@ jobs:
       if: github.event_name != 'pull_request'
       run: |
         aws s3 sync data s3://${{secrets.AWS_S3_BUCKET}} --delete
+        aws s3 sync terraform/scripts s3://${{secrets.AWS_S3_BUCKET}}/scripts --delete

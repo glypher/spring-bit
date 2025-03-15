@@ -7,15 +7,6 @@ fi
 
 source "$(dirname "$0")/utils.sh"
 
-sudo apt-get update -y -qq > /dev/null 2>&1
-sudo apt-get install -y -qq apt-transport-https ca-certificates curl unzip net-tools
-
-# Install aws cli
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip -q awscliv2.zip
-sudo ./aws/install
-rm -rf awscliv2.zip aws
-
 
 ##########################################################################
 # Install K8s, containerd, runc, Cilium agent will be deployed by master #

@@ -85,8 +85,6 @@ resource "aws_instance" "k8s_node" {
 
   iam_instance_profile = aws_iam_instance_profile.k8s_instance_profile.name
 
-  associate_public_ip_address = true
-
   # Configure the root EBS volume
   root_block_device {
     volume_size = var.worker_instance_ebs_size
@@ -99,22 +97,26 @@ resource "aws_instance" "k8s_node" {
     Value = "${var.springbit_tag}-k8s-worker-${count.index + 1}"
   }
 
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo apt-get update -y -qq > /dev/null 2>&1
+              sudo apt-get install -y -qq apt-transport-https ca-certificates curl unzip net-tools
+
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip -q awscliv2.zip
+              sudo ./aws/install
+              rm -rf awscliv2.zip aws
+
+              sudo mkdir -p /hostdata
+              sudo aws s3 sync s3://${var.springbit_s3_bucket} /hostdata --quiet
+
+              chmod -R +x /hostdata/scripts/
+              /hostdata/scripts/worker-setup.sh ${var.springbit_s3_bucket}
+              /hostdata/scripts/pull-s3-bucket.sh ${var.springbit_s3_bucket}
+              EOF
+
   provisioner "file" {
     source      = "scripts"
     destination = "/tmp"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod -R +x /tmp/scripts/",
-      "/tmp/scripts/worker-setup.sh ${var.springbit_s3_bucket}",
-      "/tmp/scripts/pull-s3-bucket.sh ${var.springbit_s3_bucket}"
-    ]
-  }
-  connection {
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = file(var.instance_ssh_key)
-    host        = self.public_ip
   }
 }
