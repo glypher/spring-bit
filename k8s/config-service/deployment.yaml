@@ -39,7 +39,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
-                  - key: springbit.org/backend
+                  - key: springbit.org/frontend
                     operator: In
                     values:
                       - "yes"
